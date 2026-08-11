@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.tokenizer_cache/
+packed/*.bin
+packed/meta.json
+tokenizer/*.model
+tokenizer/*.vocab
+runs/
+reference_models/
+data/*
+!data/.gitkeep

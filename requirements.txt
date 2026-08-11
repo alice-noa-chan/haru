@@ -1,0 +1,5 @@
+torch==2.12.1
+numpy==2.5.0
+sentencepiece==0.2.1
+transformers==5.12.1
+safetensors==0.8.0
