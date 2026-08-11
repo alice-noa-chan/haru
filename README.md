@@ -231,3 +231,9 @@ T4 uses fp16 with gradient scaling; L4 uses bf16.
 
 The training corpus is not included in this repository or model release. The
 minimal attribution required by its license is recorded in [NOTICE.md](NOTICE.md).
+
+## License
+
+Haru source code and model weights are released under the
+[MIT License](LICENSE). The training dataset remains subject to its separate
+CC BY 4.0 license described in [NOTICE.md](NOTICE.md).
