@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 from pathlib import Path
 
 import torch
@@ -36,6 +37,7 @@ def build_model_card(checkpoint: dict, model_config: ModelConfig, parameter_coun
 library_name: transformers
 pipeline_tag: text-generation
 language: ko
+license: mit
 tags:
 - haru
 - cfrd
@@ -98,6 +100,10 @@ print(tokenizer.decode(output[0], skip_special_tokens=True))
 - Longer generations can repeat ideas or drift between entities.
 - The model is not suitable for factual or safety-critical use.
 - There is no inference cache yet, so generation recomputes the active context.
+
+## License
+
+Haru model weights and included code are released under the MIT License.
 """
 
 
@@ -177,6 +183,7 @@ def main() -> None:
     export_directory.mkdir(parents=True, exist_ok=True)
     hf_model.save_pretrained(export_directory, safe_serialization=True)
     hf_tokenizer.save_pretrained(export_directory)
+    shutil.copy2(config.CODE_DIR / "LICENSE", export_directory / "LICENSE")
 
     generation_config = GenerationConfig(
         max_new_tokens=config.GENERATION_MAX_NEW_TOKENS,

@@ -229,3 +229,8 @@ a GPU uses fp16 with gradient scaling; a GPU uses bf16.
 ## Training data notice
 
 The training corpus is not distributed with the code or model weights.
+
+## License
+
+Haru source code and model weights are released under the
+[MIT License](LICENSE).
