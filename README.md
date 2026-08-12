@@ -1,5 +1,11 @@
 # Haru
 
+<p align="center">
+  <img src="assets/haru.png" alt="Haru character" width="420">
+</p>
+
+<p align="center"><strong>Haru</strong> — the character representing Haru in the model family.</p>
+
 Haru is a compact Korean story continuation language model. Its custom Causal
 Folded Recurrent Decoder (CFRD) uses local causal attention, compressed summary
 memory, and reusable decoder cells. The released checkpoint has 6.8 million
