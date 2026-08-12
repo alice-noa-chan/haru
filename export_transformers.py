@@ -30,7 +30,45 @@ def select_checkpoint() -> Path:
     return path
 
 
-def build_model_card(checkpoint: dict, model_config: ModelConfig, parameter_count: int) -> str:
+def load_evaluation_results() -> dict[str, float | int]:
+    """Load metrics produced by evaluate.py for the active run, if present."""
+
+    path = config.RUN_DIR / "evaluation.json"
+    if not path.exists():
+        return {}
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError(f"Evaluation output must be a JSON object: {path}")
+    return payload
+
+
+def build_evaluation_table(model_config: ModelConfig, evaluation: dict[str, float | int]) -> str:
+    """Render only metrics that belong to the checkpoint's active run."""
+
+    rows = []
+    for depth in model_config.exit_depths:
+        loss = evaluation.get(f"depth_{depth}_loss")
+        perplexity = evaluation.get(f"depth_{depth}_perplexity")
+        if loss is None or perplexity is None:
+            continue
+        rows.append(f"| {depth} | {float(loss):.5f} | {float(perplexity):.3f} |")
+    if not rows:
+        return "Evaluation metrics are not included in this export. Run `python evaluate.py` before exporting."
+    return "\n".join(
+        [
+            "| Recurrent depth | Validation loss | Perplexity |",
+            "|---:|---:|---:|",
+            *rows,
+        ]
+    )
+
+
+def build_model_card(
+    checkpoint: dict,
+    model_config: ModelConfig,
+    parameter_count: int,
+    evaluation: dict[str, float | int],
+) -> str:
     """Create a small self-contained README for the exported model directory."""
 
     return f"""---
@@ -44,7 +82,7 @@ tags:
 - custom-code
 ---
 
-# Haru
+# Haru v{config.RELEASE_VERSION}
 
 Haru is a compact Korean story continuation model built with the custom CFRD
 causal architecture. It has {parameter_count:,} parameters and supports
@@ -52,6 +90,7 @@ recurrent inference depths 2, 4, and 6.
 
 - [Source code](https://github.com/alice-noa-chan/haru)
 - [Interactive demo](https://huggingface.co/spaces/gaon12/haru)
+- [Previous Haru release](https://huggingface.co/{config.PREVIOUS_HUGGINGFACE_MODEL_ID})
 
 ## Usage
 
@@ -60,7 +99,7 @@ Review the included Python files before enabling remote custom code.
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-MODEL_ID = "gaon12/haru"
+MODEL_ID = "{config.HUGGINGFACE_MODEL_ID}"
 tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained(MODEL_ID, trust_remote_code=True)
 
@@ -88,11 +127,7 @@ print(tokenizer.decode(output[0], skip_special_tokens=True))
 
 ## Evaluation
 
-| Recurrent depth | Validation loss | Perplexity |
-|---:|---:|---:|
-| 2 | 2.37096 | 10.708 |
-| 4 | 2.06052 | 7.850 |
-| 6 | 2.00630 | 7.436 |
+{build_evaluation_table(model_config, evaluation)}
 
 ## Training data attribution
 
@@ -211,6 +246,7 @@ def main() -> None:
             checkpoint,
             model_config,
             sum(parameter.numel() for parameter in hf_model.parameters()),
+            load_evaluation_results(),
         ),
         encoding="utf-8",
     )
@@ -220,6 +256,8 @@ def main() -> None:
                 "source_checkpoint": str(checkpoint_path.relative_to(config.ROOT_DIR)),
                 "source_checkpoint_step": int(checkpoint.get("step", 0)),
                 "tokenizer_blake2b16": blake2b_file(config.TOKENIZER_MODEL_PATH),
+                "release_version": config.RELEASE_VERSION,
+                "huggingface_model_id": config.HUGGINGFACE_MODEL_ID,
             },
             indent=2,
         ),
