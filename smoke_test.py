@@ -15,8 +15,10 @@ from counterfactual_data import (
     RELATION_CATEGORIES,
     TRAIN_ENTITIES,
     VALIDATION_ENTITIES,
+    CounterfactualPair,
     CounterfactualSampler,
 )
+from counterfactual_objective import counterfactual_ranking_result, encode_counterfactual_pairs
 from model import CFRDLanguageModel, ModelConfig, count_parameters
 from modeling_cfrd import CFRDForCausalLM
 from surface_features import SURFACE_FEATURE_DIM
@@ -326,6 +328,41 @@ def test_counterfactual_sampler() -> None:
     assert {pair.template_id for pair in first_batch}.isdisjoint(pair.template_id for pair in validation_batch)
 
 
+def test_counterfactual_objective_backward() -> None:
+    class CharacterTokenizer:
+        pad_id = 0
+
+        def encode(self, text: str, add_bos: bool = False, add_eos: bool = False) -> list[int]:
+            ids = [4 + (ord(character) % (TEST_VOCAB_SIZE - 4)) for character in text]
+            return ([2] if add_bos else []) + ids + ([3] if add_eos else [])
+
+    pair = CounterfactualPair(
+        category="test",
+        template_id="test:0",
+        entity_a="A",
+        entity_b="B",
+        prompt_a="A=x; B=y; A?",
+        prompt_b="A=y; B=x; A?",
+        candidates=("x", "y"),
+    )
+    model = build_test_model()
+    batch = encode_counterfactual_pairs(
+        (pair,),
+        CharacterTokenizer(),
+        context_length=TEST_CONTEXT_LENGTH,
+        device=torch.device("cpu"),
+    )
+    result = counterfactual_ranking_result(model, batch, margin=0.5)
+    result.loss.backward()
+
+    assert batch.input_ids.shape[0] == 4
+    assert batch.score_mask.sum().item() == 4
+    assert torch.isfinite(result.loss)
+    assert 0.0 <= result.decision_accuracy.item() <= 1.0
+    assert 0.0 <= result.strict_pair_accuracy.item() <= 1.0
+    assert model.token_embedding.weight.grad is not None
+
+
 def main() -> None:
     test_shapes()
     test_backward_pass()
@@ -336,6 +373,7 @@ def main() -> None:
     test_exact_sampler_resume()
     test_transformers_auto_model_roundtrip()
     test_counterfactual_sampler()
+    test_counterfactual_objective_backward()
     test_transformers_tokenizer_roundtrip()
     print_default_parameter_count()
     print("smoke tests passed")
