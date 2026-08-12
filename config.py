@@ -14,12 +14,12 @@ CODE_DIR = Path(__file__).resolve().parent
 ROOT_DIR = Path(os.environ.get("HARU_STORAGE_DIR", os.environ.get("CFRD_STORAGE_DIR", CODE_DIR))).resolve()
 DATA_DIR = ROOT_DIR / "data"
 TOKENIZER_DIR = ROOT_DIR / "tokenizer"
-PACKED_DIR = ROOT_DIR / "packed"
-RUN_NAME = "haru"
+RUN_NAME = "haru-v2-binding"
+PACKED_DIR = ROOT_DIR / "packed" / RUN_NAME
 RUN_DIR = ROOT_DIR / "runs" / RUN_NAME
 
-TOKENIZER_MODEL_PATH = TOKENIZER_DIR / "tiny_ko_8k.model"
-TOKENIZER_VOCAB_PATH = TOKENIZER_DIR / "tiny_ko_8k.vocab"
+TOKENIZER_MODEL_PATH = TOKENIZER_DIR / "tiny_ko_12k.model"
+TOKENIZER_VOCAB_PATH = TOKENIZER_DIR / "tiny_ko_12k.vocab"
 TRAIN_BIN_PATH = PACKED_DIR / "train.bin"
 VAL_BIN_PATH = PACKED_DIR / "val.bin"
 PACKED_META_PATH = PACKED_DIR / "meta.json"
@@ -47,7 +47,7 @@ NEWLINE_ESCAPE_TOKEN = "<|literal_nl|>"
 # ============================================================================
 # Tokenizer
 # ============================================================================
-TOKENIZER_VOCAB_SIZE = 8192
+TOKENIZER_VOCAB_SIZE = 12_000
 TOKENIZER_MODEL_TYPE = "unigram"
 TOKENIZER_CHARACTER_COVERAGE = 1.0
 TOKENIZER_BYTE_FALLBACK = True
@@ -63,7 +63,8 @@ EOS_ID = 3
 # ============================================================================
 # CFRD (Causal Folded Recurrent Decoder)
 # ============================================================================
-# The default model targets roughly seven million trainable parameters.
+# The next-generation training default stays within the 8-12 million parameter
+# budget while giving tokens more independent processing capacity.
 CONTEXT_LENGTH = 512
 CHUNK_SIZE = 64
 D_MODEL = 384
@@ -82,9 +83,14 @@ MEMORY_HEADS = 4
 # This gives long-range memory an explicit sense of event order.
 MEMORY_RECENCY_BIAS_INIT = 0.10
 
-# Two physical cells are reused in alternating order for six recurrent steps.
-PHYSICAL_CELLS = 2
+# Three physical cells are reused in alternating order for six recurrent steps.
+PHYSICAL_CELLS = 3
 RECURRENCES = 6
+
+# Finish the recurrent stack with one non-recurrent, full-context causal block.
+# This gives entity-role bindings an independent path that is not forced through
+# the shared local cells or compressed summary memory.
+USE_BINDING_BLOCK = True
 
 # Apply the shared LM head at recurrent depths 2, 4, and 6 during training.
 # Depth 6 is the main objective; earlier depths receive auxiliary supervision.

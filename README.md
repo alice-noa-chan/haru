@@ -2,9 +2,10 @@
 
 Haru is a compact Korean story continuation language model. Its custom Causal
 Folded Recurrent Decoder (CFRD) uses local causal attention, compressed summary
-memory, and two reusable decoder cells. The trained model has 6.8 million
+memory, and reusable decoder cells. The released checkpoint has 6.8 million
 parameters and can trade inference cost for quality with recurrent depths 2,
-4, and 6.
+4, and 6. The repository's next-training defaults add independent capacity and
+a final full-context binding block without modifying that released checkpoint.
 
 - GitHub: [alice-noa-chan/haru](https://github.com/alice-noa-chan/haru)
 - Model: [gaon12/haru](https://huggingface.co/gaon12/haru)
@@ -13,7 +14,7 @@ parameters and can trade inference cost for quality with recurrent depths 2,
 Haru is a research prototype for story continuation. It is not an instruction
 model, a factual assistant, or a safety-reviewed product.
 
-## Model at a glance
+## Released model at a glance
 
 | Setting | Value |
 |---|---:|
@@ -36,6 +37,24 @@ A -> B -> A -> B -> A -> B
 
 The shared language-model head supervises depths 2, 4, and 6. Depth 4 is a
 useful CPU setting; depth 6 gives the best measured validation quality.
+
+## Next-training defaults
+
+New training runs use a separate `haru-v2-binding` directory and a separate
+12,000-token tokenizer. They do not overwrite the released model's artifacts.
+
+| Setting | Value |
+|---|---:|
+| Vocabulary | 12,000 |
+| Physical decoder cells | 3 |
+| Recurrent depth | 6 |
+| Full-context binding block | enabled |
+| Trainable parameters | 11,634,459 |
+
+The extra cell reduces forced parameter sharing. The final binding block gives
+all tokens one independent causal-attention pass after the recurrent stack,
+so entity, role, and attribute evidence need not survive only through local
+chunks and compressed summaries.
 
 ## Install
 
@@ -102,6 +121,11 @@ Summary memory has a learned per-head recency bias. Korean token embeddings
 also receive a small projection of onset, vowel, coda, word-boundary, digit,
 ASCII, punctuation, byte-fallback, and token-length features.
 
+The next-training configuration then applies a non-recurrent full-context
+causal attention and SwiGLU block before the shared language-model head. Older
+configuration files do not enable this block, so existing exports remain
+loadable with their original architecture.
+
 See [RESEARCH.md](RESEARCH.md) for related work.
 
 ## Evaluation
@@ -158,7 +182,9 @@ python evaluate.py
 ```
 
 Review model, optimizer, schedule, and path settings in `config.py` first. Use
-a new `RUN_NAME` when changing an architecture or training schedule.
+a new `RUN_NAME` when changing an architecture or training schedule. The
+current defaults already isolate the new tokenizer, packed data, checkpoints,
+and logs under `haru-v2-binding` paths.
 
 ### 6. Export
 

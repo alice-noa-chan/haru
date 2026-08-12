@@ -286,11 +286,12 @@ def test_transformers_tokenizer_roundtrip() -> None:
 
 
 def print_default_parameter_count() -> None:
-    cfg = ModelConfig(vocab_size=config.TOKENIZER_VOCAB_SIZE)
+    cfg = ModelConfig.from_project_settings(config, config.TOKENIZER_VOCAB_SIZE)
     dummy_features = torch.zeros(config.TOKENIZER_VOCAB_SIZE, SURFACE_FEATURE_DIM)
     model = CFRDLanguageModel(cfg, dummy_features)
     counts = count_parameters(model)
-    assert counts["total"] == 6_793_363
+    assert counts["total"] == 11_634_459
+    assert 8_000_000 <= counts["total"] <= 12_000_000
     print(f"default total parameters: {counts['total']:,}")
 
 
