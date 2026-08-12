@@ -43,8 +43,7 @@ def seed_everything(seed: int) -> None:
 def load_packed_meta() -> dict[str, Any]:
     if not config.PACKED_META_PATH.exists():
         raise FileNotFoundError(
-            f"Packed metadata does not exist: {config.PACKED_META_PATH}\n"
-            "Run `python prepare_data.py` first."
+            f"Packed metadata does not exist: {config.PACKED_META_PATH}\nRun `python prepare_data.py` first."
         )
     return json.loads(config.PACKED_META_PATH.read_text(encoding="utf-8"))
 
@@ -75,9 +74,7 @@ def validate_packed_data(meta: dict[str, Any], tokenizer: StoryTokenizer) -> Non
     if config.STRICT_DATA_FINGERPRINT:
         current_files = dataset_fingerprint()
         if current_files != meta.get("data_files"):
-            raise ValueError(
-                "Source files changed after packing; run prepare_data.py again"
-            )
+            raise ValueError("Source files changed after packing; run prepare_data.py again")
 
 
 def open_token_stream(path: Path) -> np.memmap:
@@ -100,9 +97,7 @@ def get_random_batch(
     starts = rng.integers(0, max_start + 1, size=batch_size, endpoint=False)
 
     # Copy memmap slices explicitly to avoid read-only tensor warnings.
-    x_np = np.stack(
-        [np.array(data[start : start + context_length], dtype=np.int64, copy=True) for start in starts]
-    )
+    x_np = np.stack([np.array(data[start : start + context_length], dtype=np.int64, copy=True) for start in starts])
     y_np = np.stack(
         [np.array(data[start + 1 : start + context_length + 1], dtype=np.int64, copy=True) for start in starts]
     )
@@ -272,8 +267,7 @@ def restore_checkpoint(
         saved_model_config["exit_depths"] = tuple(saved_model_config["exit_depths"])
     if saved_model_config != asdict(model_cfg):
         raise ValueError(
-            "Checkpoint model configuration differs from config.py. "
-            "Use a new RUN_NAME for a new architecture."
+            "Checkpoint model configuration differs from config.py. Use a new RUN_NAME for a new architecture."
         )
 
     if checkpoint.get("optimizer_config") != optimizer_settings():
@@ -402,9 +396,7 @@ def main() -> None:
     train_data = open_token_stream(config.TRAIN_BIN_PATH)
     val_data = open_token_stream(config.VAL_BIN_PATH)
 
-    tokens_per_optimizer_step = (
-        config.BATCH_SIZE * config.CONTEXT_LENGTH * config.GRAD_ACCUM_STEPS
-    )
+    tokens_per_optimizer_step = config.BATCH_SIZE * config.CONTEXT_LENGTH * config.GRAD_ACCUM_STEPS
     max_steps = math.ceil(config.TARGET_TOKENS / tokens_per_optimizer_step)
 
     print("=" * 78, flush=True)
@@ -523,9 +515,7 @@ def main() -> None:
             )
 
             print(
-                f"validation step={current_step} "
-                f"loss={metrics['loss']:.4f} "
-                f"final={metrics['final_loss']:.4f}",
+                f"validation step={current_step} loss={metrics['loss']:.4f} final={metrics['final_loss']:.4f}",
                 flush=True,
             )
 

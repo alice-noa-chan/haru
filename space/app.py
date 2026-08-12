@@ -8,14 +8,17 @@ import gradio as gr
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-
 MODEL_ID = os.environ.get("HARU_MODEL_ID", "gaon12/haru")
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, trust_remote_code=True)
-model = AutoModelForCausalLM.from_pretrained(
-    MODEL_ID,
-    trust_remote_code=True,
-).cpu().eval()
+model = (
+    AutoModelForCausalLM.from_pretrained(
+        MODEL_ID,
+        trust_remote_code=True,
+    )
+    .cpu()
+    .eval()
+)
 
 
 @torch.inference_mode()

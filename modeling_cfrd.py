@@ -86,7 +86,7 @@ class CFRDForCausalLM(CFRDPreTrainedModel, GenerationMixin):
 
         return_dict = self.config.return_dict if return_dict is None else return_dict
         if not return_dict:
-            return ((loss, logits) if loss is not None else (logits,))
+            return (loss, logits) if loss is not None else (logits,)
         return CausalLMOutputWithPast(loss=loss, logits=logits, past_key_values=None)
 
     def _forward_padded_batch(

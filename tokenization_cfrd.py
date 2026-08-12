@@ -10,7 +10,6 @@ from pathlib import Path
 import sentencepiece as spm
 from transformers import PreTrainedTokenizer
 
-
 VOCAB_FILES_NAMES = {"vocab_file": "tokenizer.model"}
 
 
@@ -88,9 +87,7 @@ class CFRDTokenizer(PreTrainedTokenizer):
             return [1 if token_id in special_ids else 0 for token_id in token_ids_0]
         if token_ids_1 is not None:
             raise ValueError("CFRDTokenizer does not support paired sequences")
-        return ([1] if self.add_bos_token else []) + [0] * len(token_ids_0) + (
-            [1] if self.add_eos_token else []
-        )
+        return ([1] if self.add_bos_token else []) + [0] * len(token_ids_0) + ([1] if self.add_eos_token else [])
 
     def create_token_type_ids_from_sequences(
         self,

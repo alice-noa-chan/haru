@@ -1,14 +1,12 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 import numpy as np
 
 import config
 from data_utils import blake2b_file, dataset_fingerprint, is_validation_text, iter_text_records
 from tokenizer_utils import StoryTokenizer
-
 
 # Buffer tokens per split to avoid many tiny writes.
 WRITE_BUFFER_TOKENS = 1_000_000

@@ -52,11 +52,7 @@ def iter_data_files(data_dir: Path | None = None) -> list[Path]:
     if not root.exists():
         return []
 
-    files = [
-        path
-        for path in root.rglob("*")
-        if path.is_file() and path.suffix.lower() in {".txt", ".jsonl"}
-    ]
+    files = [path for path in root.rglob("*") if path.is_file() and path.suffix.lower() in {".txt", ".jsonl"}]
     return sorted(files, key=lambda p: p.as_posix())
 
 
@@ -65,9 +61,7 @@ def iter_text_records(data_dir: Path | None = None) -> Iterator[TextRecord]:
 
     files = iter_data_files(data_dir)
     if not files:
-        raise FileNotFoundError(
-            f"No training data found. Add .txt or .jsonl files under {config.DATA_DIR}"
-        )
+        raise FileNotFoundError(f"No training data found. Add .txt or .jsonl files under {config.DATA_DIR}")
 
     for path in files:
         suffix = path.suffix.lower()
@@ -85,25 +79,15 @@ def iter_text_records(data_dir: Path | None = None) -> Iterator[TextRecord]:
                     try:
                         row = json.loads(raw_line)
                     except json.JSONDecodeError as exc:
-                        raise ValueError(
-                            f"Invalid JSONL at {path}:{line_number}: {exc}"
-                        ) from exc
+                        raise ValueError(f"Invalid JSONL at {path}:{line_number}: {exc}") from exc
 
                     if not isinstance(row, dict):
-                        raise ValueError(
-                            f"JSONL record must be an object: {path}:{line_number}"
-                        )
+                        raise ValueError(f"JSONL record must be an object: {path}:{line_number}")
                     if config.JSONL_TEXT_KEY not in row:
-                        raise KeyError(
-                            f"JSONL record is missing {config.JSONL_TEXT_KEY!r}: "
-                            f"{path}:{line_number}"
-                        )
+                        raise KeyError(f"JSONL record is missing {config.JSONL_TEXT_KEY!r}: {path}:{line_number}")
                     text_value = row[config.JSONL_TEXT_KEY]
                     if not isinstance(text_value, str):
-                        raise TypeError(
-                            f"JSONL field {config.JSONL_TEXT_KEY!r} must be a string: "
-                            f"{path}:{line_number}"
-                        )
+                        raise TypeError(f"JSONL field {config.JSONL_TEXT_KEY!r} must be a string: {path}:{line_number}")
                     text = text_value
 
                 text = normalize_text(text)
