@@ -37,6 +37,7 @@ class CFRDConfig(PretrainedConfig):
         aux_exit_loss_weight: float = 0.15,
         residual_gate_init: float = -1.0,
         memory_gain_init: float = 0.0,
+        use_binding_block: bool = False,
         use_surface_features: bool = True,
         surface_feature_dim: int = 76,
         surface_feature_gain_init: float = 0.10,
@@ -66,6 +67,7 @@ class CFRDConfig(PretrainedConfig):
         self.aux_exit_loss_weight = aux_exit_loss_weight
         self.residual_gate_init = residual_gate_init
         self.memory_gain_init = memory_gain_init
+        self.use_binding_block = use_binding_block
         self.use_surface_features = use_surface_features
         self.surface_feature_dim = surface_feature_dim
         self.surface_feature_gain_init = surface_feature_gain_init
@@ -117,6 +119,7 @@ class CFRDConfig(PretrainedConfig):
             aux_exit_loss_weight=model_config.aux_exit_loss_weight,
             residual_gate_init=model_config.residual_gate_init,
             memory_gain_init=model_config.memory_gain_init,
+            use_binding_block=model_config.use_binding_block,
             use_surface_features=model_config.use_surface_features,
             surface_feature_dim=model_config.surface_feature_dim,
             surface_feature_gain_init=model_config.surface_feature_gain_init,
@@ -151,6 +154,7 @@ class CFRDConfig(PretrainedConfig):
             aux_exit_loss_weight=self.aux_exit_loss_weight,
             residual_gate_init=self.residual_gate_init,
             memory_gain_init=self.memory_gain_init,
+            use_binding_block=self.use_binding_block,
             use_surface_features=self.use_surface_features,
             surface_feature_dim=self.surface_feature_dim,
             surface_feature_gain_init=self.surface_feature_gain_init,

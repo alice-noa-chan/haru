@@ -36,6 +36,7 @@ class ModelConfig:
     aux_exit_loss_weight: float = 0.15
     residual_gate_init: float = -1.0
     memory_gain_init: float = 0.0
+    use_binding_block: bool = False
     use_surface_features: bool = True
     surface_feature_dim: int = SURFACE_FEATURE_DIM
     surface_feature_gain_init: float = 0.10
@@ -118,6 +119,7 @@ class ModelConfig:
             aux_exit_loss_weight=settings.AUX_EXIT_LOSS_WEIGHT,
             residual_gate_init=settings.RESIDUAL_GATE_INIT,
             memory_gain_init=settings.MEMORY_GAIN_INIT,
+            use_binding_block=getattr(settings, "USE_BINDING_BLOCK", False),
             use_surface_features=settings.USE_KOREAN_SURFACE_FEATURES,
             surface_feature_dim=SURFACE_FEATURE_DIM,
             surface_feature_gain_init=settings.SURFACE_FEATURE_GAIN_INIT,
@@ -262,6 +264,52 @@ class LocalCausalAttention(nn.Module):
         y = self.o_proj(y)
         y = y.view(batch, chunk_count, chunk, channels).reshape(batch, padded_time, channels)
         return y[:, :time, :]
+
+
+class FullCausalAttention(nn.Module):
+    """One full-context causal attention pass used for final variable binding."""
+
+    def __init__(self, cfg: ModelConfig) -> None:
+        super().__init__()
+
+        self.n_head = cfg.n_head
+        self.n_kv_head = cfg.n_kv_head
+        self.head_dim = cfg.d_model // cfg.n_head
+        self.dropout = cfg.dropout
+
+        self.q_proj = nn.Linear(cfg.d_model, cfg.n_head * self.head_dim, bias=False)
+        self.k_proj = nn.Linear(cfg.d_model, cfg.n_kv_head * self.head_dim, bias=False)
+        self.v_proj = nn.Linear(cfg.d_model, cfg.n_kv_head * self.head_dim, bias=False)
+        self.o_proj = nn.Linear(cfg.d_model, cfg.d_model, bias=False)
+
+    def forward(
+        self,
+        x: torch.Tensor,
+        rope_cos: torch.Tensor,
+        rope_sin: torch.Tensor,
+    ) -> torch.Tensor:
+        batch, time, channels = x.shape
+
+        q = self.q_proj(x).view(batch, time, self.n_head, self.head_dim).transpose(1, 2)
+        k = self.k_proj(x).view(batch, time, self.n_kv_head, self.head_dim).transpose(1, 2)
+        v = self.v_proj(x).view(batch, time, self.n_kv_head, self.head_dim).transpose(1, 2)
+
+        cos = rope_cos[:time].view(1, 1, time, -1)
+        sin = rope_sin[:time].view(1, 1, time, -1)
+        q = apply_rope(q, cos, sin)
+        k = apply_rope(k, cos, sin)
+
+        y = F.scaled_dot_product_attention(
+            q,
+            k,
+            v,
+            attn_mask=None,
+            dropout_p=self.dropout if self.training else 0.0,
+            is_causal=True,
+            enable_gqa=self.n_head != self.n_kv_head,
+        )
+        y = y.transpose(1, 2).contiguous().view(batch, time, channels)
+        return self.o_proj(y)
 
 
 class CausalSummaryMemory(nn.Module):
@@ -409,6 +457,40 @@ class SwiGLU(nn.Module):
         return self.dropout(self.w2(F.silu(self.w1(x)) * self.w3(x)))
 
 
+class BindingBlock(nn.Module):
+    """Independent final block for exact token-to-role and long-range binding."""
+
+    def __init__(self, cfg: ModelConfig) -> None:
+        super().__init__()
+
+        self.attn_norm = RMSNorm(cfg.d_model)
+        self.ffn_norm = RMSNorm(cfg.d_model)
+        self.attention = FullCausalAttention(cfg)
+        self.ffn = SwiGLU(cfg)
+        self.attn_gate = nn.Linear(cfg.d_model, 1, bias=True)
+        self.ffn_gate = nn.Linear(cfg.d_model, 1, bias=True)
+        self.residual_scale = 1.0 / math.sqrt(2.0)
+
+        nn.init.zeros_(self.attn_gate.weight)
+        nn.init.constant_(self.attn_gate.bias, cfg.residual_gate_init)
+        nn.init.zeros_(self.ffn_gate.weight)
+        nn.init.constant_(self.ffn_gate.bias, cfg.residual_gate_init)
+
+    def forward(
+        self,
+        x: torch.Tensor,
+        rope_cos: torch.Tensor,
+        rope_sin: torch.Tensor,
+    ) -> torch.Tensor:
+        u = self.attn_norm(x)
+        attention_update = self.attention(u, rope_cos, rope_sin)
+        x = x + self.residual_scale * torch.sigmoid(self.attn_gate(u)) * attention_update
+
+        v = self.ffn_norm(x)
+        ffn_update = self.ffn(v)
+        return x + self.residual_scale * torch.sigmoid(self.ffn_gate(v)) * ffn_update
+
+
 class FoldedCell(nn.Module):
     """One physical recurrent cell whose parameters are reused across depths."""
 
@@ -517,6 +599,7 @@ class CFRDLanguageModel(nn.Module):
             self.surface_gain = None
 
         self.cells = nn.ModuleList([FoldedCell(cfg) for _ in range(cfg.physical_cells)])
+        self.binding_block = BindingBlock(cfg) if cfg.use_binding_block else None
 
         # Small FiLM parameters let a reused cell specialize by recurrent depth.
         self.attn_phase_scale = nn.Parameter(torch.zeros(cfg.recurrences, cfg.d_model))
@@ -560,6 +643,14 @@ class CFRDLanguageModel(nn.Module):
             nn.init.constant_(cell.attn_gate.bias, self.cfg.residual_gate_init)
             nn.init.zeros_(cell.ffn_gate.weight)
             nn.init.constant_(cell.ffn_gate.bias, self.cfg.residual_gate_init)
+
+        if self.binding_block is not None:
+            nn.init.normal_(self.binding_block.attention.o_proj.weight, mean=0.0, std=std)
+            nn.init.normal_(self.binding_block.ffn.w2.weight, mean=0.0, std=std)
+            nn.init.zeros_(self.binding_block.attn_gate.weight)
+            nn.init.constant_(self.binding_block.attn_gate.bias, self.cfg.residual_gate_init)
+            nn.init.zeros_(self.binding_block.ffn_gate.weight)
+            nn.init.constant_(self.binding_block.ffn_gate.bias, self.cfg.residual_gate_init)
 
     def _embed(self, token_ids: torch.Tensor) -> torch.Tensor:
         x = self.token_embedding(token_ids)
@@ -619,7 +710,10 @@ class CFRDLanguageModel(nn.Module):
             should_project = depth == run_recurrences or (targets is not None and depth in self.cfg.exit_depths)
 
             if should_project:
-                logits_at_depth = self._logits(x)
+                projection_x = x
+                if depth == run_recurrences and self.binding_block is not None:
+                    projection_x = self.binding_block(x, self.rope_cos, self.rope_sin)
+                logits_at_depth = self._logits(projection_x)
 
                 if depth == run_recurrences:
                     final_logits = logits_at_depth
