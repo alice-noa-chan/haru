@@ -48,6 +48,7 @@ def build_test_model() -> CFRDLanguageModel:
         physical_cells=TEST_PHYSICAL_CELLS,
         recurrences=TEST_RECURRENCES,
         exit_depths=TEST_EXIT_DEPTHS,
+        use_binding_block=True,
         use_surface_features=True,
         surface_feature_dim=SURFACE_FEATURE_DIM,
     )
@@ -135,6 +136,35 @@ def test_partial_chunk() -> None:
         output = model(x)
     assert output.logits.shape == (2, TEST_CONTEXT_LENGTH - 3, TEST_VOCAB_SIZE)
     assert torch.isfinite(output.logits).all()
+
+
+def test_binding_block_config_compatibility() -> None:
+    """Old checkpoints stay disabled while new HF configs preserve the block."""
+
+    legacy_checkpoint = {
+        "model_config": {
+            "vocab_size": TEST_VOCAB_SIZE,
+            "context_length": TEST_CONTEXT_LENGTH,
+            "chunk_size": TEST_CHUNK_SIZE,
+            "d_model": TEST_D_MODEL,
+            "n_head": TEST_N_HEAD,
+            "n_kv_head": TEST_N_KV_HEAD,
+            "ffn_dim": TEST_FFN_DIM,
+            "summary_slots": TEST_SUMMARY_SLOTS,
+            "memory_dim": TEST_MEMORY_DIM,
+            "memory_heads": TEST_MEMORY_HEADS,
+            "physical_cells": TEST_PHYSICAL_CELLS,
+            "recurrences": TEST_RECURRENCES,
+            "exit_depths": list(TEST_EXIT_DEPTHS),
+        }
+    }
+    restored = ModelConfig.from_checkpoint(legacy_checkpoint, TEST_VOCAB_SIZE)
+    assert not restored.use_binding_block
+
+    enabled = build_test_model().cfg
+    hf_config = CFRDConfig.from_model_config(enabled)
+    assert hf_config.use_binding_block
+    assert hf_config.to_model_config().use_binding_block
 
 
 def test_exact_sampler_resume() -> None:
@@ -270,6 +300,7 @@ def main() -> None:
     test_causality_inside_chunk()
     test_causality_across_chunks()
     test_partial_chunk()
+    test_binding_block_config_compatibility()
     test_exact_sampler_resume()
     test_transformers_auto_model_roundtrip()
     test_transformers_tokenizer_roundtrip()
