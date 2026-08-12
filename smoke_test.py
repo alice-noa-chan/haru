@@ -11,6 +11,12 @@ from transformers.utils import logging as transformers_logging
 
 import config
 from configuration_cfrd import CFRDConfig
+from counterfactual_data import (
+    RELATION_CATEGORIES,
+    TRAIN_ENTITIES,
+    VALIDATION_ENTITIES,
+    CounterfactualSampler,
+)
 from model import CFRDLanguageModel, ModelConfig, count_parameters
 from modeling_cfrd import CFRDForCausalLM
 from surface_features import SURFACE_FEATURE_DIM
@@ -295,6 +301,31 @@ def print_default_parameter_count() -> None:
     print(f"default total parameters: {counts['total']:,}")
 
 
+def test_counterfactual_sampler() -> None:
+    first_rng = np.random.default_rng(20260812)
+    second_rng = np.random.default_rng(20260812)
+    train_sampler = CounterfactualSampler("train")
+
+    first_batch = train_sampler.sample_batch(15, first_rng)
+    repeated_batch = train_sampler.sample_batch(15, second_rng)
+    next_batch = train_sampler.sample_batch(15, first_rng)
+
+    assert first_batch == repeated_batch
+    assert first_batch != next_batch
+    assert {pair.category for pair in first_batch} == set(RELATION_CATEGORIES)
+    assert len({pair.entity_a for pair in first_batch[:12]} | {pair.entity_b for pair in first_batch[:12]}) == 24
+
+    for pair in first_batch:
+        assert pair.entity_a != pair.entity_b
+        assert pair.prompt_a != pair.prompt_b
+        assert pair.candidates[0] != pair.candidates[1]
+        assert pair.correct_indices == (0, 1)
+
+    validation_batch = CounterfactualSampler("validation").sample_batch(10, np.random.default_rng(7))
+    assert set(TRAIN_ENTITIES).isdisjoint(VALIDATION_ENTITIES)
+    assert {pair.template_id for pair in first_batch}.isdisjoint(pair.template_id for pair in validation_batch)
+
+
 def main() -> None:
     test_shapes()
     test_backward_pass()
@@ -304,6 +335,7 @@ def main() -> None:
     test_binding_block_config_compatibility()
     test_exact_sampler_resume()
     test_transformers_auto_model_roundtrip()
+    test_counterfactual_sampler()
     test_transformers_tokenizer_roundtrip()
     print_default_parameter_count()
     print("smoke tests passed")
