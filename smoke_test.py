@@ -186,6 +186,7 @@ def test_exact_sampler_resume() -> None:
     with tempfile.TemporaryDirectory() as temp_dir:
         path = Path(temp_dir) / "checkpoint.pt"
         save_checkpoint(path, model, optimizer, 7, 1234, 2.0, model.cfg, "test-hash", rng)
+        expected_pairs = CounterfactualSampler("train").sample_batch(5, rng)
         expected = rng.integers(0, 10_000, size=20)
 
         restored_model = build_test_model()
@@ -199,11 +200,13 @@ def test_exact_sampler_resume() -> None:
             "test-hash",
             restored_rng,
         )
+        actual_pairs = CounterfactualSampler("train").sample_batch(5, restored_rng)
         actual = restored_rng.integers(0, 10_000, size=20)
 
     assert step == 7
     assert tokens_seen == 1234
     assert best_loss == 2.0
+    assert actual_pairs == expected_pairs
     assert np.array_equal(actual, expected)
 
 
