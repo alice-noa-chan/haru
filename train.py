@@ -13,6 +13,8 @@ import numpy as np
 import torch
 
 import config
+from counterfactual_data import CounterfactualSampler
+from counterfactual_objective import counterfactual_ranking_result, encode_counterfactual_pairs
 from data_utils import blake2b_file, dataset_fingerprint
 from model import CFRDLanguageModel, ModelConfig, count_parameters
 from surface_features import build_surface_feature_table
@@ -182,6 +184,10 @@ def optimizer_settings() -> dict[str, Any]:
         "adam_beta2": config.ADAM_BETA2,
         "adam_eps": config.ADAM_EPS,
         "grad_clip_norm": config.GRAD_CLIP_NORM,
+        "counterfactual_loss_weight": config.COUNTERFACTUAL_LOSS_WEIGHT,
+        "counterfactual_pairs_per_micro_batch": config.COUNTERFACTUAL_PAIRS_PER_MICRO_BATCH,
+        "counterfactual_margin": config.COUNTERFACTUAL_MARGIN,
+        "counterfactual_eval_pairs": config.COUNTERFACTUAL_EVAL_PAIRS,
         "precision": config.PRECISION,
         "seed": config.SEED,
     }
@@ -350,6 +356,43 @@ def evaluate(
     return result
 
 
+@torch.no_grad()
+def evaluate_counterfactual_relations(
+    model: CFRDLanguageModel,
+    tokenizer: StoryTokenizer,
+    device: torch.device,
+) -> dict[str, float]:
+    """Evaluate held-out names and phrasings with a fixed sampler seed."""
+
+    was_training = model.training
+    model.eval()
+    rng = np.random.default_rng(config.SEED + 20_000)
+    sampler = CounterfactualSampler("validation")
+
+    totals = {"loss": 0.0, "decision_accuracy": 0.0, "strict_pair_accuracy": 0.0, "mean_margin": 0.0}
+    evaluated_pairs = 0
+
+    while evaluated_pairs < config.COUNTERFACTUAL_EVAL_PAIRS:
+        pair_count = min(
+            config.COUNTERFACTUAL_PAIRS_PER_MICRO_BATCH,
+            config.COUNTERFACTUAL_EVAL_PAIRS - evaluated_pairs,
+        )
+        pairs = sampler.sample_batch(pair_count, rng)
+        batch = encode_counterfactual_pairs(pairs, tokenizer, model.cfg.context_length, device)
+        with autocast_context(device):
+            result = counterfactual_ranking_result(model, batch, config.COUNTERFACTUAL_MARGIN)
+
+        totals["loss"] += float(result.loss.item()) * pair_count
+        totals["decision_accuracy"] += float(result.decision_accuracy.item()) * pair_count
+        totals["strict_pair_accuracy"] += float(result.strict_pair_accuracy.item()) * pair_count
+        totals["mean_margin"] += float(result.mean_margin.item()) * pair_count
+        evaluated_pairs += pair_count
+
+    if was_training:
+        model.train()
+    return {key: value / evaluated_pairs for key, value in totals.items()}
+
+
 def main() -> None:
     config.RUN_DIR.mkdir(parents=True, exist_ok=True)
     seed_everything(config.SEED)
@@ -376,6 +419,7 @@ def main() -> None:
     tokens_seen = 0
     best_val_loss = float("inf")
     train_rng = np.random.default_rng(config.SEED)
+    counterfactual_sampler = CounterfactualSampler("train")
 
     if config.LATEST_CHECKPOINT_PATH.exists():
         print(f"Resuming checkpoint: {config.LATEST_CHECKPOINT_PATH}", flush=True)
@@ -429,6 +473,9 @@ def main() -> None:
         optimizer.zero_grad(set_to_none=True)
         accumulated_loss = 0.0
         accumulated_final_loss = 0.0
+        accumulated_counterfactual_loss = 0.0
+        accumulated_counterfactual_accuracy = 0.0
+        accumulated_counterfactual_strict_accuracy = 0.0
 
         for micro_step in range(config.GRAD_ACCUM_STEPS):
             x, y = get_random_batch(
@@ -437,6 +484,16 @@ def main() -> None:
                 config.CONTEXT_LENGTH,
                 device,
                 train_rng,
+            )
+            relation_pairs = counterfactual_sampler.sample_batch(
+                config.COUNTERFACTUAL_PAIRS_PER_MICRO_BATCH,
+                train_rng,
+            )
+            relation_batch = encode_counterfactual_pairs(
+                relation_pairs,
+                tokenizer,
+                model_cfg.context_length,
+                device,
             )
 
             sync_context = (
@@ -448,13 +505,26 @@ def main() -> None:
             with sync_context:
                 with autocast_context(device):
                     output = train_model(x, targets=y)
+                    relation_result = counterfactual_ranking_result(
+                        train_model,
+                        relation_batch,
+                        config.COUNTERFACTUAL_MARGIN,
+                    )
 
                 assert output.loss is not None
                 assert output.final_loss is not None
-                loss = output.loss / config.GRAD_ACCUM_STEPS
+                combined_loss = output.loss + config.COUNTERFACTUAL_LOSS_WEIGHT * relation_result.loss
+                loss = combined_loss / config.GRAD_ACCUM_STEPS
 
-                accumulated_loss += float(output.loss.item()) / config.GRAD_ACCUM_STEPS
+                accumulated_loss += float(combined_loss.item()) / config.GRAD_ACCUM_STEPS
                 accumulated_final_loss += float(output.final_loss.item()) / config.GRAD_ACCUM_STEPS
+                accumulated_counterfactual_loss += float(relation_result.loss.item()) / config.GRAD_ACCUM_STEPS
+                accumulated_counterfactual_accuracy += (
+                    float(relation_result.decision_accuracy.item()) / config.GRAD_ACCUM_STEPS
+                )
+                accumulated_counterfactual_strict_accuracy += (
+                    float(relation_result.strict_pair_accuracy.item()) / config.GRAD_ACCUM_STEPS
+                )
 
                 if scaler.is_enabled():
                     scaler.scale(loss).backward()
@@ -486,6 +556,9 @@ def main() -> None:
                 "tokens_seen": tokens_seen,
                 "loss": accumulated_loss,
                 "final_loss": accumulated_final_loss,
+                "counterfactual_loss": accumulated_counterfactual_loss,
+                "counterfactual_decision_accuracy": accumulated_counterfactual_accuracy,
+                "counterfactual_strict_pair_accuracy": accumulated_counterfactual_strict_accuracy,
                 "lr": lr,
                 "grad_norm": float(grad_norm),
                 "tokens_per_second": tokens_per_second,
@@ -497,6 +570,8 @@ def main() -> None:
                 f"tokens={tokens_seen:,} "
                 f"loss={accumulated_loss:.4f} "
                 f"final={accumulated_final_loss:.4f} "
+                f"cf={accumulated_counterfactual_loss:.4f} "
+                f"cf_pair={accumulated_counterfactual_strict_accuracy:.2%} "
                 f"lr={lr:.2e} "
                 f"tok/s={tokens_per_second:,.0f}",
                 flush=True,
@@ -505,22 +580,30 @@ def main() -> None:
         should_eval = current_step % config.EVAL_INTERVAL == 0 or current_step == max_steps
         if should_eval:
             metrics = evaluate(model, val_data, device)
+            relation_metrics = evaluate_counterfactual_relations(model, tokenizer, device)
+            selection_loss = metrics["final_loss"] + config.COUNTERFACTUAL_LOSS_WEIGHT * relation_metrics["loss"]
             append_jsonl(
                 config.TRAIN_LOG_PATH,
                 {
                     "step": current_step,
                     "tokens_seen": tokens_seen,
                     "validation": metrics,
+                    "counterfactual_validation": relation_metrics,
+                    "selection_loss": selection_loss,
                 },
             )
 
             print(
-                f"validation step={current_step} loss={metrics['loss']:.4f} final={metrics['final_loss']:.4f}",
+                f"validation step={current_step} loss={metrics['loss']:.4f} "
+                f"final={metrics['final_loss']:.4f} "
+                f"cf={relation_metrics['loss']:.4f} "
+                f"cf_pair={relation_metrics['strict_pair_accuracy']:.2%} "
+                f"selection={selection_loss:.4f}",
                 flush=True,
             )
 
-            if metrics["final_loss"] < best_val_loss:
-                best_val_loss = metrics["final_loss"]
+            if selection_loss < best_val_loss:
+                best_val_loss = selection_loss
                 save_checkpoint(
                     config.BEST_CHECKPOINT_PATH,
                     model,

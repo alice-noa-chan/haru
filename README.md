@@ -56,6 +56,13 @@ all tokens one independent causal-attention pass after the recurrent stack,
 so entity, role, and attribute evidence need not survive only through local
 chunks and compressed summaries.
 
+Training also adds a 0.20-weight auxiliary relation objective. Each step draws
+fresh entity permutations across location, state, ownership, transfer, and
+speaker-attribution pairs. The loss compares only candidate-answer token spans
+and requires the preferred answer to flip in both counterfactual directions.
+Held-out names and phrasings are evaluated separately; best-checkpoint
+selection combines language-model loss with this relation loss.
+
 ## Install
 
 Haru requires Python 3.11 or newer.
@@ -171,8 +178,9 @@ python smoke_test.py
 ```
 
 The suite checks shapes, gradients, causality, partial chunks, exact checkpoint
-resume, Safetensors parity, AutoClass loading, tokenizer round trips, and the
-default parameter count.
+resume (including the dynamic relation sampler), counterfactual-pair leakage
+and gradients, Safetensors parity, AutoClass loading, tokenizer round trips,
+and the default parameter count.
 
 ### 5. Train and evaluate
 

@@ -126,6 +126,14 @@ ADAM_BETA2 = 0.95
 ADAM_EPS = 1.0e-8
 GRAD_CLIP_NORM = 1.0
 
+# Pair ordinary next-token learning with a small relation-binding objective.
+# Each micro-batch covers all five relation families, while fresh entity
+# permutations prevent the model from memorizing fixed name/answer identities.
+COUNTERFACTUAL_LOSS_WEIGHT = 0.20
+COUNTERFACTUAL_PAIRS_PER_MICRO_BATCH = 5
+COUNTERFACTUAL_MARGIN = 0.50
+COUNTERFACTUAL_EVAL_PAIRS = 100
+
 LOG_INTERVAL = 10
 EVAL_INTERVAL = 250
 EVAL_BATCHES = 100
