@@ -3,6 +3,8 @@ __pycache__/
 .tokenizer_cache/
 packed/*.bin
 packed/meta.json
+packed/**/*.bin
+packed/**/meta.json
 tokenizer/*.model
 tokenizer/*.vocab
 runs/
