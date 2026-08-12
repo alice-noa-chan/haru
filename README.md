@@ -8,46 +8,54 @@
 
 Haru is a compact Korean story continuation language model. Its custom Causal
 Folded Recurrent Decoder (CFRD) uses local causal attention, compressed summary
-memory, and reusable decoder cells. The released checkpoint has 6.8 million
-parameters and can trade inference cost for quality with recurrent depths 2,
-4, and 6. The repository's next-training defaults add independent capacity and
-a final full-context binding block without modifying that released checkpoint.
+memory, and reusable decoder cells. Haru v1.1 is the current 11.6-million-
+parameter release; the original 6.8-million-parameter checkpoint remains
+available as Haru v1.0. Both support recurrent inference depths 2, 4, and 6.
 
 - GitHub: [alice-noa-chan/haru](https://github.com/alice-noa-chan/haru)
-- Model: [gaon12/haru](https://huggingface.co/gaon12/haru)
+- Model v1.1: [gaon12/haru_1.1](https://huggingface.co/gaon12/haru_1.1)
+- Model v1.0: [gaon12/haru](https://huggingface.co/gaon12/haru)
 - Demo: [gaon12/haru](https://huggingface.co/spaces/gaon12/haru)
 
 Haru is a research prototype for story continuation. It is not an instruction
 model, a factual assistant, or a safety-reviewed product.
 
-## Released model at a glance
+## Releases
+
+| Version | GitHub | Hugging Face | Status |
+|---|---|---|---|
+| 1.1 | [`v1.1.0`](https://github.com/alice-noa-chan/haru/releases/tag/v1.1.0) | [`gaon12/haru_1.1`](https://huggingface.co/gaon12/haru_1.1) | Current |
+| 1.0 | [`v1.0.0`](https://github.com/alice-noa-chan/haru/releases/tag/v1.0.0) | [`gaon12/haru`](https://huggingface.co/gaon12/haru) | Legacy |
+
+## Haru v1.1 at a glance
 
 | Setting | Value |
 |---|---:|
-| Vocabulary | 8,192 |
+| Vocabulary | 12,000 |
 | Context length | 512 tokens |
 | Local chunk | 64 tokens |
 | Hidden size | 384 |
 | Query / KV heads | 6 / 2 |
-| Physical decoder cells | 2 |
+| Physical decoder cells | 3 |
 | Recurrent depth | 6 |
 | FFN size | 1,024 |
-| Trainable parameters | 6,793,363 |
-| Training tokens | 800,063,488 |
+| Full-context binding block | enabled |
+| Trainable parameters | 11,634,459 |
+| Best-checkpoint training tokens | 753,664,000 |
 
-The two physical cells run in this order:
+The three physical cells run in this order:
 
 ```text
-A -> B -> A -> B -> A -> B
+A -> B -> C -> A -> B -> C
 ```
 
 The shared language-model head supervises depths 2, 4, and 6. Depth 4 is a
 useful CPU setting; depth 6 gives the best measured validation quality.
 
-## Next-training defaults
+## What changed in v1.1
 
-New training runs use a separate `haru-v2-binding` directory and a separate
-12,000-token tokenizer. They do not overwrite the released model's artifacts.
+Version 1.1 uses a separate `haru-v2-binding` run and a separate 12,000-token
+tokenizer. It does not overwrite the v1.0 artifacts.
 
 | Setting | Value |
 |---|---:|
@@ -85,7 +93,7 @@ AutoClasses. It does not load the training `.pt` checkpoint.
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-model_id = "gaon12/haru"
+model_id = "gaon12/haru_1.1"
 tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained(
     model_id,
@@ -134,22 +142,41 @@ Summary memory has a learned per-head recency bias. Korean token embeddings
 also receive a small projection of onset, vowel, coda, word-boundary, digit,
 ASCII, punctuation, byte-fallback, and token-length features.
 
-The next-training configuration then applies a non-recurrent full-context
+The v1.1 configuration then applies a non-recurrent full-context
 causal attention and SwiGLU block before the shared language-model head. Older
 configuration files do not enable this block, so existing exports remain
 loadable with their original architecture.
 
 See [RESEARCH.md](RESEARCH.md) for related work.
 
-## Evaluation
+## Version comparison
+
+All three models were evaluated with their native tokenizers. Cross-model
+forced-choice accuracy uses the same 42 cases for which both candidates have
+matched token lengths in every tokenizer. Bits per character (BPC) normalizes
+the shared-text language-model score for tokenizer differences; lower is
+better.
+
+| Model | Parameters | Factual choice | Counterfactual strict pairs | BPC |
+|---|---:|---:|---:|---:|
+| Haru v1.0 | 6,793,363 | 18/42 (42.9%) | 0/100 | 2.668 |
+| Haru v1.1 | 11,634,459 | **20/42 (47.6%)** | **21/100** | **2.631** |
+| Tiny-Ko-Stories-35M | 34,217,856 | 15/42 (35.7%) | 2/100 | 2.681 |
+
+The v1.1 counterfactual gain is concentrated in location (16/20 strict pairs)
+and ownership (4/20). Speaker attribution and transfer remain 0/20, so v1.1 is
+still a research checkpoint rather than a solved entity-binding model. Run
+`python compare_models.py` to reproduce the three-way comparison.
+
+## Haru v1.1 evaluation
 
 The final held-out evaluation used 200 fixed batches at each supervised depth.
 
 | Inference recurrences | Validation loss | Perplexity |
 |---:|---:|---:|
-| 2 | 2.37096 | 10.708 |
-| 4 | 2.06052 | 7.850 |
-| 6 | 2.00630 | 7.436 |
+| 2 | 2.95689 | 19.238 |
+| 4 | 2.12258 | 8.353 |
+| 6 | 1.92052 | 6.825 |
 
 Per-token perplexity is comparable only for models using the same tokenizer.
 For different tokenizers, use byte- or character-normalized negative
@@ -253,6 +280,7 @@ a GPU uses fp16 with gradient scaling; a GPU uses bf16.
 | `train.py` | Training, validation, checkpoints, and exact resume |
 | `evaluate.py` | Recurrent-depth evaluation |
 | `export_transformers.py` | Safetensors and AutoClass export |
+| `compare_models.py` | Reproducible v1.0/v1.1/35M comparison |
 | `generate.py` | Transformers-based local generation |
 | `cloud_train.py` | the cloud benchmark, preparation, training, and export |
 | `smoke_test.py` | Fast correctness tests |
@@ -265,6 +293,7 @@ a GPU uses fp16 with gradient scaling; a GPU uses bf16.
 - Summary memory can lose names, quotations, and exact event details.
 - Generation has no KV or recurrent-state cache yet.
 - Longer continuations may repeat ideas or drift between entities.
+- Speaker attribution and transfer bindings remain weak in v1.1.
 - The repository does not include a parameter-matched Transformer baseline.
 
 ## Training data notice
