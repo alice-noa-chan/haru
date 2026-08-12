@@ -15,6 +15,9 @@ ROOT_DIR = Path(os.environ.get("HARU_STORAGE_DIR", os.environ.get("CFRD_STORAGE_
 DATA_DIR = ROOT_DIR / "data"
 TOKENIZER_DIR = ROOT_DIR / "tokenizer"
 RUN_NAME = "haru-v2-binding"
+RELEASE_VERSION = "1.1"
+HUGGINGFACE_MODEL_ID = "gaon12/haru_1.1"
+PREVIOUS_HUGGINGFACE_MODEL_ID = "gaon12/haru"
 PACKED_DIR = ROOT_DIR / "packed" / RUN_NAME
 RUN_DIR = ROOT_DIR / "runs" / RUN_NAME
 
