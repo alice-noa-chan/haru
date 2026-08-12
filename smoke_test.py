@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from pathlib import Path
 import tempfile
+from pathlib import Path
 
 import numpy as np
 import sentencepiece as spm
@@ -16,7 +16,6 @@ from modeling_cfrd import CFRDForCausalLM
 from surface_features import SURFACE_FEATURE_DIM
 from tokenization_cfrd import CFRDTokenizer
 from train import configure_optimizer, restore_checkpoint, save_checkpoint
-
 
 # Small synthetic setup that does not require a trained tokenizer.
 TEST_VOCAB_SIZE = 512

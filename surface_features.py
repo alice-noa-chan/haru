@@ -8,6 +8,7 @@ import torch
 from cfrd_features import N_CHO, N_JONG, N_JUNG, SURFACE_FEATURE_DIM
 from tokenizer_utils import StoryTokenizer
 
+
 def _is_punctuation(char: str) -> bool:
     return unicodedata.category(char).startswith("P")
 

@@ -14,10 +14,7 @@ class StoryTokenizer:
     def __init__(self, model_path: Path | None = None) -> None:
         path = model_path or config.TOKENIZER_MODEL_PATH
         if not path.exists():
-            raise FileNotFoundError(
-                f"Tokenizer model does not exist: {path}\n"
-                "Run `python tokenizer_train.py` first."
-            )
+            raise FileNotFoundError(f"Tokenizer model does not exist: {path}\nRun `python tokenizer_train.py` first.")
 
         self.model_path = path
         self.sp = spm.SentencePieceProcessor(model_file=str(path))

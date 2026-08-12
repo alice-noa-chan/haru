@@ -11,9 +11,7 @@ from pathlib import Path
 # Keep code and large mutable artifacts separate when CFRD runs in a cloud
 # container. Locally, both default to the project directory.
 CODE_DIR = Path(__file__).resolve().parent
-ROOT_DIR = Path(
-    os.environ.get("HARU_STORAGE_DIR", os.environ.get("CFRD_STORAGE_DIR", CODE_DIR))
-).resolve()
+ROOT_DIR = Path(os.environ.get("HARU_STORAGE_DIR", os.environ.get("CFRD_STORAGE_DIR", CODE_DIR))).resolve()
 DATA_DIR = ROOT_DIR / "data"
 TOKENIZER_DIR = ROOT_DIR / "tokenizer"
 PACKED_DIR = ROOT_DIR / "packed"

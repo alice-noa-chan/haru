@@ -57,9 +57,7 @@ def main() -> None:
     validate_packed_data(meta, tokenizer)
 
     checkpoint_path = (
-        config.BEST_CHECKPOINT_PATH
-        if config.BEST_CHECKPOINT_PATH.exists()
-        else config.LATEST_CHECKPOINT_PATH
+        config.BEST_CHECKPOINT_PATH if config.BEST_CHECKPOINT_PATH.exists() else config.LATEST_CHECKPOINT_PATH
     )
     if not checkpoint_path.exists():
         raise FileNotFoundError("No trained checkpoint was found")

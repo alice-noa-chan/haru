@@ -14,8 +14,7 @@ def main() -> None:
     export_directory = config.TRANSFORMERS_EXPORT_DIR
     if not (export_directory / "config.json").exists():
         raise FileNotFoundError(
-            f"No Transformers export found at {export_directory}. "
-            "Run `python export_transformers.py` first."
+            f"No Transformers export found at {export_directory}. Run `python export_transformers.py` first."
         )
 
     device = resolve_device()

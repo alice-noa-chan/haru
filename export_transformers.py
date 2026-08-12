@@ -83,8 +83,8 @@ print(tokenizer.decode(output[0], skip_special_tokens=True))
 - Parameters: {parameter_count:,}
 - Context length: {model_config.context_length}
 - Recurrent depths supervised during training: {model_config.exit_depths}
-- Exported checkpoint step: {int(checkpoint.get('step', 0))}
-- Training tokens seen: {int(checkpoint.get('tokens_seen', 0)):,}
+- Exported checkpoint step: {int(checkpoint.get("step", 0))}
+- Training tokens seen: {int(checkpoint.get("tokens_seen", 0)):,}
 
 ## Evaluation
 

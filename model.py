@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, fields
 import math
+from dataclasses import dataclass, fields
 
 import torch
 import torch.nn as nn
@@ -589,9 +589,7 @@ class CFRDLanguageModel(nn.Module):
         del batch
 
         if time > self.cfg.context_length:
-            raise ValueError(
-                f"Sequence length {time} exceeds context_length {self.cfg.context_length}"
-            )
+            raise ValueError(f"Sequence length {time} exceeds context_length {self.cfg.context_length}")
 
         run_recurrences = self.cfg.recurrences if recurrences is None else recurrences
         if run_recurrences <= 0 or run_recurrences > self.cfg.recurrences:
@@ -646,11 +644,7 @@ class CFRDLanguageModel(nn.Module):
                     targets.reshape(-1),
                 )
 
-            auxiliary = [
-                loss_value
-                for depth, loss_value in exit_losses.items()
-                if depth != run_recurrences
-            ]
+            auxiliary = [loss_value for depth, loss_value in exit_losses.items() if depth != run_recurrences]
 
             if auxiliary:
                 aux_mean = torch.stack(auxiliary).mean()
