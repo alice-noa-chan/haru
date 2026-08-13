@@ -212,6 +212,59 @@ def cfrd_ablations(cfrd_cfg: ModelConfig) -> dict[str, ModelConfig]:
     return variants
 
 
+def combination_arms(cfrd_cfg: ModelConfig) -> dict[str, ModelConfig]:
+    """Arms that combine changes the ablations only measured separately.
+
+    Unfolding and full-context cells each beat CFRD on their own at release
+    scale. Nothing in that table shows they compose: they may be two routes to
+    the same gain rather than two gains. Only an arm carrying both can tell
+    those apart, and it is deliberately multi-field, which is why it does not
+    live in cfrd_ablations and its one-field rule.
+
+    The combination is also the cheaper of the two. Unfolding alone costs
+    17,047,725 parameters, above the 17M the project treats as its practical
+    ceiling, while dropping summary memory pays for the extra cells and brings
+    the pair to 15,667,599 at fewer FLOPs than v1.1.
+    """
+
+    if cfrd_cfg.physical_cells >= cfrd_cfg.recurrences or cfrd_cfg.cell_attention == "full":
+        return {}
+    return {
+        "cfrd-unfolded-full-attention": replace(
+            cfrd_cfg,
+            physical_cells=cfrd_cfg.recurrences,
+            cell_attention="full",
+        )
+    }
+
+
+def check_parameter_budget(
+    architectures: dict[str, object],
+    surface_features: torch.Tensor,
+    ceiling: int,
+) -> dict[str, int]:
+    """Reject any arm above the project's parameter ceiling before training.
+
+    Haru's point is being small. An arm that quietly exceeds the budget costs a
+    full run and produces a number that cannot be shipped, so the check happens
+    before the first optimizer step rather than after the table is read.
+    """
+
+    counts: dict[str, int] = {}
+    oversized: list[str] = []
+    for name, model_cfg in architectures.items():
+        counts[name] = count_parameters(build_model(model_cfg, surface_features))["total"]
+        if counts[name] > ceiling:
+            oversized.append(f"{name} ({counts[name]:,})")
+
+    if oversized:
+        raise ValueError(
+            f"These arms exceed the {ceiling:,} parameter ceiling: {', '.join(oversized)}. "
+            "Raise --max-parameters deliberately or shrink the configuration."
+        )
+    return counts
+
+
 ENCODE_BATCH_LINES = 20_000
 
 
@@ -553,6 +606,19 @@ def parse_arguments() -> argparse.Namespace:
         "so leaving this off measures the one thing CFRD was not built for.",
     )
     parser.add_argument(
+        "--combine",
+        action="store_true",
+        help="Add the arm carrying both unfolding and full-context cells. The ablations measure "
+        "them separately and cannot show whether the two gains compose.",
+    )
+    parser.add_argument(
+        "--max-parameters",
+        type=int,
+        default=20_000_000,
+        help="Reject any arm above this before training. Haru targets under 20M, with 17M as the "
+        "practical ceiling, so an oversized arm wastes a run on an unshippable number.",
+    )
+    parser.add_argument(
         "--deep-supervision-arms",
         action="store_true",
         help="Add arms that isolate deep supervision: CFRD without it, and the parameter-matched "
@@ -602,6 +668,13 @@ def main() -> None:
         architectures.update(cfrd_ablations(cfrd_cfg))
     if args.deep_supervision_arms:
         architectures.update(deep_supervision_arms(cfrd_cfg, baselines))
+    if args.combine:
+        architectures.update(combination_arms(cfrd_cfg))
+
+    parameter_counts = check_parameter_budget(architectures, surface_features, args.max_parameters)
+    print(f"{len(architectures)} arms, all within the {args.max_parameters:,} parameter ceiling:", flush=True)
+    for name, count in parameter_counts.items():
+        print(f"  {name:<32}{count:>12,}", flush=True)
 
     print(f"Loading up to {args.corpus_lines:,} records from {config.DATA_DIR / 'data.txt'}", flush=True)
     stream = load_token_stream(tokenizer, args.corpus_lines, config.DATA_DIR / "data.txt", args.max_tokens)
