@@ -93,7 +93,10 @@ def filter_corpus(source: Path, destination: Path, index: set[int], size: int) -
 
     kept = dropped = 0
     with source.open("r", encoding="utf-8", errors="replace") as reader:
-        with destination.open("w", encoding="utf-8") as writer:
+        # Force LF. Text mode on Windows rewrites every terminator to CRLF,
+        # which showed up as a cleaned file 2,003,542 bytes larger than its
+        # input after dropping zero lines: one byte per line, no content change.
+        with destination.open("w", encoding="utf-8", newline="\n") as writer:
             for line in reader:
                 text = line.strip()
                 if not text:

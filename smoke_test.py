@@ -35,6 +35,7 @@ from counterfactual_data import (
     CounterfactualSampler,
 )
 from counterfactual_objective import candidate_scores, counterfactual_ranking_result, encode_counterfactual_pairs
+from decontaminate import filter_corpus
 from evaluate import make_final_eval_rng
 from model import CFRDLanguageModel, FullCausalAttention, ModelConfig, count_parameters
 from model_factory import (
@@ -1060,6 +1061,32 @@ def test_relation_padding_is_score_preserving() -> None:
         except ValueError:
             continue
         raise AssertionError(f"pad_to_multiple_of={invalid} was accepted")
+
+
+def test_corpus_writers_emit_lf() -> None:
+    """Corpora must carry LF regardless of the machine that produced them.
+
+    Text mode on Windows rewrites every terminator to CRLF, which added a byte
+    per line to a corpus bound for a Linux training host. It surfaced as a
+    decontaminated file 2,003,542 bytes larger than its input after dropping
+    zero lines, which reads like data corruption and is not.
+    """
+
+    with tempfile.TemporaryDirectory() as directory:
+        source = Path(directory) / "corpus.txt"
+        # Written with CRLF on purpose, the way an unfixed writer would leave it.
+        source.write_bytes("\r\n".join(f"줄 {index} 입니다" for index in range(50)).encode("utf-8") + b"\r\n")
+        assert source.read_bytes().count(b"\r\n") == 50
+
+        counts = filter_corpus(source, Path(directory) / "out.txt", index=set(), size=40)
+        assert counts["dropped"] == 0
+
+        written = (Path(directory) / "out.txt").read_bytes()
+        assert written.count(b"\r\n") == 0, "cleaned corpus still carries CRLF"
+        assert written.count(b"\n") == 50
+
+        # Byte growth with nothing dropped is the symptom that exposed this.
+        assert len(written) < len(source.read_bytes())
 
 
 def print_default_parameter_count() -> None:
