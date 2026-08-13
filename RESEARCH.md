@@ -172,6 +172,59 @@ redirect v1.2: at compact scale, folding is not what produces Haru's binding
 behaviour, and the components v1.1 shipped together have to be separated
 before any further capacity is spent on the fold.
 
+## v1.2 direction
+
+The direction test rules out one explanation and points at another. Folding is
+not what produces Haru's binding behaviour at compact scale: a plain dense
+decoder holding the same parameters, and spending 11% fewer FLOPs, beat CFRD on
+both language-model loss and strict pair accuracy. So the question is not how
+much more recurrence to add, but which part of CFRD was ever doing the work.
+
+The remaining structural difference between CFRD and those baselines is not the
+fold at all. It is what a cell is allowed to see. A CFRD cell reads a 64-token
+chunk and reaches past it only through four compressed summary slots; every
+dense baseline reads the full context directly. Three independent observations
+line up behind that being the binding constraint:
+
+- v1.1's binding gain, 0/100 to 21/100, arrived together with the binding
+  block, which is one ordinary full-context attention layer appended after the
+  recurrent stack.
+- README already lists "summary memory can lose names, quotations, and exact
+  event details" as a known limitation. That is a description of the failure
+  mode strict pair accuracy measures.
+- The relation families that improved in v1.1 were location and ownership,
+  which a single attribute lookup can answer. Speaker attribution and transfer,
+  which need an exact token relationship recovered at distance, stayed at 0/20.
+
+v1.2 therefore keeps the fold and changes what the fold operates on.
+`cell_attention = "full"` gives every recurrence unrestricted causal attention
+and drops summary memory, which exists only to cross a chunk boundary that no
+longer exists. At release shape this is cheaper on both axes, 10,944,393
+parameters and 16.03 GFLOPs against 11,634,459 and 17.31, so it is not buying
+quality with compute.
+
+### What each result means, decided before the run
+
+`compare_architectures.py --ablate` runs CFRD, both matched dense baselines,
+and three single-field variants under shared seeds. The reading is fixed in
+advance so it cannot be chosen afterwards:
+
+| Observation | Conclusion |
+|---|---|
+| `cfrd-no-binding-block` collapses binding, `cfrd-full-attention` recovers it | Full-context attention was the mechanism. v1.2 adopts full cells and drops summary memory. |
+| `cfrd-full-attention` still loses to the dense baselines | The fold itself is the cost, not the attention range. Fold no further; treat CFRD as a compute-sharing trick with a quality price and say so. |
+| `cfrd-unfolded` beats `cfrd` by more than the seed spread | Parameter sharing is the liability. Its saving has to be priced against that gap rather than assumed free. |
+| Every CFRD arm stays inside the seed spread of the others | No component is carrying the result. The 21/100 in v1.1 is then attributable to the relation objective and the larger vocabulary, both of which apply to a dense model equally. |
+
+The last row is the one that would end the architecture, and it is a live
+possibility rather than a formality: CFRD's strict pair accuracy already ranges
+0.07 to 0.39 across three seeds while both dense arms stay inside 0.30 to 0.40.
+
+No v1.2 checkpoint should be trained until this table exists. v1.1 was released
+having changed four things at once, which is why nothing in it can be
+attributed, and repeating that with a fifth change would be the same mistake at
+greater cost.
+
 ## Required validation and limits
 
 The implementation tests causality, serialization, gradient flow, deterministic
