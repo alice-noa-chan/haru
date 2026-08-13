@@ -14,6 +14,7 @@ paired deltas, strict pair accuracies, parameter counts, and measured FLOPs.
 | `architecture_ablation_3seed.json` | `compare_architectures.py --scale small --steps 300 --seeds 3 --ablate` | RESEARCH.md, "The result: row two fired"; README, "Result at compact scale" |
 | `architecture_comparison_release.json` | `the cloud run cloud_train.py --action compare` (a GPU, 6,000 steps, 3 seeds) | RESEARCH.md, "Release-scale result"; README, "Result at release scale" |
 | `architecture_release_ablate_deepsup_6000steps_3seeds.json` | `cloud_compare.py --ablate --deep-supervision-arms` (a GPU, 6,000 steps, 3 seeds) | RESEARCH.md, "Eight-arm release table" |
+| `architecture_release_ablate_combine_6000steps_3seeds.json` | `cloud_compare.py --ablate --combine` (a GPU, 6,000 steps, 3 seeds) | RESEARCH.md, "Does the combination compose" |
 | `korean_benchmarks_v1.1.json` | `evaluate_korean.py runs/haru-v2-binding/transformers` | README, "Korean benchmarks" |
 | `decontamination_textbooks.json` | `decontaminate.py data/textbooks.txt` | data/datasets.md, decontamination log |
 
