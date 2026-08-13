@@ -158,6 +158,10 @@ def cfrd_ablations(cfrd_cfg: ModelConfig) -> dict[str, ModelConfig]:
         variants["cfrd-no-binding-block"] = replace(cfrd_cfg, use_binding_block=False)
     if cfrd_cfg.physical_cells < cfrd_cfg.recurrences:
         variants["cfrd-unfolded"] = replace(cfrd_cfg, physical_cells=cfrd_cfg.recurrences)
+    if cfrd_cfg.cell_attention != "full":
+        # Not an ablation of v1.1 but the arm that tests the replacement for it:
+        # keep the fold, give each cell the full context, drop summary memory.
+        variants["cfrd-full-attention"] = replace(cfrd_cfg, cell_attention="full")
     return variants
 
 

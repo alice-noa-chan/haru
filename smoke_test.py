@@ -687,13 +687,17 @@ def test_cfrd_ablations_change_one_field_each() -> None:
 
     reference = build_test_model().cfg
     variants = cfrd_ablations(reference)
-    assert set(variants) == {"cfrd-no-binding-block", "cfrd-unfolded"}
+    assert set(variants) == {"cfrd-no-binding-block", "cfrd-unfolded", "cfrd-full-attention"}
 
     features = torch.randn(TEST_VOCAB_SIZE, SURFACE_FEATURE_DIM)
     x = torch.randint(0, TEST_VOCAB_SIZE, (2, TEST_CONTEXT_LENGTH))
     y = torch.randint(0, TEST_VOCAB_SIZE, (2, TEST_CONTEXT_LENGTH))
 
-    expected_field = {"cfrd-no-binding-block": "use_binding_block", "cfrd-unfolded": "physical_cells"}
+    expected_field = {
+        "cfrd-no-binding-block": "use_binding_block",
+        "cfrd-unfolded": "physical_cells",
+        "cfrd-full-attention": "cell_attention",
+    }
     for name, variant in variants.items():
         changed = [
             field.name
