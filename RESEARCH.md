@@ -116,6 +116,62 @@ against parameter count: depth 2, 4, and 6 cost 10.01, 13.66, and 17.31 GFLOPs
 and reach perplexity 19.24, 8.35, and 6.82. A parameter-matched dense model at
 11.95 GFLOPs sits between depth 2 and depth 4.
 
+## Direction test: CFRD against matched dense baselines
+
+A CPU-scale replication of `compare_architectures.py`, three seeds per arm,
+400 steps, 819,200 tokens per arm per seed, 8,192-entry tokenizer, relation
+objective at weight 0.20 in every arm. The CFRD arm keeps the release
+proportions at reduced size: d_model 192, 3 cells, 4 recurrences, binding block
+enabled, 3.34M parameters.
+
+| Arm | Parameters | GFLOPs | Validation loss | Paired delta | Strict pairs |
+|---|---:|---:|---:|---:|---:|
+| CFRD | 3,339,673 | 1.93 | 4.4414 (sd 0.0158) | reference | 0.233 |
+| Dense, parameter-matched | 3,364,801 | 1.72 | 4.3988 (sd 0.0148) | -0.0426 | 0.350 |
+| Dense, compute-matched | 3,809,089 | 1.95 | 4.3974 (sd 0.0211) | -0.0441 | 0.347 |
+
+CFRD lost both comparisons. The paired delta was negative on every seed and
+exceeded the spread of the paired differences, so it is not seed noise at this
+scale. It also lost the parameter-matched comparison to an arm spending 11%
+fewer FLOPs.
+
+The binding result matters more, because binding is what the architecture was
+built for. Strict pair accuracy has a chance level of 0.25, since both
+directions of a pair must flip:
+
+| Arm | Seed 1337 | Seed 1338 | Seed 1339 | Mean | Mean margin |
+|---|---:|---:|---:|---:|---:|
+| CFRD | 0.24 | 0.07 | 0.39 | 0.233 | +0.56 |
+| Dense, parameter-matched | 0.35 | 0.40 | 0.30 | 0.350 | +1.17 |
+| Dense, compute-matched | 0.40 | 0.32 | 0.32 | 0.347 | +1.29 |
+
+CFRD's mean sits at chance. Both dense arms sit clearly above it with roughly
+twice the decision margin. The spread is the sharper finding: CFRD ranges from
+0.07 to 0.39 across seeds while the dense arms stay inside 0.30 to 0.40. A
+single CFRD seed could report either a strong binding result or a total failure,
+which is consistent with the earlier diagnosis that a narrow relation-training
+set scored 14/25 nearby and 6/200 on V2, and with the fixed-name experiment
+that produced 17/40 and then 5/40 on a second seed.
+
+Limits of this test, in the order they would change the conclusion:
+
+- The budget is roughly 900x smaller than a release run (819K tokens against
+  753.7M). Folded architectures are argued to need depth-in-time that only
+  appears with training, so this measures early optimization, not converged
+  quality.
+- The scale is 3.34M parameters at d_model 192 with 4 recurrences, not
+  11.6M at 384 with 6. Parameter sharing may pay off only where independent
+  capacity is the binding constraint.
+- One tokenizer (8,192) and one corpus slice.
+- The learning rate is the project's own CFRD-tuned 4e-4, shared by all arms,
+  so the schedule favors CFRD if it favors anything.
+
+None of these limits explain a below-chance binding mean or a 5.6x spread
+across seeds. The conclusion this test supports is narrow and sufficient to
+redirect v1.2: at compact scale, folding is not what produces Haru's binding
+behaviour, and the components v1.1 shipped together have to be separated
+before any further capacity is spent on the fold.
+
 ## Required validation and limits
 
 The implementation tests causality, serialization, gradient flow, deterministic
