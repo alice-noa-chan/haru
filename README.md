@@ -222,14 +222,36 @@ so they stay matched when the architecture changes. To train a single dense arm
 through the normal pipeline instead, set `MODEL_ARCH = "dense-baseline"` and a
 new `RUN_NAME` in `config.py`.
 
+### Result at release scale
+
+Three seeds, 6,000 steps, 49,152,000 tokens per arm per seed, at the release
+architecture on an a GPU, with the relation objective at weight 0.20 in every arm.
+A positive delta means CFRD won; both are positive on all three seeds and
+exceed the spread of the paired differences.
+
+| Arm | Parameters | GFLOPs | Validation loss | vs CFRD | Strict pairs |
+|---|---:|---:|---:|---:|---:|
+| CFRD | 11,634,459 | 17.31 | **3.3765** | reference | **0.413** |
+| Dense, parameter-matched | 11,669,377 | 11.95 | 3.4377 | +0.0612 | 0.260 |
+| Dense, compute-matched | 16,943,233 | 17.34 | 3.3977 | +0.0212 | 0.320 |
+
+**CFRD wins both comparisons.** The compute-matched arm carries 45.6% more
+parameters at equal FLOPs and still loses. On held-out entity binding CFRD
+reaches 0.413 strict pairs with every seed above the 0.25 chance level, while
+the parameter-matched dense arm straddles chance at 0.260.
+
+This is the first evidence that the architecture does anything. It is not yet
+evidence that *folding* is why: CFRD trains with deep supervision that the
+dense arms do not get, every arm shares CFRD's own tuned learning rate, and the
+budget is still 15x short of a release run. See [RESEARCH.md](RESEARCH.md) for
+the confounds and the order in which they must be removed.
+
 ### Result at compact scale
 
-**No release-scale comparison exists yet.** The published v1.0 and v1.1
-checkpoints have never been measured against a matched dense decoder, so the
-version table above cannot separate the architecture from its parameter count
-and training budget.
+At 3.3M parameters and a far shorter budget the same table comes out the other
+way, which is why the release-scale run above was needed.
 
-A CPU-scale replication has been run: six arms, three seeds, 300 steps,
+A CPU-scale replication: six arms, three seeds, 300 steps,
 614,400 tokens per arm per seed, at 3.3M parameters rather than 11.6M. Every
 paired delta exceeded its own spread across seeds.
 
@@ -246,13 +268,11 @@ No CFRD configuration reached a plain dense decoder on either metric, at
 matched parameters or at matched compute. Strict pair accuracy has a chance
 level of 0.25, since both directions of a pair must flip.
 
-This is a small-scale, short-budget result: roughly 1,200x fewer training
-tokens than a release run, at under a third of the parameters. It does not
-show that CFRD fails at release scale. It does show that the architecture's
-advantage has never been demonstrated anywhere, and that the burden is on the
-next release to produce it rather than assume it. See
-[RESEARCH.md](RESEARCH.md) for the per-seed figures and what the result rules
-out.
+Both tables are accurate where they were measured. The release-scale run has
+roughly 80x the tokens per arm and 3.5x the parameters, and that difference is
+what separates the two outcomes, so the compact-scale result should be read as
+a lower bound on where folding starts to pay rather than as a verdict on the
+architecture. See [RESEARCH.md](RESEARCH.md) for per-seed figures.
 
 ## Train from source
 
@@ -381,13 +401,12 @@ a GPU uses fp16 with gradient scaling; a GPU uses bf16.
 - Generation has no KV or recurrent-state cache yet.
 - Longer continuations may repeat ideas or drift between entities.
 - Speaker attribution and transfer bindings remain weak in v1.1.
-- No released Haru version has been compared against a matched dense
-  Transformer. `compare_architectures.py` runs that comparison, but no
-  release-scale result exists yet, so the v1.1 numbers above cannot separate
-  the CFRD architecture from its parameter count and training budget.
-- At compact scale and a short budget, no CFRD configuration beat a matched
-  dense decoder on validation loss or entity binding. The architecture's
-  advantage is currently unmeasured rather than established.
+- No released Haru checkpoint has itself been compared against a matched dense
+  Transformer. The release-scale comparison trains fresh arms at 49.2M tokens
+  each, so it does not retroactively validate the v1.0 or v1.1 artifacts.
+- CFRD wins the release-scale comparison, but the margin is not yet attributed
+  to folding. Deep supervision is unablated, the shared learning rate is
+  CFRD's own tuned value, and no ablation arms have been run at that scale.
 
 ## Training data notice
 
