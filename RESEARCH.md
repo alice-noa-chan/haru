@@ -286,7 +286,7 @@ structure. And the budget is roughly 1,200x smaller than a release run, so this
 tests early optimization rather than converged quality, which is precisely the
 regime where a folded model is most often argued to be at a disadvantage.
 
-### Where this leaves v1.2
+### Where this leaves v1.2, before the release-scale run
 
 No configuration of CFRD tested here reaches a plain dense decoder on either
 metric, at matched parameters or matched compute. The architecture is not
@@ -308,6 +308,82 @@ That leaves two honest options, and no third:
 What is no longer defensible is shipping a v1.2 that adds a sixth change to the
 fold and reports the combined result, which is the path v1.0 and v1.1 both
 took.
+
+## Release-scale result: the compact-scale conclusion does not hold
+
+Option 1 was run. Three seeds, 6,000 steps, 49,152,000 tokens per arm per seed,
+at the release architecture on an a GPU: d_model 384, 3 cells, 6 recurrences,
+binding block enabled, the 12,000-entry tokenizer, relation objective at weight
+0.20 in every arm.
+
+| Arm | Parameters | GFLOPs | Validation loss | Paired delta | Strict pairs | Margin |
+|---|---:|---:|---:|---:|---:|---:|
+| CFRD | 11,634,459 | 17.31 | **3.3765** (sd 0.0131) | reference | **0.413** | +2.46 |
+| Dense, parameter-matched | 11,669,377 | 11.95 | 3.4377 (sd 0.0034) | +0.0612 | 0.260 | +2.46 |
+| Dense, compute-matched | 16,943,233 | 17.34 | 3.3977 (sd 0.0169) | +0.0212 | 0.320 | +2.46 |
+
+A positive delta means CFRD won. Both deltas are positive on all three seeds
+and exceed the spread of the paired differences.
+
+**CFRD wins both comparisons at release scale.** The compute-matched result is
+the stronger one: that arm carries 45.6% more parameters at the same FLOPs and
+still loses by 0.0212 nats. On held-out binding CFRD reaches 0.413 strict pairs
+with every seed above the 0.25 chance level (0.46, 0.42, 0.36), while the
+parameter-matched dense arm straddles chance at 0.260 (0.24, 0.32, 0.22).
+
+This directly reverses the compact-scale table. Both results are real at their
+own scale, and the difference between them is the scale and budget: 11.6M
+parameters and 49.2M tokens per arm here, against 3.3M parameters and 0.6M
+tokens there. That is the limit the compact-scale section listed first, and it
+turned out to be the one that mattered. The compact-scale sections are kept
+unchanged rather than rewritten, because the finding they report is accurate
+where it was measured and the reversal is the more useful record.
+
+### What this result does not yet establish
+
+Three confounds sit between "CFRD won this table" and "folding is why", and
+none of them is addressed by the run above.
+
+- **Deep supervision is not ablated.** CFRD optimizes `final_loss + 0.15 x
+  mean(auxiliary exits)` at depths 2 and 4, so it receives gradient signal the
+  dense arms never get. A dense decoder can carry auxiliary heads at
+  intermediate layers just as easily. Part of the margin may be deep
+  supervision rather than the fold, and `aux_exit_loss_weight = 0` measures it.
+- **The learning rate favors CFRD by construction.** Every arm shares 4e-4,
+  which is the project's own CFRD-tuned value, with warmup and no decay. This
+  was recorded earlier as a reason a baseline win would be the stronger
+  evidence; the same reasoning now weakens a CFRD win. A short sweep per
+  architecture is needed before the margin can be attributed to structure.
+- **The budget is still 15x short of a release run**, 49.2M tokens per arm
+  against 753.7M for the v1.1 checkpoint. The direction of the scale effect is
+  now known, but not where it saturates.
+
+No ablation arms were run at this scale, so which component produces the win is
+unmeasured. At compact scale removing the binding block cost the most, but that
+table's conclusions did not survive the change of scale and there is no reason
+to assume its component ranking did either.
+
+### Where this leaves v1.2
+
+v1.2 is a CFRD model. Option 2, making the dense configuration the release
+path, is withdrawn: it rested on the compact-scale table, which the release
+scale contradicts.
+
+The order of work is fixed by what is unmeasured rather than by what is
+promising:
+
+1. Rerun this table with `--ablate` at release scale, to find which component
+   produces the win rather than crediting the architecture as a whole.
+2. Ablate deep supervision, by setting `aux_exit_loss_weight = 0`, and add
+   auxiliary heads to the dense baseline. This is the confound most likely to
+   explain the margin without involving the fold at all.
+3. Sweep the learning rate per architecture, so the shared CFRD-tuned value
+   stops being a thumb on the scale.
+4. Only then extend to a release budget and train a v1.2 checkpoint.
+
+The rule that produced v1.0 and v1.1's unattributable results still applies: a
+release may change one thing at a time, and this table is the first evidence
+Haru has ever had that the architecture does anything at all.
 
 ## Required validation and limits
 
