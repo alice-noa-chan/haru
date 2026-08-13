@@ -11,3 +11,5 @@ runs/
 reference_models/
 data/*
 !data/.gitkeep
+.venv/
+analysis/
