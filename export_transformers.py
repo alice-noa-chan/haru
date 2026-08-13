@@ -13,6 +13,7 @@ import config
 from configuration_cfrd import CFRDConfig
 from data_utils import blake2b_file
 from model import ModelConfig
+from model_factory import CFRD_ARCH, architecture_of_checkpoint
 from modeling_cfrd import CFRDForCausalLM
 from surface_features import build_surface_feature_table
 from tokenization_cfrd import CFRDTokenizer
@@ -193,6 +194,18 @@ def main() -> None:
 
     training_tokenizer = StoryTokenizer()
     training_tokenizer.validate_checkpoint(checkpoint)
+
+    # ModelConfig.from_checkpoint keeps only the fields it recognizes, and every
+    # field except vocab_size has a default. A dense-baseline checkpoint would
+    # therefore build a default CFRD and fail later on a state_dict mismatch
+    # that says nothing about the real cause.
+    architecture = architecture_of_checkpoint(checkpoint)
+    if architecture != CFRD_ARCH:
+        raise ValueError(
+            f"{checkpoint_path} holds a {architecture} model. The Transformers export format is CFRD-only; "
+            "ablation baselines are controls and are not released."
+        )
+
     model_config = ModelConfig.from_checkpoint(checkpoint, training_tokenizer.vocab_size)
     hf_config = CFRDConfig.from_model_config(
         model_config,
