@@ -74,7 +74,8 @@ class CFRDConfig(PretrainedConfig):
         self.inference_recurrences = recurrences if inference_recurrences is None else inference_recurrences
 
         kwargs.setdefault("is_decoder", True)
-        kwargs.setdefault("tie_word_embeddings", False)
+        # The core model uses token_embedding.weight directly for its LM head.
+        kwargs.setdefault("tie_word_embeddings", True)
         kwargs.setdefault("use_cache", False)
         super().__init__(
             bos_token_id=bos_token_id,

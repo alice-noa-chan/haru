@@ -50,8 +50,11 @@ class CFRDForCausalLM(CFRDPreTrainedModel, GenerationMixin):
         self.model.token_embedding = value
 
     def get_output_embeddings(self):
-        # The core model applies the input embedding weight as its tied LM head.
-        return None
+        return self.model.token_embedding
+
+    def set_output_embeddings(self, value) -> None:
+        # CFRD has one physical weight for input lookup and output projection.
+        self.model.token_embedding = value
 
     def forward(
         self,

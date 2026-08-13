@@ -173,6 +173,7 @@ def test_binding_block_config_compatibility() -> None:
     enabled = build_test_model().cfg
     hf_config = CFRDConfig.from_model_config(enabled)
     assert hf_config.use_binding_block
+    assert hf_config.tie_word_embeddings
     assert hf_config.to_model_config().use_binding_block
 
 
@@ -311,6 +312,7 @@ def test_transformers_auto_model_roundtrip() -> None:
     hf_config = CFRDConfig.from_model_config(core_model.cfg, inference_recurrences=4)
     hf_model = CFRDForCausalLM(hf_config).eval()
     hf_model.model.load_state_dict(core_model.state_dict())
+    assert hf_model.get_input_embeddings() is hf_model.get_output_embeddings()
     input_ids = torch.randint(0, TEST_VOCAB_SIZE, (1, 12))
 
     with torch.no_grad():
