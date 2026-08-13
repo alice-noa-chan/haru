@@ -188,6 +188,7 @@ def optimizer_settings() -> dict[str, Any]:
         "counterfactual_pairs_per_micro_batch": config.COUNTERFACTUAL_PAIRS_PER_MICRO_BATCH,
         "counterfactual_margin": config.COUNTERFACTUAL_MARGIN,
         "counterfactual_eval_pairs": config.COUNTERFACTUAL_EVAL_PAIRS,
+        "counterfactual_seed_offset": config.COUNTERFACTUAL_SEED_OFFSET,
         "precision": config.PRECISION,
         "seed": config.SEED,
     }
@@ -228,12 +229,13 @@ def save_checkpoint(
     best_val_loss: float,
     model_cfg: ModelConfig,
     tokenizer_hash: str,
-    train_rng: np.random.Generator,
+    lm_rng: np.random.Generator,
+    counterfactual_rng: np.random.Generator,
 ) -> None:
     """Atomically save all state required for an exact training resume."""
 
     state = {
-        "checkpoint_version": 3,
+        "checkpoint_version": 4,
         "model": model.state_dict(),
         "optimizer": optimizer.state_dict(),
         "step": step,
@@ -242,7 +244,9 @@ def save_checkpoint(
         "model_config": asdict(model_cfg),
         "optimizer_config": optimizer_settings(),
         "tokenizer_blake2b16": tokenizer_hash,
-        "train_rng_state": train_rng.bit_generator.state,
+        "training_rng_mode": "shared" if lm_rng is counterfactual_rng else "separate",
+        "lm_rng_state": lm_rng.bit_generator.state,
+        "counterfactual_rng_state": counterfactual_rng.bit_generator.state,
         "rng": {
             "python": random.getstate(),
             "numpy": np.random.get_state(),
@@ -262,8 +266,9 @@ def restore_checkpoint(
     optimizer: torch.optim.Optimizer,
     model_cfg: ModelConfig,
     tokenizer_hash: str,
-    train_rng: np.random.Generator,
-) -> tuple[int, int, float]:
+    lm_rng: np.random.Generator,
+    counterfactual_rng: np.random.Generator,
+) -> tuple[int, int, float, str]:
     """Restore a checkpoint after validating its experiment configuration."""
 
     checkpoint = torch.load(path, map_location="cpu", weights_only=False)
@@ -276,7 +281,9 @@ def restore_checkpoint(
             "Checkpoint model configuration differs from config.py. Use a new RUN_NAME for a new architecture."
         )
 
-    if checkpoint.get("optimizer_config") != optimizer_settings():
+    saved_optimizer_config = dict(checkpoint.get("optimizer_config", {}))
+    saved_optimizer_config.setdefault("counterfactual_seed_offset", config.COUNTERFACTUAL_SEED_OFFSET)
+    if saved_optimizer_config != optimizer_settings():
         raise ValueError(
             "Checkpoint training settings differ from config.py. "
             "Use a new RUN_NAME instead of silently mixing experiments."
@@ -288,10 +295,21 @@ def restore_checkpoint(
     model.load_state_dict(checkpoint["model"])
     optimizer.load_state_dict(checkpoint["optimizer"])
 
-    train_rng_state = checkpoint.get("train_rng_state")
-    if train_rng_state is None:
-        raise ValueError("Checkpoint does not contain the exact training sampler state")
-    train_rng.bit_generator.state = train_rng_state
+    training_rng_mode = str(checkpoint.get("training_rng_mode", "shared"))
+    if training_rng_mode == "separate":
+        lm_rng_state = checkpoint.get("lm_rng_state")
+        counterfactual_rng_state = checkpoint.get("counterfactual_rng_state")
+        if lm_rng_state is None or counterfactual_rng_state is None:
+            raise ValueError("Separate-RNG checkpoint does not contain both sampler states")
+        lm_rng.bit_generator.state = lm_rng_state
+        counterfactual_rng.bit_generator.state = counterfactual_rng_state
+    elif training_rng_mode == "shared":
+        shared_rng_state = checkpoint.get("lm_rng_state", checkpoint.get("train_rng_state"))
+        if shared_rng_state is None:
+            raise ValueError("Checkpoint does not contain the exact training sampler state")
+        lm_rng.bit_generator.state = shared_rng_state
+    else:
+        raise ValueError(f"Unsupported training_rng_mode: {training_rng_mode}")
 
     rng = checkpoint.get("rng")
     if rng:
@@ -305,6 +323,7 @@ def restore_checkpoint(
         int(checkpoint.get("step", 0)),
         int(checkpoint.get("tokens_seen", 0)),
         float(checkpoint.get("best_val_loss", float("inf"))),
+        training_rng_mode,
     )
 
 
@@ -418,19 +437,23 @@ def main() -> None:
     start_step = 0
     tokens_seen = 0
     best_val_loss = float("inf")
-    train_rng = np.random.default_rng(config.SEED)
+    lm_rng = np.random.default_rng(config.SEED)
+    counterfactual_rng = np.random.default_rng(config.SEED + config.COUNTERFACTUAL_SEED_OFFSET)
     counterfactual_sampler = CounterfactualSampler("train")
 
     if config.LATEST_CHECKPOINT_PATH.exists():
         print(f"Resuming checkpoint: {config.LATEST_CHECKPOINT_PATH}", flush=True)
-        start_step, tokens_seen, best_val_loss = restore_checkpoint(
+        start_step, tokens_seen, best_val_loss, training_rng_mode = restore_checkpoint(
             config.LATEST_CHECKPOINT_PATH,
             model,
             optimizer,
             model_cfg,
             tokenizer_hash,
-            train_rng,
+            lm_rng,
+            counterfactual_rng,
         )
+        if training_rng_mode == "shared":
+            counterfactual_rng = lm_rng
         model.to(device)
 
     train_model: torch.nn.Module = model
@@ -483,11 +506,11 @@ def main() -> None:
                 config.BATCH_SIZE,
                 config.CONTEXT_LENGTH,
                 device,
-                train_rng,
+                lm_rng,
             )
             relation_pairs = counterfactual_sampler.sample_batch(
                 config.COUNTERFACTUAL_PAIRS_PER_MICRO_BATCH,
-                train_rng,
+                counterfactual_rng,
             )
             relation_batch = encode_counterfactual_pairs(
                 relation_pairs,
@@ -613,7 +636,8 @@ def main() -> None:
                     best_val_loss,
                     model_cfg,
                     tokenizer_hash,
-                    train_rng,
+                    lm_rng,
+                    counterfactual_rng,
                 )
                 print(f"Saved best checkpoint: {config.BEST_CHECKPOINT_PATH}", flush=True)
 
@@ -628,7 +652,8 @@ def main() -> None:
                 best_val_loss,
                 model_cfg,
                 tokenizer_hash,
-                train_rng,
+                lm_rng,
+                counterfactual_rng,
             )
             print(f"Saved latest checkpoint: {config.LATEST_CHECKPOINT_PATH}", flush=True)
 
