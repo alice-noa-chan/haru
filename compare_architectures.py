@@ -27,7 +27,7 @@ import argparse
 import json
 import math
 import time
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from pathlib import Path
 
 import numpy as np
@@ -134,6 +134,31 @@ def match_baselines(cfrd_cfg: ModelConfig, cfrd_parameters: int) -> dict[str, Ba
         "baseline-param-matched": BaselineConfig(n_layer=best_layers, ffn_dim=best_ffn, **shared),
         "baseline-compute-matched": BaselineConfig(n_layer=compute_layers, ffn_dim=best_ffn, **shared),
     }
+
+
+def cfrd_ablations(cfrd_cfg: ModelConfig) -> dict[str, ModelConfig]:
+    """Within-CFRD arms that separate the changes v1.1 shipped together.
+
+    v1.1 added a third physical cell, a full-context binding block, a larger
+    vocabulary, and an auxiliary relation objective in one release, then
+    reported a combined gain. RESEARCH.md already requires these components to
+    be ablated rather than credited jointly. Two of them are structural and can
+    be isolated by rebuilding the same configuration with one field changed:
+
+    - cfrd-no-binding-block removes the only full-context path. If the measured
+      binding gain survives, it came from folding; if it disappears, v1.1's
+      result is a plain attention block wearing a recurrent architecture.
+    - cfrd-unfolded gives every recurrence its own cell, holding depth and the
+      binding block fixed while removing parameter sharing. It costs more
+      parameters by construction, which is the point: it prices the sharing.
+    """
+
+    variants: dict[str, ModelConfig] = {}
+    if cfrd_cfg.use_binding_block:
+        variants["cfrd-no-binding-block"] = replace(cfrd_cfg, use_binding_block=False)
+    if cfrd_cfg.physical_cells < cfrd_cfg.recurrences:
+        variants["cfrd-unfolded"] = replace(cfrd_cfg, physical_cells=cfrd_cfg.recurrences)
+    return variants
 
 
 def load_token_stream(tokenizer: StoryTokenizer, lines: int, path: Path) -> np.ndarray:
@@ -427,6 +452,12 @@ def parse_arguments() -> argparse.Namespace:
         "Set 0 to compare plain language modelling only. Entity binding is what v1.1 claims, "
         "so leaving this off measures the one thing CFRD was not built for.",
     )
+    parser.add_argument(
+        "--ablate",
+        action="store_true",
+        help="Add within-CFRD arms that remove the binding block and parameter sharing, so v1.1's "
+        "bundled changes can be credited individually instead of jointly.",
+    )
     parser.add_argument("--relation-pairs", type=int, default=config.COUNTERFACTUAL_PAIRS_PER_MICRO_BATCH)
     parser.add_argument("--relation-eval-pairs", type=int, default=config.COUNTERFACTUAL_EVAL_PAIRS)
     parser.add_argument("--log-interval", type=int, default=50)
@@ -457,7 +488,11 @@ def main() -> None:
 
     torch.manual_seed(config.SEED)
     cfrd_parameters = count_parameters(build_model(cfrd_cfg, surface_features))["total"]
+    # Baselines are sized against the full CFRD, never against an ablated one,
+    # so every arm in the table is matched to the same reference.
     architectures = {"cfrd": cfrd_cfg, **match_baselines(cfrd_cfg, cfrd_parameters)}
+    if args.ablate:
+        architectures.update(cfrd_ablations(cfrd_cfg))
 
     print(f"Loading up to {args.corpus_lines:,} records from {config.DATA_DIR / 'data.txt'}", flush=True)
     stream = load_token_stream(tokenizer, args.corpus_lines, config.DATA_DIR / "data.txt")

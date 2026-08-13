@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import tempfile
-from dataclasses import asdict
+from dataclasses import asdict, fields
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -13,7 +13,7 @@ from transformers.utils import logging as transformers_logging
 
 import config
 from baseline_model import BaselineConfig, BaselineLanguageModel
-from compare_architectures import baseline_parameter_count, match_baselines
+from compare_architectures import baseline_parameter_count, cfrd_ablations, match_baselines
 from configuration_cfrd import CFRDConfig
 from counterfactual_data import (
     RELATION_CATEGORIES,
@@ -678,6 +678,42 @@ def test_matched_sizing_is_exact() -> None:
     assert compute_matched.ffn_dim == parameter_matched.ffn_dim
 
 
+def test_cfrd_ablations_change_one_field_each() -> None:
+    """An ablation arm must differ from the reference in exactly one way.
+
+    If a variant changed a second field, its result would credit or blame the
+    wrong component, which is the attribution error the ablation exists to fix.
+    """
+
+    reference = build_test_model().cfg
+    variants = cfrd_ablations(reference)
+    assert set(variants) == {"cfrd-no-binding-block", "cfrd-unfolded"}
+
+    features = torch.randn(TEST_VOCAB_SIZE, SURFACE_FEATURE_DIM)
+    x = torch.randint(0, TEST_VOCAB_SIZE, (2, TEST_CONTEXT_LENGTH))
+    y = torch.randint(0, TEST_VOCAB_SIZE, (2, TEST_CONTEXT_LENGTH))
+
+    expected_field = {"cfrd-no-binding-block": "use_binding_block", "cfrd-unfolded": "physical_cells"}
+    for name, variant in variants.items():
+        changed = [
+            field.name
+            for field in fields(ModelConfig)
+            if getattr(variant, field.name) != getattr(reference, field.name)
+        ]
+        assert changed == [expected_field[name]], f"{name} changed {changed}"
+
+        model = build_model(variant, features)
+        output = model(x, targets=y)
+        assert output.loss is not None
+        assert torch.isfinite(output.loss)
+
+    # Removing the block must remove parameters; unfolding must add them.
+    parameters = {name: count_parameters(build_model(cfg, features))["total"] for name, cfg in variants.items()}
+    baseline_parameters = count_parameters(build_model(reference, features))["total"]
+    assert parameters["cfrd-no-binding-block"] < baseline_parameters
+    assert parameters["cfrd-unfolded"] > baseline_parameters
+
+
 def print_default_parameter_count() -> None:
     cfg = ModelConfig.from_project_settings(config, config.TOKENIZER_VOCAB_SIZE)
     dummy_features = torch.zeros(config.TOKENIZER_VOCAB_SIZE, SURFACE_FEATURE_DIM)
@@ -778,6 +814,7 @@ def main() -> None:
     test_untagged_checkpoint_reads_as_cfrd()
     test_baseline_checkpoint_resume_and_arch_guard()
     test_matched_sizing_is_exact()
+    test_cfrd_ablations_change_one_field_each()
     print_default_parameter_count()
     print("smoke tests passed")
 
