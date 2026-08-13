@@ -1,0 +1,21 @@
+{
+  "ngram": 40,
+  "tasks": [
+    "kobest_boolq",
+    "kobest_copa",
+    "kobest_hellaswag",
+    "kobest_sentineg",
+    "kobest_wic"
+  ],
+  "splits": [
+    "test",
+    "validation"
+  ],
+  "corpora": {
+    "textbooks.txt": {
+      "kept": 238974,
+      "dropped": 15,
+      "drop_rate": 6.276439501399646e-05
+    }
+  }
+}
