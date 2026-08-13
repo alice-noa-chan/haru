@@ -112,6 +112,13 @@ SURFACE_FEATURE_GAIN_INIT = 0.10
 # ============================================================================
 # Dense Transformer baseline
 # ============================================================================
+# "cfrd" trains the folded recurrent architecture above. "dense-baseline"
+# trains the control in baseline_model.py using D_MODEL, N_HEAD, N_KV_HEAD,
+# CONTEXT_LENGTH, and the settings below. Always pair a change here with a new
+# RUN_NAME: train.py refuses to resume across architectures, but a fresh run
+# would otherwise write its checkpoints beside an unrelated experiment.
+MODEL_ARCH = "cfrd"
+
 # CFRD reuses three cells six times, so it spends about 1.47x the forward FLOPs
 # of a dense decoder holding the same parameter count. Quoting a single
 # "same parameter count" win would therefore compare unequal compute budgets.

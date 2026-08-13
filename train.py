@@ -16,7 +16,16 @@ import config
 from counterfactual_data import CounterfactualSampler
 from counterfactual_objective import counterfactual_ranking_result, encode_counterfactual_pairs
 from data_utils import blake2b_file, dataset_fingerprint
-from model import CFRDLanguageModel, ModelConfig, count_parameters
+from model import count_parameters
+from model_factory import (
+    AnyLanguageModel,
+    AnyModelConfig,
+    architecture_of_checkpoint,
+    architecture_of_config,
+    build_model,
+    build_model_config,
+    describe_architecture,
+)
 from surface_features import build_surface_feature_table
 from tokenizer_utils import StoryTokenizer
 
@@ -194,7 +203,7 @@ def optimizer_settings() -> dict[str, Any]:
     }
 
 
-def write_experiment_snapshot(model_cfg: ModelConfig, packed_meta: dict[str, Any]) -> None:
+def write_experiment_snapshot(model_cfg: AnyModelConfig, packed_meta: dict[str, Any]) -> None:
     """Write an immutable, human-readable description of a new run."""
 
     path = config.RUN_DIR / "experiment.json"
@@ -203,6 +212,7 @@ def write_experiment_snapshot(model_cfg: ModelConfig, packed_meta: dict[str, Any
 
     snapshot = {
         "run_name": config.RUN_NAME,
+        "model_arch": architecture_of_config(model_cfg),
         "model_config": asdict(model_cfg),
         "training_config": optimizer_settings(),
         "packed_data": packed_meta,
@@ -222,12 +232,12 @@ def append_jsonl(path: Path, row: dict[str, Any]) -> None:
 
 def save_checkpoint(
     path: Path,
-    model: CFRDLanguageModel,
+    model: AnyLanguageModel,
     optimizer: torch.optim.Optimizer,
     step: int,
     tokens_seen: int,
     best_val_loss: float,
-    model_cfg: ModelConfig,
+    model_cfg: AnyModelConfig,
     tokenizer_hash: str,
     lm_rng: np.random.Generator,
     counterfactual_rng: np.random.Generator,
@@ -235,12 +245,14 @@ def save_checkpoint(
     """Atomically save all state required for an exact training resume."""
 
     state = {
-        "checkpoint_version": 4,
+        # Version 5 adds "model_arch". Untagged files are CFRD by construction.
+        "checkpoint_version": 5,
         "model": model.state_dict(),
         "optimizer": optimizer.state_dict(),
         "step": step,
         "tokens_seen": tokens_seen,
         "best_val_loss": best_val_loss,
+        "model_arch": architecture_of_config(model_cfg),
         "model_config": asdict(model_cfg),
         "optimizer_config": optimizer_settings(),
         "tokenizer_blake2b16": tokenizer_hash,
@@ -262,9 +274,9 @@ def save_checkpoint(
 
 def restore_checkpoint(
     path: Path,
-    model: CFRDLanguageModel,
+    model: AnyLanguageModel,
     optimizer: torch.optim.Optimizer,
-    model_cfg: ModelConfig,
+    model_cfg: AnyModelConfig,
     tokenizer_hash: str,
     lm_rng: np.random.Generator,
     counterfactual_rng: np.random.Generator,
@@ -272,6 +284,16 @@ def restore_checkpoint(
     """Restore a checkpoint after validating its experiment configuration."""
 
     checkpoint = torch.load(path, map_location="cpu", weights_only=False)
+
+    # Report an architecture mismatch before the config diff, whose field lists
+    # do not overlap across architectures and so explain nothing on their own.
+    saved_architecture = architecture_of_checkpoint(checkpoint)
+    expected_architecture = architecture_of_config(model_cfg)
+    if saved_architecture != expected_architecture:
+        raise ValueError(
+            f"Checkpoint at {path} holds a {saved_architecture} model but config.py requests "
+            f"{expected_architecture}. Use a new RUN_NAME for a new architecture."
+        )
 
     saved_model_config = dict(checkpoint.get("model_config", {}))
     if saved_model_config.get("exit_depths") is not None:
@@ -329,7 +351,7 @@ def restore_checkpoint(
 
 @torch.no_grad()
 def evaluate(
-    model: CFRDLanguageModel,
+    model: AnyLanguageModel,
     val_data: np.memmap,
     device: torch.device,
 ) -> dict[str, float]:
@@ -377,7 +399,7 @@ def evaluate(
 
 @torch.no_grad()
 def evaluate_counterfactual_relations(
-    model: CFRDLanguageModel,
+    model: AnyLanguageModel,
     tokenizer: StoryTokenizer,
     device: torch.device,
 ) -> dict[str, float]:
@@ -425,8 +447,8 @@ def main() -> None:
     tokenizer_hash = blake2b_file(config.TOKENIZER_MODEL_PATH)
 
     surface_features = build_surface_feature_table(tokenizer)
-    model_cfg = ModelConfig.from_project_settings(config, tokenizer.vocab_size)
-    model = CFRDLanguageModel(model_cfg, surface_features)
+    model_cfg = build_model_config(config, tokenizer.vocab_size)
+    model = build_model(model_cfg, surface_features)
     parameter_count = count_parameters(model)
     write_experiment_snapshot(model_cfg, meta)
 
@@ -467,7 +489,7 @@ def main() -> None:
     max_steps = math.ceil(config.TARGET_TOKENS / tokens_per_optimizer_step)
 
     print("=" * 78, flush=True)
-    print("CFRD training", flush=True)
+    print(f"Haru training: {describe_architecture(model_cfg)}", flush=True)
     print(f"device={device}", flush=True)
     print(f"precision={config.PRECISION}", flush=True)
     print(f"parameters={parameter_count['total']:,}", flush=True)

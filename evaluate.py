@@ -6,7 +6,7 @@ import numpy as np
 import torch
 
 import config
-from model import CFRDLanguageModel, ModelConfig
+from model_factory import AnyLanguageModel, build_model, describe_architecture, model_config_from_checkpoint
 from surface_features import build_surface_feature_table
 from tokenizer_utils import StoryTokenizer
 from train import (
@@ -29,7 +29,7 @@ def make_final_eval_rng() -> np.random.Generator:
 
 @torch.inference_mode()
 def evaluate_depth(
-    model: CFRDLanguageModel,
+    model: AnyLanguageModel,
     data: np.memmap,
     device: torch.device,
     recurrence_depth: int,
@@ -72,17 +72,19 @@ def main() -> None:
 
     checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
     tokenizer.validate_checkpoint(checkpoint)
-    model_cfg = ModelConfig.from_checkpoint(checkpoint, tokenizer.vocab_size)
+    model_cfg = model_config_from_checkpoint(checkpoint, tokenizer.vocab_size)
     surface_features = build_surface_feature_table(tokenizer)
 
-    model = CFRDLanguageModel(model_cfg, surface_features)
+    model = build_model(model_cfg, surface_features)
     model.load_state_dict(checkpoint["model"])
     model.to(device)
     model.eval()
+    print(f"Evaluating {describe_architecture(model_cfg)}", flush=True)
 
     val_data = open_token_stream(config.VAL_BIN_PATH)
 
-    results: dict[str, float | int] = {}
+    results: dict[str, float | int | str] = {}
+    results["model_arch"] = describe_architecture(model_cfg).split()[0]
     results["checkpoint_step"] = int(checkpoint.get("step", 0))
     results["tokens_seen"] = int(checkpoint.get("tokens_seen", 0))
     results["evaluation_seed"] = config.SEED + FINAL_EVAL_SEED_OFFSET
