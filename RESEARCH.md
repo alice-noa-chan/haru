@@ -103,10 +103,13 @@ Three further properties of the comparison matter:
   gates start at sigmoid(-1) and its updates are scaled by 1/sqrt(recurrences),
   so this setting is more likely to suit CFRD than the controls. A baseline win
   under a CFRD-tuned schedule is therefore stronger evidence than the reverse.
-- CFRD's initial loss on shifted targets is 11.0 against a uniform reference of
-  ln(12000) = 9.39, while the dense baseline starts at 9.49. The gated residual
-  stack begins further from uniform than random initialization would, which is
-  a property of the architecture worth separating from its trained quality.
+- CFRD's `ModelOutput.loss` is the deep-supervision total, `final_loss + 0.15 x
+  mean(auxiliary exits)`, while the dense baseline has one exit and so reports
+  plain cross-entropy. The two fields are not comparable, and every comparison
+  must read `final_loss`. On shifted targets at initialization CFRD's
+  `final_loss` is 9.5698 and the baseline's is 9.4677, both near the uniform
+  reference of ln(12000) = 9.3927; CFRD's `loss` for the same batch is 11.0091,
+  which is 1.15x its exit mean and not a property of the architecture at all.
 
 The v1.1 depth sweep should be read against these compute figures rather than
 against parameter count: depth 2, 4, and 6 cost 10.01, 13.66, and 17.31 GFLOPs
