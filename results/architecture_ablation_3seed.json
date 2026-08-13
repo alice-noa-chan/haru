@@ -1,0 +1,1106 @@
+{
+  "scale": "small",
+  "device": "cpu",
+  "seeds": [
+    1337,
+    1338,
+    1339
+  ],
+  "steps": 300,
+  "batch_size": 8,
+  "relation_weight": 0.2,
+  "relation_pairs_per_step": 5,
+  "relation_eval_pairs": 100,
+  "tokenizer": "tokenizer\\tiny_ko_8k.model",
+  "vocab_size": 8192,
+  "train_tokens": 7335170,
+  "validation_tokens": 149698,
+  "summary": [
+    {
+      "name": "cfrd",
+      "architecture": "cfrd",
+      "shape": "cfrd cells=3 recurrences=4 d_model=192 ffn=512 binding_block=True",
+      "parameters": 3339673,
+      "forward_gflops": 1.927675904,
+      "seeds": [
+        1337,
+        1338,
+        1339
+      ],
+      "validation_losses": [
+        4.731808972358704,
+        4.709371078014374,
+        4.740580451488495
+      ],
+      "mean_validation_loss": 4.727253500620524,
+      "std_validation_loss": 0.016095666815320635,
+      "mean_validation_perplexity": 112.98482307491534,
+      "strict_pair_accuracies": [
+        0.07000000029802322,
+        0.0,
+        0.25999999046325684
+      ],
+      "mean_strict_pair_accuracy": 0.10999999692042668,
+      "mean_relation_margin": 0.1636674185671533
+    },
+    {
+      "name": "baseline-param-matched",
+      "architecture": "dense-baseline",
+      "shape": "dense-baseline layers=4 d_model=192 ffn=600",
+      "parameters": 3364801,
+      "forward_gflops": 1.721892864,
+      "seeds": [
+        1337,
+        1338,
+        1339
+      ],
+      "validation_losses": [
+        4.662336814403534,
+        4.652059435844421,
+        4.652800619602203
+      ],
+      "mean_validation_loss": 4.655732289950053,
+      "std_validation_loss": 0.005731679141680083,
+      "mean_validation_perplexity": 105.18621861357771,
+      "strict_pair_accuracies": [
+        0.1899999976158142,
+        0.33000001311302185,
+        0.09000000357627869
+      ],
+      "mean_strict_pair_accuracy": 0.20333333810170492,
+      "mean_relation_margin": 0.5322085022926331,
+      "paired_deltas": [
+        -0.06947215795517003,
+        -0.057311642169952215,
+        -0.08777983188629168
+      ],
+      "mean_paired_delta": -0.0715212106704713,
+      "std_paired_delta": 0.015337099103816084,
+      "delta_exceeds_spread": true
+    },
+    {
+      "name": "baseline-compute-matched",
+      "architecture": "dense-baseline",
+      "shape": "dense-baseline layers=5 d_model=192 ffn=600",
+      "parameters": 3809089,
+      "forward_gflops": 1.949171712,
+      "seeds": [
+        1337,
+        1338,
+        1339
+      ],
+      "validation_losses": [
+        4.657008576393127,
+        4.659846830368042,
+        4.638610923290253
+      ],
+      "mean_validation_loss": 4.65182211001714,
+      "std_validation_loss": 0.011528899013177676,
+      "mean_validation_perplexity": 104.7757246479901,
+      "strict_pair_accuracies": [
+        0.4099999964237213,
+        0.3199999928474426,
+        0.30000001192092896
+      ],
+      "mean_strict_pair_accuracy": 0.34333333373069763,
+      "mean_relation_margin": 0.8262486259142557,
+      "paired_deltas": [
+        -0.07480039596557653,
+        -0.04952424764633179,
+        -0.10196952819824201
+      ],
+      "mean_paired_delta": -0.07543139060338344,
+      "std_paired_delta": 0.02622833351009646,
+      "delta_exceeds_spread": true
+    },
+    {
+      "name": "cfrd-no-binding-block",
+      "architecture": "cfrd",
+      "shape": "cfrd cells=3 recurrences=4 d_model=192 ffn=512 binding_block=False",
+      "parameters": 2945687,
+      "forward_gflops": 1.726152704,
+      "seeds": [
+        1337,
+        1338,
+        1339
+      ],
+      "validation_losses": [
+        4.811770737171173,
+        4.7915414571762085,
+        4.772596788406372
+      ],
+      "mean_validation_loss": 4.791969660917918,
+      "std_validation_loss": 0.019590484534337607,
+      "mean_validation_perplexity": 120.53855507916863,
+      "strict_pair_accuracies": [
+        0.03999999910593033,
+        0.09000000357627869,
+        0.0
+      ],
+      "mean_strict_pair_accuracy": 0.04333333422740301,
+      "mean_relation_margin": 0.02683239181836446,
+      "paired_deltas": [
+        0.0799617648124693,
+        0.0821703791618349,
+        0.0320163369178772
+      ],
+      "mean_paired_delta": 0.0647161602973938,
+      "std_paired_delta": 0.02834040104029478,
+      "delta_exceeds_spread": true
+    },
+    {
+      "name": "cfrd-unfolded",
+      "architecture": "cfrd",
+      "shape": "cfrd cells=4 recurrences=4 d_model=192 ffn=512 binding_block=True",
+      "parameters": 3791327,
+      "forward_gflops": 1.927675904,
+      "seeds": [
+        1337,
+        1338,
+        1339
+      ],
+      "validation_losses": [
+        4.699785649776459,
+        4.693778598308564,
+        4.69373049736023
+      ],
+      "mean_validation_loss": 4.695764915148417,
+      "std_validation_loss": 0.003482141386726816,
+      "mean_validation_perplexity": 109.4825214602815,
+      "strict_pair_accuracies": [
+        0.05000000074505806,
+        0.05000000074505806,
+        0.029999999329447746
+      ],
+      "mean_strict_pair_accuracy": 0.043333333606521286,
+      "mean_relation_margin": 0.03844192158430815,
+      "paired_deltas": [
+        -0.03202332258224505,
+        -0.015592479705810014,
+        -0.0468499541282652
+      ],
+      "mean_paired_delta": -0.031488585472106756,
+      "std_paired_delta": 0.01563559671551839,
+      "delta_exceeds_spread": true
+    },
+    {
+      "name": "cfrd-full-attention",
+      "architecture": "cfrd",
+      "shape": "cfrd cells=3 recurrences=4 d_model=192 ffn=512 binding_block=True",
+      "parameters": 3166665,
+      "forward_gflops": 1.820393472,
+      "seeds": [
+        1337,
+        1338,
+        1339
+      ],
+      "validation_losses": [
+        4.766819894313812,
+        4.821634542942047,
+        4.784777045249939
+      ],
+      "mean_validation_loss": 4.791077160835266,
+      "std_validation_loss": 0.02794512512676548,
+      "mean_validation_perplexity": 120.43102240239715,
+      "strict_pair_accuracies": [
+        0.009999999776482582,
+        0.12999999523162842,
+        0.009999999776482582
+      ],
+      "mean_strict_pair_accuracy": 0.049999998261531196,
+      "mean_relation_margin": 0.08669461713482936,
+      "paired_deltas": [
+        0.035010921955108465,
+        0.1122634649276737,
+        0.044196593761443914
+      ],
+      "mean_paired_delta": 0.06382366021474202,
+      "std_paired_delta": 0.042200771937295704,
+      "delta_exceeds_spread": true
+    }
+  ],
+  "results": [
+    {
+      "name": "cfrd",
+      "seed": 1337,
+      "architecture": "cfrd",
+      "shape": "cfrd cells=3 recurrences=4 d_model=192 ffn=512 binding_block=True",
+      "model_config": {
+        "vocab_size": 8192,
+        "context_length": 256,
+        "chunk_size": 64,
+        "d_model": 192,
+        "n_head": 6,
+        "n_kv_head": 2,
+        "ffn_dim": 512,
+        "rope_theta": 10000.0,
+        "dropout": 0.0,
+        "summary_slots": 4,
+        "memory_dim": 64,
+        "memory_heads": 4,
+        "memory_recency_bias_init": 0.1,
+        "physical_cells": 3,
+        "recurrences": 4,
+        "exit_depths": [
+          2,
+          4
+        ],
+        "aux_exit_loss_weight": 0.15,
+        "residual_gate_init": -1.0,
+        "memory_gain_init": 0.0,
+        "use_binding_block": true,
+        "cell_attention": "local",
+        "use_surface_features": true,
+        "surface_feature_dim": 76,
+        "surface_feature_gain_init": 0.1
+      },
+      "parameters": 3339673,
+      "forward_gflops": 1.927675904,
+      "validation_loss": 4.731808972358704,
+      "validation_perplexity": 113.50069637426375,
+      "wall_seconds": 258.5379423999984,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 9.051506996154785
+        },
+        {
+          "step": 300,
+          "train_loss": 4.559189796447754
+        }
+      ],
+      "relation_loss": 1.1988000869750977,
+      "relation_decision_accuracy": 0.5350000262260437,
+      "relation_strict_pair_accuracy": 0.07000000029802322,
+      "relation_mean_margin": 0.17162758111953735
+    },
+    {
+      "name": "cfrd",
+      "seed": 1338,
+      "architecture": "cfrd",
+      "shape": "cfrd cells=3 recurrences=4 d_model=192 ffn=512 binding_block=True",
+      "model_config": {
+        "vocab_size": 8192,
+        "context_length": 256,
+        "chunk_size": 64,
+        "d_model": 192,
+        "n_head": 6,
+        "n_kv_head": 2,
+        "ffn_dim": 512,
+        "rope_theta": 10000.0,
+        "dropout": 0.0,
+        "summary_slots": 4,
+        "memory_dim": 64,
+        "memory_heads": 4,
+        "memory_recency_bias_init": 0.1,
+        "physical_cells": 3,
+        "recurrences": 4,
+        "exit_depths": [
+          2,
+          4
+        ],
+        "aux_exit_loss_weight": 0.15,
+        "residual_gate_init": -1.0,
+        "memory_gain_init": 0.0,
+        "use_binding_block": true,
+        "cell_attention": "local",
+        "use_surface_features": true,
+        "surface_feature_dim": 76,
+        "surface_feature_gain_init": 0.1
+      },
+      "parameters": 3339673,
+      "forward_gflops": 1.927675904,
+      "validation_loss": 4.709371078014374,
+      "validation_perplexity": 110.98233871912427,
+      "wall_seconds": 262.49956109999766,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 9.043144226074219
+        },
+        {
+          "step": 300,
+          "train_loss": 4.710294723510742
+        }
+      ],
+      "relation_loss": 1.2083278894424438,
+      "relation_decision_accuracy": 0.5,
+      "relation_strict_pair_accuracy": 0.0,
+      "relation_mean_margin": 0.0008063554996624589
+    },
+    {
+      "name": "cfrd",
+      "seed": 1339,
+      "architecture": "cfrd",
+      "shape": "cfrd cells=3 recurrences=4 d_model=192 ffn=512 binding_block=True",
+      "model_config": {
+        "vocab_size": 8192,
+        "context_length": 256,
+        "chunk_size": 64,
+        "d_model": 192,
+        "n_head": 6,
+        "n_kv_head": 2,
+        "ffn_dim": 512,
+        "rope_theta": 10000.0,
+        "dropout": 0.0,
+        "summary_slots": 4,
+        "memory_dim": 64,
+        "memory_heads": 4,
+        "memory_recency_bias_init": 0.1,
+        "physical_cells": 3,
+        "recurrences": 4,
+        "exit_depths": [
+          2,
+          4
+        ],
+        "aux_exit_loss_weight": 0.15,
+        "residual_gate_init": -1.0,
+        "memory_gain_init": 0.0,
+        "use_binding_block": true,
+        "cell_attention": "local",
+        "use_surface_features": true,
+        "surface_feature_dim": 76,
+        "surface_feature_gain_init": 0.1
+      },
+      "parameters": 3339673,
+      "forward_gflops": 1.927675904,
+      "validation_loss": 4.740580451488495,
+      "validation_perplexity": 114.50064446439966,
+      "wall_seconds": 268.07867710000573,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 9.043652534484863
+        },
+        {
+          "step": 300,
+          "train_loss": 4.788070201873779
+        }
+      ],
+      "relation_loss": 1.0242329835891724,
+      "relation_decision_accuracy": 0.6299999952316284,
+      "relation_strict_pair_accuracy": 0.25999999046325684,
+      "relation_mean_margin": 0.31856831908226013
+    },
+    {
+      "name": "baseline-param-matched",
+      "seed": 1337,
+      "architecture": "dense-baseline",
+      "shape": "dense-baseline layers=4 d_model=192 ffn=600",
+      "model_config": {
+        "vocab_size": 8192,
+        "context_length": 256,
+        "d_model": 192,
+        "n_head": 6,
+        "n_kv_head": 2,
+        "ffn_dim": 600,
+        "n_layer": 4,
+        "rope_theta": 10000.0,
+        "dropout": 0.0,
+        "use_surface_features": true,
+        "surface_feature_dim": 76,
+        "surface_feature_gain_init": 0.1
+      },
+      "parameters": 3364801,
+      "forward_gflops": 1.721892864,
+      "validation_loss": 4.662336814403534,
+      "validation_perplexity": 105.8832227233306,
+      "wall_seconds": 158.11088459999883,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 9.033784866333008
+        },
+        {
+          "step": 300,
+          "train_loss": 4.4848175048828125
+        }
+      ],
+      "relation_loss": 1.1438968181610107,
+      "relation_decision_accuracy": 0.5950000286102295,
+      "relation_strict_pair_accuracy": 0.1899999976158142,
+      "relation_mean_margin": 0.445873498916626
+    },
+    {
+      "name": "baseline-param-matched",
+      "seed": 1338,
+      "architecture": "dense-baseline",
+      "shape": "dense-baseline layers=4 d_model=192 ffn=600",
+      "model_config": {
+        "vocab_size": 8192,
+        "context_length": 256,
+        "d_model": 192,
+        "n_head": 6,
+        "n_kv_head": 2,
+        "ffn_dim": 600,
+        "n_layer": 4,
+        "rope_theta": 10000.0,
+        "dropout": 0.0,
+        "use_surface_features": true,
+        "surface_feature_dim": 76,
+        "surface_feature_gain_init": 0.1
+      },
+      "parameters": 3364801,
+      "forward_gflops": 1.721892864,
+      "validation_loss": 4.652059435844421,
+      "validation_perplexity": 104.80059358442487,
+      "wall_seconds": 156.91921450000518,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 9.054583549499512
+        },
+        {
+          "step": 300,
+          "train_loss": 4.6321563720703125
+        }
+      ],
+      "relation_loss": 0.842811644077301,
+      "relation_decision_accuracy": 0.6650000214576721,
+      "relation_strict_pair_accuracy": 0.33000001311302185,
+      "relation_mean_margin": 0.936042308807373
+    },
+    {
+      "name": "baseline-param-matched",
+      "seed": 1339,
+      "architecture": "dense-baseline",
+      "shape": "dense-baseline layers=4 d_model=192 ffn=600",
+      "model_config": {
+        "vocab_size": 8192,
+        "context_length": 256,
+        "d_model": 192,
+        "n_head": 6,
+        "n_kv_head": 2,
+        "ffn_dim": 600,
+        "n_layer": 4,
+        "rope_theta": 10000.0,
+        "dropout": 0.0,
+        "use_surface_features": true,
+        "surface_feature_dim": 76,
+        "surface_feature_gain_init": 0.1
+      },
+      "parameters": 3364801,
+      "forward_gflops": 1.721892864,
+      "validation_loss": 4.652800619602203,
+      "validation_perplexity": 104.87829887558811,
+      "wall_seconds": 167.10200559999794,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 9.072863578796387
+        },
+        {
+          "step": 300,
+          "train_loss": 4.729599952697754
+        }
+      ],
+      "relation_loss": 1.11813485622406,
+      "relation_decision_accuracy": 0.5450000166893005,
+      "relation_strict_pair_accuracy": 0.09000000357627869,
+      "relation_mean_margin": 0.21470969915390015
+    },
+    {
+      "name": "baseline-compute-matched",
+      "seed": 1337,
+      "architecture": "dense-baseline",
+      "shape": "dense-baseline layers=5 d_model=192 ffn=600",
+      "model_config": {
+        "vocab_size": 8192,
+        "context_length": 256,
+        "d_model": 192,
+        "n_head": 6,
+        "n_kv_head": 2,
+        "ffn_dim": 600,
+        "n_layer": 5,
+        "rope_theta": 10000.0,
+        "dropout": 0.0,
+        "use_surface_features": true,
+        "surface_feature_dim": 76,
+        "surface_feature_gain_init": 0.1
+      },
+      "parameters": 3809089,
+      "forward_gflops": 1.949171712,
+      "validation_loss": 4.657008576393127,
+      "validation_perplexity": 105.32055206413865,
+      "wall_seconds": 186.02229979999538,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 9.057918548583984
+        },
+        {
+          "step": 300,
+          "train_loss": 4.481667995452881
+        }
+      ],
+      "relation_loss": 0.8767566084861755,
+      "relation_decision_accuracy": 0.6949999928474426,
+      "relation_strict_pair_accuracy": 0.4099999964237213,
+      "relation_mean_margin": 1.0984326601028442
+    },
+    {
+      "name": "baseline-compute-matched",
+      "seed": 1338,
+      "architecture": "dense-baseline",
+      "shape": "dense-baseline layers=5 d_model=192 ffn=600",
+      "model_config": {
+        "vocab_size": 8192,
+        "context_length": 256,
+        "d_model": 192,
+        "n_head": 6,
+        "n_kv_head": 2,
+        "ffn_dim": 600,
+        "n_layer": 5,
+        "rope_theta": 10000.0,
+        "dropout": 0.0,
+        "use_surface_features": true,
+        "surface_feature_dim": 76,
+        "surface_feature_gain_init": 0.1
+      },
+      "parameters": 3809089,
+      "forward_gflops": 1.949171712,
+      "validation_loss": 4.659846830368042,
+      "validation_perplexity": 105.61990315593148,
+      "wall_seconds": 185.82637740000064,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 9.046545028686523
+        },
+        {
+          "step": 300,
+          "train_loss": 4.649135589599609
+        }
+      ],
+      "relation_loss": 0.9277207851409912,
+      "relation_decision_accuracy": 0.6600000262260437,
+      "relation_strict_pair_accuracy": 0.3199999928474426,
+      "relation_mean_margin": 0.7138727307319641
+    },
+    {
+      "name": "baseline-compute-matched",
+      "seed": 1339,
+      "architecture": "dense-baseline",
+      "shape": "dense-baseline layers=5 d_model=192 ffn=600",
+      "model_config": {
+        "vocab_size": 8192,
+        "context_length": 256,
+        "d_model": 192,
+        "n_head": 6,
+        "n_kv_head": 2,
+        "ffn_dim": 600,
+        "n_layer": 5,
+        "rope_theta": 10000.0,
+        "dropout": 0.0,
+        "use_surface_features": true,
+        "surface_feature_dim": 76,
+        "surface_feature_gain_init": 0.1
+      },
+      "parameters": 3809089,
+      "forward_gflops": 1.949171712,
+      "validation_loss": 4.638610923290253,
+      "validation_perplexity": 103.40061639156379,
+      "wall_seconds": 191.93804680000176,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 9.073104858398438
+        },
+        {
+          "step": 300,
+          "train_loss": 4.699863910675049
+        }
+      ],
+      "relation_loss": 0.9654431343078613,
+      "relation_decision_accuracy": 0.6499999761581421,
+      "relation_strict_pair_accuracy": 0.30000001192092896,
+      "relation_mean_margin": 0.666440486907959
+    },
+    {
+      "name": "cfrd-no-binding-block",
+      "seed": 1337,
+      "architecture": "cfrd",
+      "shape": "cfrd cells=3 recurrences=4 d_model=192 ffn=512 binding_block=False",
+      "model_config": {
+        "vocab_size": 8192,
+        "context_length": 256,
+        "chunk_size": 64,
+        "d_model": 192,
+        "n_head": 6,
+        "n_kv_head": 2,
+        "ffn_dim": 512,
+        "rope_theta": 10000.0,
+        "dropout": 0.0,
+        "summary_slots": 4,
+        "memory_dim": 64,
+        "memory_heads": 4,
+        "memory_recency_bias_init": 0.1,
+        "physical_cells": 3,
+        "recurrences": 4,
+        "exit_depths": [
+          2,
+          4
+        ],
+        "aux_exit_loss_weight": 0.15,
+        "residual_gate_init": -1.0,
+        "memory_gain_init": 0.0,
+        "use_binding_block": false,
+        "cell_attention": "local",
+        "use_surface_features": true,
+        "surface_feature_dim": 76,
+        "surface_feature_gain_init": 0.1
+      },
+      "parameters": 2945687,
+      "forward_gflops": 1.726152704,
+      "validation_loss": 4.811770737171173,
+      "validation_perplexity": 122.94913548121748,
+      "wall_seconds": 219.51589399999648,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 9.04614543914795
+        },
+        {
+          "step": 300,
+          "train_loss": 4.6385979652404785
+        }
+      ],
+      "relation_loss": 1.2547794580459595,
+      "relation_decision_accuracy": 0.5199999809265137,
+      "relation_strict_pair_accuracy": 0.03999999910593033,
+      "relation_mean_margin": 0.0575433149933815
+    },
+    {
+      "name": "cfrd-no-binding-block",
+      "seed": 1338,
+      "architecture": "cfrd",
+      "shape": "cfrd cells=3 recurrences=4 d_model=192 ffn=512 binding_block=False",
+      "model_config": {
+        "vocab_size": 8192,
+        "context_length": 256,
+        "chunk_size": 64,
+        "d_model": 192,
+        "n_head": 6,
+        "n_kv_head": 2,
+        "ffn_dim": 512,
+        "rope_theta": 10000.0,
+        "dropout": 0.0,
+        "summary_slots": 4,
+        "memory_dim": 64,
+        "memory_heads": 4,
+        "memory_recency_bias_init": 0.1,
+        "physical_cells": 3,
+        "recurrences": 4,
+        "exit_depths": [
+          2,
+          4
+        ],
+        "aux_exit_loss_weight": 0.15,
+        "residual_gate_init": -1.0,
+        "memory_gain_init": 0.0,
+        "use_binding_block": false,
+        "cell_attention": "local",
+        "use_surface_features": true,
+        "surface_feature_dim": 76,
+        "surface_feature_gain_init": 0.1
+      },
+      "parameters": 2945687,
+      "forward_gflops": 1.726152704,
+      "validation_loss": 4.7915414571762085,
+      "validation_perplexity": 120.48695106816731,
+      "wall_seconds": 231.27419640000153,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 9.049922943115234
+        },
+        {
+          "step": 300,
+          "train_loss": 4.787380218505859
+        }
+      ],
+      "relation_loss": 1.138923168182373,
+      "relation_decision_accuracy": 0.5450000166893005,
+      "relation_strict_pair_accuracy": 0.09000000357627869,
+      "relation_mean_margin": 0.015183121897280216
+    },
+    {
+      "name": "cfrd-no-binding-block",
+      "seed": 1339,
+      "architecture": "cfrd",
+      "shape": "cfrd cells=3 recurrences=4 d_model=192 ffn=512 binding_block=False",
+      "model_config": {
+        "vocab_size": 8192,
+        "context_length": 256,
+        "chunk_size": 64,
+        "d_model": 192,
+        "n_head": 6,
+        "n_kv_head": 2,
+        "ffn_dim": 512,
+        "rope_theta": 10000.0,
+        "dropout": 0.0,
+        "summary_slots": 4,
+        "memory_dim": 64,
+        "memory_heads": 4,
+        "memory_recency_bias_init": 0.1,
+        "physical_cells": 3,
+        "recurrences": 4,
+        "exit_depths": [
+          2,
+          4
+        ],
+        "aux_exit_loss_weight": 0.15,
+        "residual_gate_init": -1.0,
+        "memory_gain_init": 0.0,
+        "use_binding_block": false,
+        "cell_attention": "local",
+        "use_surface_features": true,
+        "surface_feature_dim": 76,
+        "surface_feature_gain_init": 0.1
+      },
+      "parameters": 2945687,
+      "forward_gflops": 1.726152704,
+      "validation_loss": 4.772596788406372,
+      "validation_perplexity": 118.22585120845555,
+      "wall_seconds": 220.27395949999482,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 9.057149887084961
+        },
+        {
+          "step": 300,
+          "train_loss": 4.839778423309326
+        }
+      ],
+      "relation_loss": 1.134124755859375,
+      "relation_decision_accuracy": 0.5,
+      "relation_strict_pair_accuracy": 0.0,
+      "relation_mean_margin": 0.007770738564431667
+    },
+    {
+      "name": "cfrd-unfolded",
+      "seed": 1337,
+      "architecture": "cfrd",
+      "shape": "cfrd cells=4 recurrences=4 d_model=192 ffn=512 binding_block=True",
+      "model_config": {
+        "vocab_size": 8192,
+        "context_length": 256,
+        "chunk_size": 64,
+        "d_model": 192,
+        "n_head": 6,
+        "n_kv_head": 2,
+        "ffn_dim": 512,
+        "rope_theta": 10000.0,
+        "dropout": 0.0,
+        "summary_slots": 4,
+        "memory_dim": 64,
+        "memory_heads": 4,
+        "memory_recency_bias_init": 0.1,
+        "physical_cells": 4,
+        "recurrences": 4,
+        "exit_depths": [
+          2,
+          4
+        ],
+        "aux_exit_loss_weight": 0.15,
+        "residual_gate_init": -1.0,
+        "memory_gain_init": 0.0,
+        "use_binding_block": true,
+        "cell_attention": "local",
+        "use_surface_features": true,
+        "surface_feature_dim": 76,
+        "surface_feature_gain_init": 0.1
+      },
+      "parameters": 3791327,
+      "forward_gflops": 1.927675904,
+      "validation_loss": 4.699785649776459,
+      "validation_perplexity": 109.9236077767676,
+      "wall_seconds": 266.6253304999991,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 9.074925422668457
+        },
+        {
+          "step": 300,
+          "train_loss": 4.52304744720459
+        }
+      ],
+      "relation_loss": 1.2203564643859863,
+      "relation_decision_accuracy": 0.5249999761581421,
+      "relation_strict_pair_accuracy": 0.05000000074505806,
+      "relation_mean_margin": 0.09175638109445572
+    },
+    {
+      "name": "cfrd-unfolded",
+      "seed": 1338,
+      "architecture": "cfrd",
+      "shape": "cfrd cells=4 recurrences=4 d_model=192 ffn=512 binding_block=True",
+      "model_config": {
+        "vocab_size": 8192,
+        "context_length": 256,
+        "chunk_size": 64,
+        "d_model": 192,
+        "n_head": 6,
+        "n_kv_head": 2,
+        "ffn_dim": 512,
+        "rope_theta": 10000.0,
+        "dropout": 0.0,
+        "summary_slots": 4,
+        "memory_dim": 64,
+        "memory_heads": 4,
+        "memory_recency_bias_init": 0.1,
+        "physical_cells": 4,
+        "recurrences": 4,
+        "exit_depths": [
+          2,
+          4
+        ],
+        "aux_exit_loss_weight": 0.15,
+        "residual_gate_init": -1.0,
+        "memory_gain_init": 0.0,
+        "use_binding_block": true,
+        "cell_attention": "local",
+        "use_surface_features": true,
+        "surface_feature_dim": 76,
+        "surface_feature_gain_init": 0.1
+      },
+      "parameters": 3791327,
+      "forward_gflops": 1.927675904,
+      "validation_loss": 4.693778598308564,
+      "validation_perplexity": 109.26527032046361,
+      "wall_seconds": 283.28984489999857,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 9.049653053283691
+        },
+        {
+          "step": 300,
+          "train_loss": 4.67992639541626
+        }
+      ],
+      "relation_loss": 1.161720633506775,
+      "relation_decision_accuracy": 0.5249999761581421,
+      "relation_strict_pair_accuracy": 0.05000000074505806,
+      "relation_mean_margin": 0.010366921313107014
+    },
+    {
+      "name": "cfrd-unfolded",
+      "seed": 1339,
+      "architecture": "cfrd",
+      "shape": "cfrd cells=4 recurrences=4 d_model=192 ffn=512 binding_block=True",
+      "model_config": {
+        "vocab_size": 8192,
+        "context_length": 256,
+        "chunk_size": 64,
+        "d_model": 192,
+        "n_head": 6,
+        "n_kv_head": 2,
+        "ffn_dim": 512,
+        "rope_theta": 10000.0,
+        "dropout": 0.0,
+        "summary_slots": 4,
+        "memory_dim": 64,
+        "memory_heads": 4,
+        "memory_recency_bias_init": 0.1,
+        "physical_cells": 4,
+        "recurrences": 4,
+        "exit_depths": [
+          2,
+          4
+        ],
+        "aux_exit_loss_weight": 0.15,
+        "residual_gate_init": -1.0,
+        "memory_gain_init": 0.0,
+        "use_binding_block": true,
+        "cell_attention": "local",
+        "use_surface_features": true,
+        "surface_feature_dim": 76,
+        "surface_feature_gain_init": 0.1
+      },
+      "parameters": 3791327,
+      "forward_gflops": 1.927675904,
+      "validation_loss": 4.69373049736023,
+      "validation_perplexity": 109.26001468374282,
+      "wall_seconds": 279.04292669999995,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 9.029281616210938
+        },
+        {
+          "step": 300,
+          "train_loss": 4.769413948059082
+        }
+      ],
+      "relation_loss": 1.1512846946716309,
+      "relation_decision_accuracy": 0.5149999856948853,
+      "relation_strict_pair_accuracy": 0.029999999329447746,
+      "relation_mean_margin": 0.01320246234536171
+    },
+    {
+      "name": "cfrd-full-attention",
+      "seed": 1337,
+      "architecture": "cfrd",
+      "shape": "cfrd cells=3 recurrences=4 d_model=192 ffn=512 binding_block=True",
+      "model_config": {
+        "vocab_size": 8192,
+        "context_length": 256,
+        "chunk_size": 64,
+        "d_model": 192,
+        "n_head": 6,
+        "n_kv_head": 2,
+        "ffn_dim": 512,
+        "rope_theta": 10000.0,
+        "dropout": 0.0,
+        "summary_slots": 4,
+        "memory_dim": 64,
+        "memory_heads": 4,
+        "memory_recency_bias_init": 0.1,
+        "physical_cells": 3,
+        "recurrences": 4,
+        "exit_depths": [
+          2,
+          4
+        ],
+        "aux_exit_loss_weight": 0.15,
+        "residual_gate_init": -1.0,
+        "memory_gain_init": 0.0,
+        "use_binding_block": true,
+        "cell_attention": "full",
+        "use_surface_features": true,
+        "surface_feature_dim": 76,
+        "surface_feature_gain_init": 0.1
+      },
+      "parameters": 3166665,
+      "forward_gflops": 1.820393472,
+      "validation_loss": 4.766819894313812,
+      "validation_perplexity": 117.5448419401455,
+      "wall_seconds": 235.64007710000442,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 9.020748138427734
+        },
+        {
+          "step": 300,
+          "train_loss": 4.593416690826416
+        }
+      ],
+      "relation_loss": 1.2686116695404053,
+      "relation_decision_accuracy": 0.5,
+      "relation_strict_pair_accuracy": 0.009999999776482582,
+      "relation_mean_margin": 0.008592290803790092
+    },
+    {
+      "name": "cfrd-full-attention",
+      "seed": 1338,
+      "architecture": "cfrd",
+      "shape": "cfrd cells=3 recurrences=4 d_model=192 ffn=512 binding_block=True",
+      "model_config": {
+        "vocab_size": 8192,
+        "context_length": 256,
+        "chunk_size": 64,
+        "d_model": 192,
+        "n_head": 6,
+        "n_kv_head": 2,
+        "ffn_dim": 512,
+        "rope_theta": 10000.0,
+        "dropout": 0.0,
+        "summary_slots": 4,
+        "memory_dim": 64,
+        "memory_heads": 4,
+        "memory_recency_bias_init": 0.1,
+        "physical_cells": 3,
+        "recurrences": 4,
+        "exit_depths": [
+          2,
+          4
+        ],
+        "aux_exit_loss_weight": 0.15,
+        "residual_gate_init": -1.0,
+        "memory_gain_init": 0.0,
+        "use_binding_block": true,
+        "cell_attention": "full",
+        "use_surface_features": true,
+        "surface_feature_dim": 76,
+        "surface_feature_gain_init": 0.1
+      },
+      "parameters": 3166665,
+      "forward_gflops": 1.820393472,
+      "validation_loss": 4.821634542942047,
+      "validation_perplexity": 124.16788273494734,
+      "wall_seconds": 242.53469779999432,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 9.041457176208496
+        },
+        {
+          "step": 300,
+          "train_loss": 4.802211284637451
+        }
+      ],
+      "relation_loss": 1.0339210033416748,
+      "relation_decision_accuracy": 0.5649999976158142,
+      "relation_strict_pair_accuracy": 0.12999999523162842,
+      "relation_mean_margin": 0.24129867553710938
+    },
+    {
+      "name": "cfrd-full-attention",
+      "seed": 1339,
+      "architecture": "cfrd",
+      "shape": "cfrd cells=3 recurrences=4 d_model=192 ffn=512 binding_block=True",
+      "model_config": {
+        "vocab_size": 8192,
+        "context_length": 256,
+        "chunk_size": 64,
+        "d_model": 192,
+        "n_head": 6,
+        "n_kv_head": 2,
+        "ffn_dim": 512,
+        "rope_theta": 10000.0,
+        "dropout": 0.0,
+        "summary_slots": 4,
+        "memory_dim": 64,
+        "memory_heads": 4,
+        "memory_recency_bias_init": 0.1,
+        "physical_cells": 3,
+        "recurrences": 4,
+        "exit_depths": [
+          2,
+          4
+        ],
+        "aux_exit_loss_weight": 0.15,
+        "residual_gate_init": -1.0,
+        "memory_gain_init": 0.0,
+        "use_binding_block": true,
+        "cell_attention": "full",
+        "use_surface_features": true,
+        "surface_feature_dim": 76,
+        "surface_feature_gain_init": 0.1
+      },
+      "parameters": 3166665,
+      "forward_gflops": 1.820393472,
+      "validation_loss": 4.784777045249939,
+      "validation_perplexity": 119.67467807125625,
+      "wall_seconds": 284.2429573000045,
+      "history": [
+        {
+          "step": 1,
+          "train_loss": 9.050765991210938
+        },
+        {
+          "step": 300,
+          "train_loss": 4.860540390014648
+        }
+      ],
+      "relation_loss": 1.1700191497802734,
+      "relation_decision_accuracy": 0.5049999952316284,
+      "relation_strict_pair_accuracy": 0.009999999776482582,
+      "relation_mean_margin": 0.01019288506358862
+    }
+  ]
+}
