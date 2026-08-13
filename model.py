@@ -665,8 +665,12 @@ class CFRDLanguageModel(nn.Module):
 
         return self.embedding_dropout(x)
 
-    def _logits(self, x: torch.Tensor) -> torch.Tensor:
+    def _logits(self, x: torch.Tensor, logits_to_keep: int = 0) -> torch.Tensor:
         # Tie the LM head to token embeddings to avoid a second vocabulary matrix.
+        if logits_to_keep < 0:
+            raise ValueError("logits_to_keep must be non-negative")
+        if logits_to_keep:
+            x = x[:, -logits_to_keep:, :]
         normalized = self.final_norm(x)
         return F.linear(normalized, self.token_embedding.weight)
 
@@ -675,6 +679,7 @@ class CFRDLanguageModel(nn.Module):
         token_ids: torch.Tensor,
         targets: torch.Tensor | None = None,
         recurrences: int | None = None,
+        logits_to_keep: int = 0,
     ) -> ModelOutput:
         batch, time = token_ids.shape
         del batch
@@ -685,6 +690,8 @@ class CFRDLanguageModel(nn.Module):
         run_recurrences = self.cfg.recurrences if recurrences is None else recurrences
         if run_recurrences <= 0 or run_recurrences > self.cfg.recurrences:
             raise ValueError("recurrences must be between 1 and cfg.recurrences")
+        if targets is not None and logits_to_keep:
+            raise ValueError("logits_to_keep cannot be used when targets are provided")
 
         x = self._embed(token_ids)
 
@@ -713,7 +720,8 @@ class CFRDLanguageModel(nn.Module):
                 projection_x = x
                 if self.binding_block is not None:
                     projection_x = self.binding_block(x, self.rope_cos, self.rope_sin)
-                logits_at_depth = self._logits(projection_x)
+                keep_at_depth = logits_to_keep if depth == run_recurrences else 0
+                logits_at_depth = self._logits(projection_x, keep_at_depth)
 
                 if depth == run_recurrences:
                     final_logits = logits_at_depth

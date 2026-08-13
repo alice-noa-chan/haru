@@ -62,6 +62,7 @@ class CFRDForCausalLM(CFRDPreTrainedModel, GenerationMixin):
         attention_mask: torch.Tensor | None = None,
         labels: torch.LongTensor | None = None,
         recurrences: int | None = None,
+        logits_to_keep: int = 0,
         past_key_values=None,
         use_cache: bool | None = None,
         return_dict: bool | None = None,
@@ -71,11 +72,17 @@ class CFRDForCausalLM(CFRDPreTrainedModel, GenerationMixin):
 
         del past_key_values, use_cache, kwargs
         run_recurrences = self.config.inference_recurrences if recurrences is None else recurrences
+        if labels is not None and logits_to_keep:
+            raise ValueError("logits_to_keep cannot be used when labels are provided")
 
         if attention_mask is None or bool(torch.all(attention_mask == 1)):
-            logits = self.model(input_ids, recurrences=run_recurrences).logits
+            logits = self.model(
+                input_ids,
+                recurrences=run_recurrences,
+                logits_to_keep=logits_to_keep,
+            ).logits
         else:
-            logits = self._forward_padded_batch(input_ids, attention_mask, run_recurrences)
+            logits = self._forward_padded_batch(input_ids, attention_mask, run_recurrences, logits_to_keep)
 
         loss = None
         if labels is not None:
@@ -97,6 +104,7 @@ class CFRDForCausalLM(CFRDPreTrainedModel, GenerationMixin):
         input_ids: torch.LongTensor,
         attention_mask: torch.Tensor,
         recurrences: int,
+        logits_to_keep: int,
     ) -> torch.Tensor:
         """Handle variable-length padded batches without exposing padding to attention."""
 
@@ -107,7 +115,14 @@ class CFRDForCausalLM(CFRDPreTrainedModel, GenerationMixin):
             row_ids = input_ids[row_index, valid_positions].unsqueeze(0)
             if row_ids.numel() == 0:
                 raise ValueError("Every input row must contain at least one non-padding token")
-            row_logits = self.model(row_ids, recurrences=recurrences).logits.squeeze(0)
+            row_logits = self.model(
+                row_ids,
+                recurrences=recurrences,
+                logits_to_keep=logits_to_keep,
+            ).logits.squeeze(0)
+            if logits_to_keep:
+                rows.append(row_logits)
+                continue
             padded_logits = row_logits.new_zeros(padded_length, row_logits.size(-1))
             padded_logits[valid_positions] = row_logits
             rows.append(padded_logits)
@@ -129,6 +144,7 @@ class CFRDForCausalLM(CFRDPreTrainedModel, GenerationMixin):
             "input_ids": input_ids,
             "attention_mask": attention_mask,
             "use_cache": False,
+            "logits_to_keep": 1,
         }
         if recurrences is not None:
             model_inputs["recurrences"] = recurrences
