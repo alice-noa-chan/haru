@@ -363,7 +363,7 @@ unmeasured. At compact scale removing the binding block cost the most, but that
 table's conclusions did not survive the change of scale and there is no reason
 to assume its component ranking did either.
 
-### Where this leaves v1.2
+### Next steps after the three-arm release run
 
 v1.2 is a CFRD model. Option 2, making the dense configuration the release
 path, is withdrawn: it rested on the compact-scale table, which the release
@@ -384,6 +384,96 @@ promising:
 The rule that produced v1.0 and v1.1's unattributable results still applies: a
 release may change one thing at a time, and this table is the first evidence
 Haru has ever had that the architecture does anything at all.
+
+## Eight-arm release table: the fold is not what wins
+
+Steps 1 and 2 above were run together on an a GPU: three seeds, 6,000 steps,
+49,152,000 tokens per arm per seed, relation objective at 0.20 everywhere. This
+table supersedes the three-arm one, which lacked the supervision controls.
+
+| Arm | Parameters | GFLOPs | Validation loss | Paired delta | Beyond spread | Strict pairs |
+|---|---:|---:|---:|---:|:---:|---:|
+| `cfrd-unfolded` | 17,047,725 | 17.31 | **3.3212** | -0.0586 | yes | 0.370 |
+| `cfrd-full-attention` | 10,944,393 | 16.03 | 3.3565 | -0.0233 | yes | 0.253 |
+| `cfrd-no-deep-supervision` | 11,634,459 | 17.31 | 3.3744 | -0.0054 | yes | **0.377** |
+| CFRD | 11,634,459 | 17.31 | 3.3798 | reference | | 0.263 |
+| `baseline-deep-supervised` | 11,669,377 | 11.95 | 3.3842 | +0.0044 | **no** | 0.313 |
+| Dense, compute-matched | 16,943,233 | 17.34 | 3.3846 | +0.0048 | **no** | 0.300 |
+| Dense, parameter-matched | 11,669,377 | 11.95 | 3.4294 | +0.0496 | yes | 0.263 |
+| `cfrd-no-binding-block` | 10,060,057 | 15.70 | 3.4664 | +0.0866 | yes | 0.267 |
+
+**Deep supervision explains the win, not folding.** CFRD beat the plain
+parameter-matched dense arm by 0.0496. Giving that same dense arm CFRD's
+auxiliary exits, which cost no parameters because the head is tied, moved it
+from 3.4294 to 3.3842, closing 0.0452 or 91.2% of the gap. The residual
+0.0044 does not exceed the spread of the paired differences. At matched
+parameters with supervision equalized, CFRD and an ordinary dense decoder are
+indistinguishable.
+
+**The compute-matched win does not replicate.** The three-arm table reported
++0.0212 beyond the spread. Here the same comparison gives +0.0048 and does not
+clear the spread, with the per-seed deltas changing sign (-0.0181, +0.0170,
++0.0156). That earlier row should be read as noise, and the claim built on it
+is withdrawn.
+
+**Parameter sharing is the liability, and it is the largest effect in the
+table.** `cfrd-unfolded` gives each recurrence its own cell and wins by 0.0586
+with a paired spread of 0.0030, negative on every seed. It is also the best arm
+on binding. This is the same row that fired at compact scale, now at 45x the
+budget, and it is the one conclusion that has survived every scale tested.
+
+**The other CFRD parts do earn their place.** Removing the binding block is the
+worst result in the table by a wide margin. And at a genuinely matched budget,
+`cfrd-unfolded` at 17.05M parameters and 17.31 GFLOPs beats the compute-matched
+dense arm at 16.94M and 17.34 GFLOPs by 0.0634. So the local attention, summary
+memory, depth conditioning, and binding block together do outperform a plain
+decoder; the fold is the part that does not.
+
+**Deep supervision actively hurts CFRD.** `cfrd-no-deep-supervision` improves
+both validation loss, by 0.0054 beyond the spread, and strict pairs, 0.377
+against 0.263. The auxiliary objective was helping the control more than the
+model it was designed for.
+
+**Binding is still not resolvable at this budget.** Chance is 0.25 and CFRD's
+own seeds ran 0.10, 0.23, 0.46. Only `cfrd-unfolded` (0.33, 0.33, 0.45) and
+`cfrd-no-deep-supervision` (0.41, 0.34, 0.38) are above chance on every seed.
+Everything else sits inside its own noise, so the binding column supports those
+two observations and no finer ranking. Validation loss carries this table:
+standard deviations run 0.0022 to 0.0237 and the sign is consistent across
+seeds for every row marked beyond spread.
+
+The compact-scale refutation of `cell_attention = "full"` also does not hold
+here. That arm now beats CFRD by 0.0233 with 6% fewer parameters and 7% fewer
+FLOPs, though it does not help binding.
+
+### Where this leaves v1.2
+
+The architecture the evidence supports is not the one the project is named
+after. Folding is the single component that fails to pay for itself, while the
+parts built around it do.
+
+A v1.2 candidate follows directly from the table, and every element of it is a
+row that cleared the spread on all three seeds:
+
+- Drop or greatly reduce parameter sharing. `physical_cells = recurrences` is
+  the largest measured gain available.
+- Keep the binding block. Removing it is the worst outcome measured.
+- Set `aux_exit_loss_weight = 0`. Deep supervision helps a dense decoder and
+  hurts this one.
+- Test `cell_attention = "full"` combined with unfolding. Both help
+  independently; nothing here shows they compose.
+
+Two things are still unmeasured and neither should be assumed:
+
+1. Whether unfolding and full-context cells compose, or whether they are two
+   routes to the same gain. The table has no arm with both.
+2. The learning rate remains CFRD's tuned 4e-4 for every arm. It is now the
+   last uncontrolled variable large enough to matter.
+
+Naming honesty applies to the result as well. If v1.2 ships unfolded, the
+"Folded" in Causal Folded Recurrent Decoder no longer describes it, and the
+architecture should be renamed rather than keeping a label the measurements
+have removed.
 
 ## Required validation and limits
 
