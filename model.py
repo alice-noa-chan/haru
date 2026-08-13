@@ -13,6 +13,9 @@ except ImportError:  # Direct script imports from the project root.
     from cfrd_features import SURFACE_FEATURE_DIM
 
 
+CELL_ATTENTION_MODES = ("local", "full")
+
+
 @dataclass(frozen=True, slots=True)
 class ModelConfig:
     """Serializable structural configuration for CFRD."""
@@ -37,6 +40,11 @@ class ModelConfig:
     residual_gate_init: float = -1.0
     memory_gain_init: float = 0.0
     use_binding_block: bool = False
+    # "local" reads a 64-token chunk and reaches further only through compressed
+    # summary memory. "full" gives every recurrence unrestricted causal
+    # attention and drops summary memory, keeping the fold and paying more
+    # compute per pass. See RESEARCH.md for why this axis is under test.
+    cell_attention: str = "local"
     use_surface_features: bool = True
     surface_feature_dim: int = SURFACE_FEATURE_DIM
     surface_feature_gain_init: float = 0.10
@@ -79,6 +87,8 @@ class ModelConfig:
             raise ValueError("dropout must be in the range [0, 1)")
         if self.memory_recency_bias_init <= 0.0:
             raise ValueError("memory_recency_bias_init must be positive")
+        if self.cell_attention not in CELL_ATTENTION_MODES:
+            raise ValueError(f"cell_attention must be one of {CELL_ATTENTION_MODES}, not {self.cell_attention!r}")
 
     @classmethod
     def from_checkpoint(cls, checkpoint: dict, vocab_size: int) -> "ModelConfig":
@@ -500,8 +510,15 @@ class FoldedCell(nn.Module):
         self.attn_norm = RMSNorm(cfg.d_model)
         self.ffn_norm = RMSNorm(cfg.d_model)
 
-        self.local_attention = LocalCausalAttention(cfg)
-        self.summary_memory = CausalSummaryMemory(cfg)
+        # Full-context cells make summary memory redundant: it exists to carry
+        # information past a chunk boundary that no longer exists.
+        self.full_context = cfg.cell_attention == "full"
+        if self.full_context:
+            self.local_attention = FullCausalAttention(cfg)
+            self.summary_memory = None
+        else:
+            self.local_attention = LocalCausalAttention(cfg)
+            self.summary_memory = CausalSummaryMemory(cfg)
         self.ffn = SwiGLU(cfg)
 
         # A scalar gate controls each token's residual update.
@@ -536,13 +553,16 @@ class FoldedCell(nn.Module):
 
         local_update = self.local_attention(u, rope_cos, rope_sin)
 
-        # Build causal local context before folding it into summaries. Those
-        # summaries become visible only to later chunks.
-        local_context = u + local_update
-        memory_update = self.summary_memory(query_x=local_context, summary_x=local_context)
-        memory_strength = torch.sigmoid(memory_gain[recurrence_index])
+        if self.summary_memory is None:
+            mixed_update = local_update
+        else:
+            # Build causal local context before folding it into summaries. Those
+            # summaries become visible only to later chunks.
+            local_context = u + local_update
+            memory_update = self.summary_memory(query_x=local_context, summary_x=local_context)
+            memory_strength = torch.sigmoid(memory_gain[recurrence_index])
+            mixed_update = local_update + memory_strength * memory_update
 
-        mixed_update = local_update + memory_strength * memory_update
         attn_gate = torch.sigmoid(self.attn_gate(u))
         x = x + residual_scale * attn_gate * mixed_update
 
@@ -606,7 +626,13 @@ class CFRDLanguageModel(nn.Module):
         self.attn_phase_shift = nn.Parameter(torch.zeros(cfg.recurrences, cfg.d_model))
         self.ffn_phase_scale = nn.Parameter(torch.zeros(cfg.recurrences, cfg.d_model))
         self.ffn_phase_shift = nn.Parameter(torch.zeros(cfg.recurrences, cfg.d_model))
-        self.memory_gain = nn.Parameter(torch.full((cfg.recurrences,), cfg.memory_gain_init))
+
+        # Full-context cells have no summary memory to weight, so this would be
+        # a parameter that never receives a gradient.
+        if cfg.cell_attention == "local":
+            self.memory_gain = nn.Parameter(torch.full((cfg.recurrences,), cfg.memory_gain_init))
+        else:
+            self.register_parameter("memory_gain", None)
 
         self.final_norm = RMSNorm(cfg.d_model)
 
@@ -635,7 +661,8 @@ class CFRDLanguageModel(nn.Module):
 
         for cell in self.cells:
             nn.init.normal_(cell.local_attention.o_proj.weight, mean=0.0, std=std)
-            nn.init.normal_(cell.summary_memory.read_o.weight, mean=0.0, std=std)
+            if cell.summary_memory is not None:
+                nn.init.normal_(cell.summary_memory.read_o.weight, mean=0.0, std=std)
             nn.init.normal_(cell.ffn.w2.weight, mean=0.0, std=std)
 
             # module.apply() touched these layers, so restore the intended gates.
