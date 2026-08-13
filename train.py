@@ -419,7 +419,9 @@ def evaluate_counterfactual_relations(
             config.COUNTERFACTUAL_EVAL_PAIRS - evaluated_pairs,
         )
         pairs = sampler.sample_batch(pair_count, rng)
-        batch = encode_counterfactual_pairs(pairs, tokenizer, model.cfg.context_length, device)
+        batch = encode_counterfactual_pairs(
+            pairs, tokenizer, model.cfg.context_length, device, config.COUNTERFACTUAL_PAD_MULTIPLE
+        )
         with autocast_context(device):
             result = counterfactual_ranking_result(model, batch, config.COUNTERFACTUAL_MARGIN)
 
@@ -539,6 +541,7 @@ def main() -> None:
                 tokenizer,
                 model_cfg.context_length,
                 device,
+                config.COUNTERFACTUAL_PAD_MULTIPLE,
             )
 
             sync_context = (

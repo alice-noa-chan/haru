@@ -36,11 +36,26 @@ def encode_counterfactual_pairs(
     tokenizer: TextEncoder,
     context_length: int,
     device: torch.device,
+    pad_to_multiple_of: int = 1,
 ) -> CounterfactualBatch:
-    """Encode four candidate continuations per pair and mark answer tokens only."""
+    """Encode four candidate continuations per pair and mark answer tokens only.
+
+    `pad_to_multiple_of` rounds the time dimension up to a fixed stride. Sampled
+    prompts differ in length, so this batch otherwise arrives at a new shape
+    almost every step: 40 consecutive draws produced 16 distinct shapes. The
+    language-model batch is a fixed (batch, context_length), so the same model
+    is compiled against a stream of shapes it never sees twice, which makes
+    torch.compile recompile continuously instead of paying off.
+
+    Padding is free of side effects here. Attention is causal, so the appended
+    positions cannot influence any earlier one, and score_mask already excludes
+    everything outside the candidate span, so the scored logits are unchanged.
+    """
 
     if not pairs:
         raise ValueError("At least one counterfactual pair is required")
+    if pad_to_multiple_of < 1:
+        raise ValueError("pad_to_multiple_of must be at least 1")
 
     rows: list[tuple[list[int], int]] = []
     for pair in pairs:
@@ -58,7 +73,12 @@ def encode_counterfactual_pairs(
                     )
                 rows.append((full_ids, len(prefix_ids)))
 
-    max_time = max(len(full_ids) - 1 for full_ids, _ in rows)
+    longest = max(len(full_ids) - 1 for full_ids, _ in rows)
+    max_time = -(-longest // pad_to_multiple_of) * pad_to_multiple_of
+    if max_time > context_length:
+        raise ValueError(
+            f"Padding {longest} tokens to a multiple of {pad_to_multiple_of} exceeds context {context_length}"
+        )
     input_ids = torch.full((len(rows), max_time), tokenizer.pad_id, dtype=torch.long, device=device)
     target_ids = torch.full_like(input_ids, tokenizer.pad_id)
     score_mask = torch.zeros_like(input_ids, dtype=torch.bool)
