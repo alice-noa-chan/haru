@@ -75,6 +75,44 @@ The synthetic relation objective has weight 0.20 and remains auxiliary to the
 ordinary next-token objective. It is intended to teach a reusable binding
 operation, not to replace broad text training with a small synthetic corpus.
 
+## Parameter count is the wrong axis to match on alone
+
+A folded architecture decouples parameters from compute, so "matched
+parameters" and "matched compute" name two different experiments. Measured on a
+512-token forward with `torch.utils.flop_counter`:
+
+| Model | Parameters | GFLOPs | Blocks applied |
+|---|---:|---:|---:|
+| Haru v1.1 CFRD (depth 6) | 11,634,459 | 17.31 | 7 |
+| Dense 4 layers x FFN 1184 | 11,669,377 | 11.95 | 4 |
+| Dense 7 layers x FFN 1184 | 16,943,233 | 17.34 | 7 |
+
+Three cells applied six times, plus the binding block, give CFRD seven block
+applications from four blocks' worth of parameters. Holding parameters fixed
+therefore hands CFRD about 1.45x the forward FLOPs, and a win under that
+condition alone would not establish an architectural advantage.
+
+Three further properties of the comparison matter:
+
+- A dense decoder cannot match parameters, sequential depth, and FFN ratio at
+  once. At seven layers the parameter budget forces FFN 512, or 1.33x d_model,
+  which handicaps the control instead of isolating the architecture. Both arms
+  therefore keep FFN near 3x d_model, CFRD's own cell proportion, and each arm
+  concedes exactly one axis.
+- The learning rate is CFRD's tuned value, shared by every arm. CFRD's residual
+  gates start at sigmoid(-1) and its updates are scaled by 1/sqrt(recurrences),
+  so this setting is more likely to suit CFRD than the controls. A baseline win
+  under a CFRD-tuned schedule is therefore stronger evidence than the reverse.
+- CFRD's initial loss on shifted targets is 11.0 against a uniform reference of
+  ln(12000) = 9.39, while the dense baseline starts at 9.49. The gated residual
+  stack begins further from uniform than random initialization would, which is
+  a property of the architecture worth separating from its trained quality.
+
+The v1.1 depth sweep should be read against these compute figures rather than
+against parameter count: depth 2, 4, and 6 cost 10.01, 13.66, and 17.31 GFLOPs
+and reach perplexity 19.24, 8.35, and 6.82. A parameter-matched dense model at
+11.95 GFLOPs sits between depth 2 and depth 4.
+
 ## Required validation and limits
 
 The implementation tests causality, serialization, gradient flow, deterministic
@@ -87,6 +125,9 @@ After full training, evaluation should report at least:
 - language-model validation loss at recurrent depths 2, 4, and 6;
 - decision accuracy and strict pair accuracy overall and per relation family;
 - preference-flip rate, mean signed margin, and multiple training seeds;
+- both matched dense baselines, trained on identical windows under an
+  identical schedule, with the relation objective enabled in every arm so the
+  architecture and the objective stay separable;
 - ablations for the third cell, binding block, vocabulary size, and relation
   loss rather than attributing a combined gain to one component;
 - free-generation quality and memorization checks outside synthetic templates.

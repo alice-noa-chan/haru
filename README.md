@@ -182,6 +182,39 @@ Per-token perplexity is comparable only for models using the same tokenizer.
 For different tokenizers, use byte- or character-normalized negative
 log-likelihood and report actual latency or FLOPs.
 
+## Architecture comparison
+
+CFRD reuses three physical cells across six recurrences, so it does not spend
+compute the way its parameter count suggests. Measured with
+`torch.utils.flop_counter` on a 512-token forward:
+
+| Model | Parameters | GFLOPs | Blocks applied |
+|---|---:|---:|---:|
+| Haru v1.1 CFRD (depth 6) | 11,634,459 | 17.31 | 7 |
+| Dense 4 layers x FFN 1184 | 11,669,377 | 11.95 | 4 |
+| Dense 7 layers x FFN 1184 | 16,943,233 | 17.34 | 7 |
+
+Holding parameters fixed leaves CFRD with about 1.45x the forward FLOPs, so a
+lone "same parameter count" comparison is not a fair test. `compare_architectures.py`
+therefore trains two controls on identical windows in an identical order:
+
+- **parameter-matched** (+0.30% parameters, -30.98% FLOPs). CFRD must win this
+  for recurrent folding to be worth anything.
+- **compute-matched** (+45.63% parameters, +0.21% FLOPs). Only this arm can
+  support a claim about quality per parameter.
+
+```bash
+python compare_architectures.py --scale small      # CPU direction check
+python compare_architectures.py --scale release    # GPU, config.py architecture
+```
+
+Baseline shapes are derived from the CFRD configuration rather than hard-coded,
+so they stay matched when the architecture changes. To train a single dense arm
+through the normal pipeline instead, set `MODEL_ARCH = "dense-baseline"` and a
+new `RUN_NAME` in `config.py`.
+
+No release-scale result exists yet.
+
 ## Train from source
 
 ### 1. Add text
@@ -280,6 +313,9 @@ a GPU uses fp16 with gradient scaling; a GPU uses bf16.
 | `train.py` | Training, validation, checkpoints, and exact resume |
 | `evaluate.py` | Recurrent-depth evaluation |
 | `export_transformers.py` | Safetensors and AutoClass export |
+| `baseline_model.py` | Dense Transformer control for CFRD ablations |
+| `model_factory.py` | Architecture selection for training and evaluation |
+| `compare_architectures.py` | CFRD versus matched dense baselines |
 | `compare_models.py` | Reproducible v1.0/v1.1/35M comparison |
 | `generate.py` | Transformers-based local generation |
 | `cloud_train.py` | the cloud benchmark, preparation, training, and export |
@@ -294,7 +330,10 @@ a GPU uses fp16 with gradient scaling; a GPU uses bf16.
 - Generation has no KV or recurrent-state cache yet.
 - Longer continuations may repeat ideas or drift between entities.
 - Speaker attribution and transfer bindings remain weak in v1.1.
-- The repository does not include a parameter-matched Transformer baseline.
+- No released Haru version has been compared against a matched dense
+  Transformer. `compare_architectures.py` runs that comparison, but no
+  release-scale result exists yet, so the v1.1 numbers above cannot separate
+  the CFRD architecture from its parameter count and training budget.
 
 ## Training data notice
 
