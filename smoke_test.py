@@ -13,7 +13,13 @@ from transformers.utils import logging as transformers_logging
 
 import config
 from baseline_model import BaselineConfig, BaselineLanguageModel
-from compare_architectures import baseline_parameter_count, cfrd_ablations, match_baselines
+from compare_architectures import (
+    ENCODE_BATCH_LINES,
+    baseline_parameter_count,
+    cfrd_ablations,
+    load_token_stream,
+    match_baselines,
+)
 from configuration_cfrd import CFRDConfig
 from counterfactual_data import (
     RELATION_CATEGORIES,
@@ -772,6 +778,67 @@ def test_full_context_cells() -> None:
         raise AssertionError(f"cell_attention={invalid!r} was accepted")
 
 
+def test_token_stream_batching_and_cap() -> None:
+    """Batched encoding must not drop a partial batch or overrun the cap.
+
+    The stream is built in blocks so a release-scale corpus does not have to
+    exist as a Python list of ints first, which costs about 32 bytes per token.
+    The failure modes that introduces are silent: a trailing partial batch that
+    never gets flushed, and a cap applied per block instead of overall.
+    """
+
+    class LineTokenizer:
+        bos_id = 2
+        eos_id = 3
+
+        class _Processor:
+            @staticmethod
+            def encode(texts: list[str], out_type: type = int) -> list[list[int]]:
+                del out_type
+                return [[4 + (ord(character) % 200) for character in text] for text in texts]
+
+        sp = _Processor()
+
+    tokenizer = LineTokenizer()
+    # Straddle ENCODE_BATCH_LINES so the last batch is deliberately partial.
+    line_count = ENCODE_BATCH_LINES + 37
+
+    with tempfile.TemporaryDirectory() as directory:
+        path = Path(directory) / "corpus.txt"
+        path.write_text("".join(f"line{index}\n" for index in range(line_count)), encoding="utf-8")
+
+        def expected(lines: int) -> np.ndarray:
+            ids: list[int] = []
+            for index in range(min(lines, line_count)):
+                ids.append(tokenizer.bos_id)
+                ids.extend(LineTokenizer._Processor.encode([f"line{index}"])[0])
+                ids.append(tokenizer.eos_id)
+            return np.asarray(ids, dtype=np.uint16)
+
+        full = load_token_stream(tokenizer, line_count, path, max_tokens=10**9)
+        assert np.array_equal(full, expected(line_count)), "a partial trailing batch was dropped"
+
+        # Stopping at the line limit mid-batch must still flush what was read.
+        partial_lines = ENCODE_BATCH_LINES + 11
+        partial = load_token_stream(tokenizer, partial_lines, path, max_tokens=10**9)
+        assert np.array_equal(partial, expected(partial_lines))
+
+        # The cap is on the whole stream, not on each block.
+        for cap in (1, 7, ENCODE_BATCH_LINES, int(full.size) - 1):
+            capped = load_token_stream(tokenizer, line_count, path, max_tokens=cap)
+            assert capped.size == cap, f"cap {cap} produced {capped.size} tokens"
+            assert np.array_equal(capped, full[:cap]), f"cap {cap} changed token order"
+
+        blank = Path(directory) / "blank.txt"
+        blank.write_text("\n   \n\n", encoding="utf-8")
+        try:
+            load_token_stream(tokenizer, 10, blank, max_tokens=10**9)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("An empty corpus produced a stream")
+
+
 def print_default_parameter_count() -> None:
     cfg = ModelConfig.from_project_settings(config, config.TOKENIZER_VOCAB_SIZE)
     dummy_features = torch.zeros(config.TOKENIZER_VOCAB_SIZE, SURFACE_FEATURE_DIM)
@@ -874,6 +941,7 @@ def main() -> None:
     test_matched_sizing_is_exact()
     test_cfrd_ablations_change_one_field_each()
     test_full_context_cells()
+    test_token_stream_batching_and_cap()
     print_default_parameter_count()
     print("smoke tests passed")
 
