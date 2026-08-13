@@ -18,6 +18,14 @@ from train import (
     validate_packed_data,
 )
 
+FINAL_EVAL_SEED_OFFSET = 30_000
+
+
+def make_final_eval_rng() -> np.random.Generator:
+    """Recreate one shared validation-window sequence for every exit depth."""
+
+    return np.random.default_rng(config.SEED + FINAL_EVAL_SEED_OFFSET)
+
 
 @torch.inference_mode()
 def evaluate_depth(
@@ -26,7 +34,7 @@ def evaluate_depth(
     device: torch.device,
     recurrence_depth: int,
 ) -> float:
-    rng = np.random.default_rng(config.SEED + 20_000 + recurrence_depth)
+    rng = make_final_eval_rng()
     total = 0.0
 
     for _ in range(config.FINAL_EVAL_BATCHES):
@@ -77,6 +85,7 @@ def main() -> None:
     results: dict[str, float | int] = {}
     results["checkpoint_step"] = int(checkpoint.get("step", 0))
     results["tokens_seen"] = int(checkpoint.get("tokens_seen", 0))
+    results["evaluation_seed"] = config.SEED + FINAL_EVAL_SEED_OFFSET
     for depth in model_cfg.exit_depths:
         loss = evaluate_depth(model, val_data, device, depth)
         results[f"depth_{depth}_loss"] = loss

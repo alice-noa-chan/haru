@@ -19,6 +19,7 @@ from counterfactual_data import (
     CounterfactualSampler,
 )
 from counterfactual_objective import counterfactual_ranking_result, encode_counterfactual_pairs
+from evaluate import make_final_eval_rng
 from model import CFRDLanguageModel, ModelConfig, count_parameters
 from modeling_cfrd import CFRDForCausalLM
 from surface_features import SURFACE_FEATURE_DIM
@@ -198,6 +199,14 @@ def test_binding_block_supervises_every_exit() -> None:
         assert binding_calls == 1
     finally:
         handle.remove()
+
+
+def test_final_depth_evaluation_reuses_windows() -> None:
+    """Every depth comparison must draw the same ordered validation windows."""
+
+    first_starts = make_final_eval_rng().integers(0, 10_000, size=(8, 4))
+    second_starts = make_final_eval_rng().integers(0, 10_000, size=(8, 4))
+    assert np.array_equal(first_starts, second_starts)
 
 
 def test_exact_sampler_resume() -> None:
@@ -399,6 +408,7 @@ def main() -> None:
     test_partial_chunk()
     test_binding_block_config_compatibility()
     test_binding_block_supervises_every_exit()
+    test_final_depth_evaluation_reuses_windows()
     test_exact_sampler_resume()
     test_transformers_auto_model_roundtrip()
     test_counterfactual_sampler()
