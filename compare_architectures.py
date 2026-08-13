@@ -37,6 +37,8 @@ from torch.utils.flop_counter import FlopCounterMode
 import config
 from baseline_model import BaselineConfig
 from cfrd_features import SURFACE_FEATURE_DIM
+from counterfactual_data import CounterfactualSampler
+from counterfactual_objective import counterfactual_ranking_result, encode_counterfactual_pairs
 from data_utils import prepare_text_for_tokenizer
 from model import ModelConfig, count_parameters
 from model_factory import architecture_of_config, build_model, describe_architecture
@@ -46,6 +48,8 @@ from train import autocast_context, configure_optimizer, get_random_batch, resol
 
 DATA_SEED_OFFSET = 40_000
 VALIDATION_SEED_OFFSET = 41_000
+RELATION_SEED_OFFSET = 42_000
+RELATION_EVAL_SEED_OFFSET = 43_000
 
 
 def baseline_parameter_count(vocab_size: int, d_model: int, n_head: int, n_kv_head: int, ffn: int, layers: int) -> int:
@@ -186,6 +190,43 @@ def validation_loss(model: torch.nn.Module, data: np.ndarray, device: torch.devi
     return total / batches
 
 
+@torch.no_grad()
+def relation_metrics(
+    model: torch.nn.Module,
+    tokenizer: StoryTokenizer,
+    device: torch.device,
+    pairs: int,
+) -> dict[str, float]:
+    """Score held-out entity bindings, the capability v1.1 actually claims.
+
+    Validation entities and phrasings are disjoint from the training sampler,
+    and the seed is fixed, so every arm faces the same held-out pairs.
+    """
+
+    was_training = model.training
+    model.eval()
+    sampler = CounterfactualSampler("validation")
+    rng = np.random.default_rng(config.SEED + RELATION_EVAL_SEED_OFFSET)
+    batch = encode_counterfactual_pairs(
+        sampler.sample_batch(pairs, rng),
+        tokenizer,
+        model.cfg.context_length,
+        device,
+    )
+
+    with autocast_context(device):
+        result = counterfactual_ranking_result(model, batch, config.COUNTERFACTUAL_MARGIN)
+
+    if was_training:
+        model.train()
+    return {
+        "relation_loss": float(result.loss.item()),
+        "relation_decision_accuracy": float(result.decision_accuracy.item()),
+        "relation_strict_pair_accuracy": float(result.strict_pair_accuracy.item()),
+        "relation_mean_margin": float(result.mean_margin.item()),
+    }
+
+
 def train_arm(
     name: str,
     model_cfg,
@@ -195,6 +236,7 @@ def train_arm(
     device: torch.device,
     args: argparse.Namespace,
     seed: int,
+    tokenizer: StoryTokenizer,
 ) -> dict:
     """Train one architecture under one seed.
 
@@ -213,6 +255,10 @@ def train_arm(
     model.train()
     optimizer = configure_optimizer(model, device)
     rng = np.random.default_rng(seed + DATA_SEED_OFFSET)
+    # Relation sampling is kept off the LM window generator, matching train.py,
+    # so enabling the objective does not shift which text an arm sees.
+    relation_rng = np.random.default_rng(seed + RELATION_SEED_OFFSET)
+    relation_sampler = CounterfactualSampler("train") if args.relation_weight > 0.0 else None
 
     print(f"\n{name} (seed {seed}): {describe_architecture(model_cfg)}", flush=True)
     print(f"  parameters={parameters:,}  forward={gflops:.3f} GFLOPs/{model_cfg.context_length}tok", flush=True)
@@ -229,8 +275,20 @@ def train_arm(
         x, y = get_random_batch(train_data, args.batch_size, model_cfg.context_length, device, rng)
         with autocast_context(device):
             output = model(x, targets=y)
-        assert output.loss is not None
-        output.loss.backward()
+            assert output.loss is not None
+            total_loss = output.loss
+
+            if relation_sampler is not None:
+                relation_batch = encode_counterfactual_pairs(
+                    relation_sampler.sample_batch(args.relation_pairs, relation_rng),
+                    tokenizer,
+                    model_cfg.context_length,
+                    device,
+                )
+                relation = counterfactual_ranking_result(model, relation_batch, config.COUNTERFACTUAL_MARGIN)
+                total_loss = total_loss + args.relation_weight * relation.loss
+
+        total_loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), config.GRAD_CLIP_NORM)
         optimizer.step()
 
@@ -245,8 +303,14 @@ def train_arm(
 
     wall_seconds = time.perf_counter() - start
     final_loss = validation_loss(model, val_data, device, args.eval_batches, args.batch_size)
+    relation = relation_metrics(model, tokenizer, device, args.relation_eval_pairs)
 
     print(f"  validation loss={final_loss:.4f}  perplexity={math.exp(min(final_loss, 20.0)):.3f}", flush=True)
+    print(
+        f"  held-out relations: strict pairs={relation['relation_strict_pair_accuracy']:.3f}  "
+        f"decisions={relation['relation_decision_accuracy']:.3f}  margin={relation['relation_mean_margin']:+.4f}",
+        flush=True,
+    )
 
     return {
         "name": name,
@@ -260,6 +324,7 @@ def train_arm(
         "validation_perplexity": float(math.exp(min(final_loss, 20.0))),
         "wall_seconds": wall_seconds,
         "history": history,
+        **relation,
     }
 
 
@@ -274,6 +339,7 @@ def summarize_arm(name: str, runs: list[dict], reference_runs: list[dict] | None
     losses = [run["validation_loss"] for run in runs]
     mean = sum(losses) / len(losses)
     spread = (sum((value - mean) ** 2 for value in losses) / (len(losses) - 1)) ** 0.5 if len(losses) > 1 else 0.0
+    strict = [run["relation_strict_pair_accuracy"] for run in runs]
 
     summary = {
         "name": name,
@@ -286,6 +352,9 @@ def summarize_arm(name: str, runs: list[dict], reference_runs: list[dict] | None
         "mean_validation_loss": mean,
         "std_validation_loss": spread,
         "mean_validation_perplexity": float(math.exp(min(mean, 20.0))),
+        "strict_pair_accuracies": strict,
+        "mean_strict_pair_accuracy": sum(strict) / len(strict),
+        "mean_relation_margin": sum(run["relation_mean_margin"] for run in runs) / len(runs),
     }
 
     if reference_runs is not None:
@@ -350,6 +419,16 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--warmup-steps", type=int, default=30)
     parser.add_argument("--corpus-lines", type=int, default=30_000, help="Records read from the corpus")
     parser.add_argument("--eval-batches", type=int, default=20)
+    parser.add_argument(
+        "--relation-weight",
+        type=float,
+        default=config.COUNTERFACTUAL_LOSS_WEIGHT,
+        help="Auxiliary relation-binding loss weight, applied identically to every arm. "
+        "Set 0 to compare plain language modelling only. Entity binding is what v1.1 claims, "
+        "so leaving this off measures the one thing CFRD was not built for.",
+    )
+    parser.add_argument("--relation-pairs", type=int, default=config.COUNTERFACTUAL_PAIRS_PER_MICRO_BATCH)
+    parser.add_argument("--relation-eval-pairs", type=int, default=config.COUNTERFACTUAL_EVAL_PAIRS)
     parser.add_argument("--log-interval", type=int, default=50)
     parser.add_argument("--device", default=None, help="Defaults to config.DEVICE resolution")
     parser.add_argument(
@@ -392,7 +471,9 @@ def main() -> None:
     # each completed replication, which is the unit the pairing needs.
     for seed in seeds:
         for name, model_cfg in architectures.items():
-            runs[name].append(train_arm(name, model_cfg, surface_features, train_data, val_data, device, args, seed))
+            runs[name].append(
+                train_arm(name, model_cfg, surface_features, train_data, val_data, device, args, seed, tokenizer)
+            )
 
     reference_name = next(iter(architectures))
     summaries = [
@@ -403,7 +484,10 @@ def main() -> None:
     tokens_per_arm = args.batch_size * args.steps * cfrd_cfg.context_length
     print("\n" + "=" * 92, flush=True)
     print(f"{args.seeds} seed(s), {args.steps} steps, {tokens_per_arm:,} tokens per arm per seed", flush=True)
-    print(f"{'arm':<26}{'params':>12}{'GFLOPs':>9}{'val loss':>10}{'sd':>8}{'vs cfrd':>10}{'verdict':>14}", flush=True)
+    print(
+        f"{'arm':<26}{'params':>12}{'GFLOPs':>9}{'val loss':>10}{'sd':>8}{'vs cfrd':>10}{'verdict':>14}{'strict':>9}",
+        flush=True,
+    )
     print("-" * 92, flush=True)
     for row in summaries:
         if "mean_paired_delta" not in row:
@@ -418,11 +502,17 @@ def main() -> None:
                 verdict = "cfrd wins" if row["mean_paired_delta"] > 0 else "cfrd loses"
         print(
             f"{row['name']:<26}{row['parameters']:>12,}{row['forward_gflops']:>9.2f}"
-            f"{row['mean_validation_loss']:>10.4f}{row['std_validation_loss']:>8.4f}{delta:>10}{verdict:>14}",
+            f"{row['mean_validation_loss']:>10.4f}{row['std_validation_loss']:>8.4f}{delta:>10}{verdict:>14}"
+            f"{row['mean_strict_pair_accuracy']:>9.3f}",
             flush=True,
         )
     print("=" * 92, flush=True)
     print("Lower validation loss is better. A positive delta means CFRD won that comparison.", flush=True)
+    print(
+        f"'strict' is held-out strict pair accuracy at relation weight {args.relation_weight}; "
+        "chance is 0.25 and both directions must flip.",
+        flush=True,
+    )
     if args.seeds < 2:
         print("Run --seeds 3 or more before reading any delta as a result.", flush=True)
 
@@ -433,6 +523,9 @@ def main() -> None:
         "seeds": seeds,
         "steps": args.steps,
         "batch_size": args.batch_size,
+        "relation_weight": args.relation_weight,
+        "relation_pairs_per_step": args.relation_pairs,
+        "relation_eval_pairs": args.relation_eval_pairs,
         "tokenizer": str(tokenizer.model_path),
         "vocab_size": tokenizer.vocab_size,
         "train_tokens": int(len(train_data)),
