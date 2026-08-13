@@ -163,7 +163,11 @@ def measure_forward_flops(model: torch.nn.Module, context_length: int, vocab_siz
 
 @torch.no_grad()
 def validation_loss(model: torch.nn.Module, data: np.ndarray, device: torch.device, batches: int, batch: int) -> float:
-    """Score fixed windows so every architecture is judged on identical text."""
+    """Score fixed windows so every architecture is judged on identical text.
+
+    The window seed is deliberately independent of the training seed, so every
+    arm of every replication is scored on exactly the same text.
+    """
 
     was_training = model.training
     model.eval()
@@ -190,10 +194,17 @@ def train_arm(
     val_data: np.ndarray,
     device: torch.device,
     args: argparse.Namespace,
+    seed: int,
 ) -> dict:
-    """Train one architecture. Seeds are reset so every arm starts identically."""
+    """Train one architecture under one seed.
 
-    torch.manual_seed(config.SEED)
+    Within a replication every arm shares the seed, so initialization and the
+    window order are identical across architectures and the comparison stays
+    paired. Across replications the seed changes, which is what makes a delta
+    separable from run-to-run variance.
+    """
+
+    torch.manual_seed(seed)
     model = build_model(model_cfg, surface_features)
     parameters = count_parameters(model)["total"]
     gflops = measure_forward_flops(model, model_cfg.context_length, model_cfg.vocab_size)
@@ -201,11 +212,9 @@ def train_arm(
     model.to(device)
     model.train()
     optimizer = configure_optimizer(model, device)
-    # Identical seed and identical step count give every arm the same windows
-    # in the same order, so a difference cannot come from the data draw.
-    rng = np.random.default_rng(config.SEED + DATA_SEED_OFFSET)
+    rng = np.random.default_rng(seed + DATA_SEED_OFFSET)
 
-    print(f"\n{name}: {describe_architecture(model_cfg)}", flush=True)
+    print(f"\n{name} (seed {seed}): {describe_architecture(model_cfg)}", flush=True)
     print(f"  parameters={parameters:,}  forward={gflops:.3f} GFLOPs/{model_cfg.context_length}tok", flush=True)
 
     history: list[dict] = []
@@ -241,6 +250,7 @@ def train_arm(
 
     return {
         "name": name,
+        "seed": seed,
         "architecture": architecture_of_config(model_cfg),
         "shape": describe_architecture(model_cfg),
         "model_config": asdict(model_cfg),
@@ -251,6 +261,50 @@ def train_arm(
         "wall_seconds": wall_seconds,
         "history": history,
     }
+
+
+def summarize_arm(name: str, runs: list[dict], reference_runs: list[dict] | None) -> dict:
+    """Aggregate one arm's replications and pair its deltas against CFRD.
+
+    Deltas are computed per seed and then averaged, not taken between the two
+    averages. Both arms of a replication share initialization and window order,
+    so the paired difference cancels the variance the seed introduces.
+    """
+
+    losses = [run["validation_loss"] for run in runs]
+    mean = sum(losses) / len(losses)
+    spread = (sum((value - mean) ** 2 for value in losses) / (len(losses) - 1)) ** 0.5 if len(losses) > 1 else 0.0
+
+    summary = {
+        "name": name,
+        "architecture": runs[0]["architecture"],
+        "shape": runs[0]["shape"],
+        "parameters": runs[0]["parameters"],
+        "forward_gflops": runs[0]["forward_gflops"],
+        "seeds": [run["seed"] for run in runs],
+        "validation_losses": losses,
+        "mean_validation_loss": mean,
+        "std_validation_loss": spread,
+        "mean_validation_perplexity": float(math.exp(min(mean, 20.0))),
+    }
+
+    if reference_runs is not None:
+        by_seed = {run["seed"]: run["validation_loss"] for run in reference_runs}
+        deltas = [run["validation_loss"] - by_seed[run["seed"]] for run in runs if run["seed"] in by_seed]
+        if deltas:
+            delta_mean = sum(deltas) / len(deltas)
+            delta_spread = (
+                (sum((value - delta_mean) ** 2 for value in deltas) / (len(deltas) - 1)) ** 0.5
+                if len(deltas) > 1
+                else 0.0
+            )
+            summary["paired_deltas"] = deltas
+            summary["mean_paired_delta"] = delta_mean
+            summary["std_paired_delta"] = delta_spread
+            # A delta smaller than the spread it sits in is not a result.
+            summary["delta_exceeds_spread"] = len(deltas) > 1 and abs(delta_mean) > delta_spread
+
+    return summary
 
 
 def small_scale_config(vocab_size: int) -> ModelConfig:
@@ -284,6 +338,13 @@ def parse_arguments() -> argparse.Namespace:
         help="'small' is a CPU-feasible direction test; 'release' uses config.py's architecture",
     )
     parser.add_argument("--steps", type=int, default=300, help="Optimizer steps per architecture")
+    parser.add_argument(
+        "--seeds",
+        type=int,
+        default=3,
+        help="Replications per architecture. Deltas between compact models are small enough that a "
+        "single seed cannot separate them from run-to-run variance.",
+    )
     parser.add_argument("--batch-size", type=int, default=8)
     parser.add_argument("--learning-rate", type=float, default=config.LEARNING_RATE)
     parser.add_argument("--warmup-steps", type=int, default=30)
@@ -325,38 +386,59 @@ def main() -> None:
     train_data, val_data = stream[:split], stream[split:]
     print(f"train tokens={len(train_data):,}  validation tokens={len(val_data):,}", flush=True)
 
-    results = [
-        train_arm(name, model_cfg, surface_features, train_data, val_data, device, args)
-        for name, model_cfg in architectures.items()
+    seeds = [config.SEED + offset for offset in range(args.seeds)]
+    runs: dict[str, list[dict]] = {name: [] for name in architectures}
+    # Seed varies in the outer loop so a partial run still holds every arm of
+    # each completed replication, which is the unit the pairing needs.
+    for seed in seeds:
+        for name, model_cfg in architectures.items():
+            runs[name].append(train_arm(name, model_cfg, surface_features, train_data, val_data, device, args, seed))
+
+    reference_name = next(iter(architectures))
+    summaries = [
+        summarize_arm(name, arm_runs, None if name == reference_name else runs[reference_name])
+        for name, arm_runs in runs.items()
     ]
 
-    reference = results[0]
-    print("\n" + "=" * 84, flush=True)
-    print(f"{'arm':<26}{'params':>12}{'GFLOPs':>9}{'val loss':>10}{'ppl':>9}{'vs cfrd':>10}", flush=True)
-    print("-" * 84, flush=True)
-    for row in results:
-        delta = row["validation_loss"] - reference["validation_loss"]
-        marker = "  (ref)" if row is reference else f"{delta:+9.4f}"
+    tokens_per_arm = args.batch_size * args.steps * cfrd_cfg.context_length
+    print("\n" + "=" * 92, flush=True)
+    print(f"{args.seeds} seed(s), {args.steps} steps, {tokens_per_arm:,} tokens per arm per seed", flush=True)
+    print(f"{'arm':<26}{'params':>12}{'GFLOPs':>9}{'val loss':>10}{'sd':>8}{'vs cfrd':>10}{'verdict':>14}", flush=True)
+    print("-" * 92, flush=True)
+    for row in summaries:
+        if "mean_paired_delta" not in row:
+            delta, verdict = "  (ref)", ""
+        else:
+            delta = f"{row['mean_paired_delta']:+9.4f}"
+            if args.seeds < 2:
+                verdict = "1 seed"
+            elif not row["delta_exceeds_spread"]:
+                verdict = "within noise"
+            else:
+                verdict = "cfrd wins" if row["mean_paired_delta"] > 0 else "cfrd loses"
         print(
             f"{row['name']:<26}{row['parameters']:>12,}{row['forward_gflops']:>9.2f}"
-            f"{row['validation_loss']:>10.4f}{row['validation_perplexity']:>9.2f}{marker:>10}",
+            f"{row['mean_validation_loss']:>10.4f}{row['std_validation_loss']:>8.4f}{delta:>10}{verdict:>14}",
             flush=True,
         )
-    print("=" * 84, flush=True)
+    print("=" * 92, flush=True)
     print("Lower validation loss is better. A positive delta means CFRD won that comparison.", flush=True)
+    if args.seeds < 2:
+        print("Run --seeds 3 or more before reading any delta as a result.", flush=True)
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "scale": args.scale,
         "device": str(device),
-        "seed": config.SEED,
+        "seeds": seeds,
         "steps": args.steps,
         "batch_size": args.batch_size,
         "tokenizer": str(tokenizer.model_path),
         "vocab_size": tokenizer.vocab_size,
         "train_tokens": int(len(train_data)),
         "validation_tokens": int(len(val_data)),
-        "results": results,
+        "summary": summaries,
+        "results": [run for arm_runs in runs.values() for run in arm_runs],
     }
     args.output.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"Saved {args.output}", flush=True)
