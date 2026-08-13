@@ -711,7 +711,7 @@ class CFRDLanguageModel(nn.Module):
 
             if should_project:
                 projection_x = x
-                if depth == run_recurrences and self.binding_block is not None:
+                if self.binding_block is not None:
                     projection_x = self.binding_block(x, self.rope_cos, self.rope_sin)
                 logits_at_depth = self._logits(projection_x)
 

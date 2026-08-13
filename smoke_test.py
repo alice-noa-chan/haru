@@ -175,6 +175,31 @@ def test_binding_block_config_compatibility() -> None:
     assert hf_config.to_model_config().use_binding_block
 
 
+def test_binding_block_supervises_every_exit() -> None:
+    """Training and terminal inference must project through the same binding path."""
+
+    model = build_test_model()
+    assert model.binding_block is not None
+    x = torch.randint(0, TEST_VOCAB_SIZE, (2, TEST_CONTEXT_LENGTH))
+    y = torch.randint(0, TEST_VOCAB_SIZE, (2, TEST_CONTEXT_LENGTH))
+    binding_calls = 0
+
+    def count_binding_calls(_module, _args, _output) -> None:
+        nonlocal binding_calls
+        binding_calls += 1
+
+    handle = model.binding_block.register_forward_hook(count_binding_calls)
+    try:
+        model(x, targets=y)
+        assert binding_calls == len(TEST_EXIT_DEPTHS)
+
+        binding_calls = 0
+        model(x, recurrences=TEST_EXIT_DEPTHS[0])
+        assert binding_calls == 1
+    finally:
+        handle.remove()
+
+
 def test_exact_sampler_resume() -> None:
     """Checkpoint restore must continue the exact random batch sequence."""
 
@@ -373,6 +398,7 @@ def main() -> None:
     test_causality_across_chunks()
     test_partial_chunk()
     test_binding_block_config_compatibility()
+    test_binding_block_supervises_every_exit()
     test_exact_sampler_resume()
     test_transformers_auto_model_roundtrip()
     test_counterfactual_sampler()
