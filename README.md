@@ -370,6 +370,49 @@ tokens; the three-arm table costs roughly 0.55x that figure and the six-arm
 The the cloud app and persistent Volume are named `haru` and `haru-training`.
 a GPU uses fp16 with gradient scaling; a GPU uses bf16.
 
+## Compare on the cloud Cloud
+
+`cloud_train.py` runs the same comparison on the cloud, for when the cloud credits run
+out. It pins identical package versions, so a result cannot differ because of
+where it ran.
+
+```bash
+uv tool install the cloud-client
+the cloud configure default --token <API_KEY>
+the cloud volume create haru-training
+```
+
+Upload the corpus and tokenizer once. **Do this from Linux or WSL, not from
+Windows**: the Windows client joins the volume name and key with a backslash,
+and `the cloud cp --no-multipart` reports a completed transfer while writing
+nothing at all. Always confirm afterwards.
+
+```bash
+the cloud cp data/data.txt the cloud://haru-training/data/data.txt
+the cloud cp tokenizer/tiny_ko_12k.model the cloud://haru-training/tokenizer/tiny_ko_12k.model
+the cloud ls haru-training/data          # must show data.txt, not "0 items"
+```
+
+Then run any arm set:
+
+```bash
+python cloud_train.py                                    # 3 arms
+python cloud_train.py --ablate                           # + 3 within-CFRD arms
+python cloud_train.py --ablate --deep-supervision-arms   # + 2 supervision arms
+```
+
+the cloud has no a GPU, so the function requests an a GPU. Every arm shares the same
+GPU, so the comparison is unaffected. `headless=True` keeps the run alive after
+the client disconnects, which matters because these tables run for hours.
+
+Results are named after the arm set and budget, for example
+`architecture_release_ablate_deepsup_6000steps_3seeds.json`, and land on the
+volume under `runs/<RUN_NAME>/`. Fetch one with:
+
+```bash
+the cloud cp the cloud://haru-training/runs/haru-v2-binding/<name>.json results/
+```
+
 ## Project files
 
 | File | Purpose |
@@ -390,6 +433,7 @@ a GPU uses fp16 with gradient scaling; a GPU uses bf16.
 | `compare_models.py` | Reproducible v1.0/v1.1/35M comparison |
 | `generate.py` | Transformers-based local generation |
 | `cloud_train.py` | the cloud benchmark, preparation, training, and export |
+| `cloud_train.py` | the cloud Cloud architecture comparison |
 | `smoke_test.py` | Fast correctness tests |
 | `NOTICE.md` | Required training-data attribution |
 | `RESEARCH.md` | Related architecture research |
