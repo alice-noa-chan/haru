@@ -184,6 +184,49 @@ Per-token perplexity is comparable only for models using the same tokenizer.
 For different tokenizers, use byte- or character-normalized negative
 log-likelihood and report actual latency or FLOPs.
 
+## Korean benchmarks
+
+Validation loss and the project's own counterfactual pairs cannot be compared
+against any other model. `evaluate_korean.py` scores a Transformers export on
+the five KoBEST tasks through lm-eval, the harness published baselines use.
+
+```bash
+python evaluate_korean.py runs/<RUN_NAME>/transformers
+```
+
+Haru v1.1 sits at chance on every task:
+
+| Task | Accuracy | Chance | vs chance |
+|---|---:|---:|---:|
+| kobest_boolq | 0.502 | 0.50 | +0.002 |
+| kobest_copa | 0.500 | 0.50 | +0.000 |
+| kobest_hellaswag | 0.224 | 0.25 | -0.026 |
+| kobest_sentineg | 0.496 | 0.50 | -0.004 |
+| kobest_wic | 0.488 | 0.50 | -0.012 |
+| **mean** | **0.442** | **0.450** | **-0.008** |
+
+The tasks mix two-way and four-way formats, so the mean has no fixed floor and
+is printed beside the mean of the chance levels. 0.442 is what a coin flip
+scores, not a score.
+
+This is a data result, not an architecture one. v1.1 saw 0.75B tokens of
+children's stories; a Pythia-scale baseline sees roughly 400x more text across
+far more domains, and KoBEST asks for world knowledge, sentiment, and word
+sense that children's stories barely contain.
+
+The English suite these models are usually reported on is unavailable to Haru
+at any effort: its tokenizer spends 1.02 tokens per English character against
+0.29 per Korean character, and 292 of its 12,000 pieces are ASCII with 256 of
+those byte fallbacks. An English score would measure the tokenizer.
+
+Evaluation needs its own environment, since lm-eval requires transformers 4.x
+while the project targets 5.x:
+
+```bash
+uv venv .venv-eval --python 3.11
+uv pip install --python .venv-eval/Scripts/python.exe lm-eval==0.4.9 transformers==4.57.1 torch sentencepiece "datasets<4"
+```
+
 ## Architecture comparison
 
 CFRD reuses three physical cells across six recurrences, so it does not spend
@@ -440,6 +483,7 @@ the cloud cp the cloud://haru-training/runs/haru-v2-binding/<name>.json results/
 | `prepare_data.py` | Packed token-stream creation |
 | `train.py` | Training, validation, checkpoints, and exact resume |
 | `evaluate.py` | Recurrent-depth evaluation |
+| `evaluate_korean.py` | KoBEST zero-shot scoring through lm-eval |
 | `export_transformers.py` | Safetensors and AutoClass export |
 | `baseline_model.py` | Dense Transformer control for CFRD ablations |
 | `model_factory.py` | Architecture selection for training and evaluation |
@@ -448,6 +492,9 @@ the cloud cp the cloud://haru-training/runs/haru-v2-binding/<name>.json results/
 | `generate.py` | Transformers-based local generation |
 | `cloud_train.py` | the cloud benchmark, preparation, training, and export |
 | `cloud_train.py` | the cloud Cloud architecture comparison |
+| `cloud_train.py` | the cloud pods, GPU and batch-size benchmarking |
+| `download_data.py` | Corpus download, refusing benchmark datasets |
+| `decontaminate.py` | Benchmark n-gram removal from a corpus |
 | `smoke_test.py` | Fast correctness tests |
 | `NOTICE.md` | Required training-data attribution |
 | `RESEARCH.md` | Related architecture research |
