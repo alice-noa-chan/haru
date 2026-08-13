@@ -204,8 +204,17 @@ therefore trains two controls on identical windows in an identical order:
   support a claim about quality per parameter.
 
 ```bash
-python compare_architectures.py --scale small      # CPU direction check
-python compare_architectures.py --scale release    # GPU, config.py architecture
+python compare_architectures.py --scale small              # CPU direction check
+python compare_architectures.py --scale small --ablate     # plus within-CFRD arms
+python compare_architectures.py --scale release            # GPU, config.py architecture
+```
+
+On the cloud, the release-scale table is one command against the corpus and
+tokenizer already on the volume:
+
+```bash
+python -m the cloud run --detach cloud_train.py --action compare
+python -m the cloud run --detach cloud_train.py --action compare --ablate
 ```
 
 Baseline shapes are derived from the CFRD configuration rather than hard-coded,
@@ -325,6 +334,18 @@ Evaluate and export after training:
 python -m the cloud run cloud_train.py --action evaluate
 python -m the cloud run cloud_train.py --action export
 ```
+
+Compare CFRD against matched dense baselines at the release architecture:
+
+```bash
+python -m the cloud run --detach cloud_train.py --action compare
+python -m the cloud run --detach cloud_train.py --action compare --ablate
+```
+
+Defaults are 6,000 steps and 3 seeds, or 49.2M tokens per arm per seed.
+`--action benchmark` reports measured throughput and a cost estimate for 800M
+tokens; the three-arm table costs roughly 0.55x that figure and the six-arm
+`--ablate` form roughly 1.1x.
 
 The the cloud app and persistent Volume are named `haru` and `haru-training`.
 a GPU uses fp16 with gradient scaling; a GPU uses bf16.
