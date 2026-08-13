@@ -165,13 +165,47 @@ def cfrd_ablations(cfrd_cfg: ModelConfig) -> dict[str, ModelConfig]:
     return variants
 
 
-def load_token_stream(tokenizer: StoryTokenizer, lines: int, path: Path) -> np.ndarray:
-    """Encode the first `lines` records of the corpus into one packed stream."""
+ENCODE_BATCH_LINES = 20_000
+
+
+def load_token_stream(tokenizer: StoryTokenizer, lines: int, path: Path, max_tokens: int) -> np.ndarray:
+    """Encode up to `lines` records of the corpus into one packed stream.
+
+    Tokens are flushed into uint16 blocks as they are produced. Accumulating
+    them in a Python list instead costs about 32 bytes per token, which is
+    survivable for a CPU-scale slice and roughly 20 GB for a release-scale one.
+    `max_tokens` bounds the result regardless of how large the corpus is.
+    """
 
     if not path.exists():
         raise FileNotFoundError(f"No corpus at {path}. Place training text under data/ first.")
+    if max_tokens <= 0:
+        raise ValueError("max_tokens must be positive")
 
-    ids: list[int] = []
+    blocks: list[np.ndarray] = []
+    total = 0
+    pending: list[str] = []
+
+    def flush() -> bool:
+        """Encode the buffered lines. Returns False once the cap is reached."""
+
+        nonlocal total
+        if not pending:
+            return True
+
+        ids: list[int] = []
+        for encoded in tokenizer.sp.encode(pending, out_type=int):
+            ids.append(tokenizer.bos_id)
+            ids.extend(encoded)
+            ids.append(tokenizer.eos_id)
+        pending.clear()
+
+        block = np.asarray(ids[: max_tokens - total], dtype=np.uint16)
+        blocks.append(block)
+        total += int(block.size)
+        return total < max_tokens
+
+    capped = False
     with path.open("r", encoding="utf-8", errors="replace") as handle:
         for index, line in enumerate(handle):
             if index >= lines:
@@ -179,11 +213,19 @@ def load_token_stream(tokenizer: StoryTokenizer, lines: int, path: Path) -> np.n
             text = line.strip()
             if not text:
                 continue
-            ids.append(tokenizer.bos_id)
-            ids.extend(tokenizer.sp.encode(prepare_text_for_tokenizer(text), out_type=int))
-            ids.append(tokenizer.eos_id)
+            pending.append(prepare_text_for_tokenizer(text))
+            if len(pending) >= ENCODE_BATCH_LINES and not flush():
+                capped = True
+                break
 
-    return np.asarray(ids, dtype=np.uint16)
+    # Reaching the line limit leaves a partial batch buffered; only a token cap
+    # means the remainder is deliberately discarded.
+    if not capped:
+        flush()
+
+    if not blocks:
+        raise ValueError(f"No usable text found in {path}")
+    return np.concatenate(blocks)
 
 
 def measure_forward_flops(model: torch.nn.Module, context_length: int, vocab_size: int) -> float:
@@ -447,6 +489,13 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--learning-rate", type=float, default=config.LEARNING_RATE)
     parser.add_argument("--warmup-steps", type=int, default=30)
     parser.add_argument("--corpus-lines", type=int, default=30_000, help="Records read from the corpus")
+    parser.add_argument(
+        "--max-tokens",
+        type=int,
+        default=200_000_000,
+        help="Hard cap on the packed stream. At 2 bytes per token this bounds memory, and the default "
+        "already exceeds what the largest documented run consumes.",
+    )
     parser.add_argument("--eval-batches", type=int, default=20)
     parser.add_argument(
         "--relation-weight",
@@ -499,7 +548,7 @@ def main() -> None:
         architectures.update(cfrd_ablations(cfrd_cfg))
 
     print(f"Loading up to {args.corpus_lines:,} records from {config.DATA_DIR / 'data.txt'}", flush=True)
-    stream = load_token_stream(tokenizer, args.corpus_lines, config.DATA_DIR / "data.txt")
+    stream = load_token_stream(tokenizer, args.corpus_lines, config.DATA_DIR / "data.txt", args.max_tokens)
     split = int(len(stream) * 0.98)
     train_data, val_data = stream[:split], stream[split:]
     print(f"train tokens={len(train_data):,}  validation tokens={len(val_data):,}", flush=True)
