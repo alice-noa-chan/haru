@@ -730,22 +730,27 @@ def test_counterfactual_objective_backward() -> None:
         prompt_b="A=y; B=x; A?",
         candidates=("x", "y"),
     )
-    model = build_test_model()
     batch = encode_counterfactual_pairs(
         (pair,),
         CharacterTokenizer(),
         context_length=TEST_CONTEXT_LENGTH,
         device=torch.device("cpu"),
     )
-    result = counterfactual_ranking_result(model, batch, margin=0.5)
-    result.loss.backward()
 
     assert batch.input_ids.shape[0] == 4
     assert batch.score_mask.sum().item() == 4
-    assert torch.isfinite(result.loss)
-    assert 0.0 <= result.decision_accuracy.item() <= 1.0
-    assert 0.0 <= result.strict_pair_accuracy.item() <= 1.0
-    assert model.token_embedding.weight.grad is not None
+
+    # compare_architectures.py applies this objective to every arm, so it has to
+    # drive the dense baseline exactly as it drives CFRD. Scoring only CFRD
+    # would compare a relation-trained model against an untrained control.
+    for model in (build_test_model(), build_test_baseline()):
+        result = counterfactual_ranking_result(model, batch, margin=0.5)
+        result.loss.backward()
+
+        assert torch.isfinite(result.loss)
+        assert 0.0 <= result.decision_accuracy.item() <= 1.0
+        assert 0.0 <= result.strict_pair_accuracy.item() <= 1.0
+        assert model.token_embedding.weight.grad is not None
 
 
 def main() -> None:
