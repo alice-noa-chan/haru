@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import sys
 import tempfile
+from collections.abc import Callable
 from dataclasses import asdict, fields, replace
 from pathlib import Path
 from types import SimpleNamespace
@@ -914,36 +916,36 @@ def test_counterfactual_objective_backward() -> None:
         assert model.token_embedding.weight.grad is not None
 
 
+def discover_tests() -> list[tuple[str, Callable[[], None]]]:
+    """Collect every test_* function in definition order.
+
+    Listing them by hand meant a new test needed two edits, and forgetting the
+    second one produced a passing suite that silently never ran it. Module
+    namespaces preserve definition order, so the source order is the run order.
+    """
+
+    return [
+        (name, value)
+        for name, value in vars(sys.modules[__name__]).items()
+        if name.startswith("test_") and callable(value)
+    ]
+
+
 def main() -> None:
-    test_shapes()
-    test_backward_pass()
-    test_causality_inside_chunk()
-    test_causality_across_chunks()
-    test_partial_chunk()
-    test_last_token_logits_match_full_projection()
-    test_binding_block_config_compatibility()
-    test_binding_block_supervises_every_exit()
-    test_final_depth_evaluation_reuses_windows()
-    test_exact_sampler_resume()
-    test_legacy_shared_sampler_resume()
-    test_transformers_auto_model_roundtrip()
-    test_counterfactual_sampler()
-    test_counterfactual_objective_backward()
-    test_transformers_tokenizer_roundtrip()
-    test_baseline_shapes_and_exit()
-    test_baseline_backward_pass()
-    test_baseline_causality()
-    test_baseline_last_token_logits_match_full_projection()
-    test_baseline_rejects_recurrent_depth()
-    test_model_factory_dispatch()
-    test_untagged_checkpoint_reads_as_cfrd()
-    test_baseline_checkpoint_resume_and_arch_guard()
-    test_matched_sizing_is_exact()
-    test_cfrd_ablations_change_one_field_each()
-    test_full_context_cells()
-    test_token_stream_batching_and_cap()
+    tests = discover_tests()
+    if not tests:
+        raise AssertionError("No test functions were discovered")
+
+    for name, test in tests:
+        try:
+            test()
+        except Exception as error:
+            raise AssertionError(f"{name} failed: {error}") from error
+
     print_default_parameter_count()
-    print("smoke tests passed")
+    # Print the count so a test that stops being discovered is visible rather
+    # than silently absent, which is the failure the manual list allowed.
+    print(f"{len(tests)} smoke tests passed")
 
 
 if __name__ == "__main__":
