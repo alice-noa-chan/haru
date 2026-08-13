@@ -14,3 +14,4 @@ data/*
 .venv/
 analysis/
 .venv-eval/
+.flash/
