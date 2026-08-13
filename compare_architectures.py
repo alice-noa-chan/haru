@@ -183,7 +183,34 @@ def deep_supervision_arms(
     return arms
 
 
-def cfrd_ablations(cfrd_cfg: ModelConfig) -> dict[str, ModelConfig]:
+def fit_to_budget(cfg: ModelConfig, surface_features: torch.Tensor, ceiling: int) -> ModelConfig | None:
+    """Trim ffn_dim until the configuration fits under a parameter ceiling.
+
+    Unfolding at the release shape costs 17,047,725 parameters, just past the
+    17M this project treats as its limit. Solving for the width rather than
+    hard-coding one keeps the arm meaningful at any scale, including the tiny
+    configurations the test suite builds.
+
+    Returns None when the configuration already fits and no trim is needed.
+    """
+
+    if count_parameters(build_model(cfg, surface_features))["total"] <= ceiling:
+        return None
+
+    step = max(8, cfg.d_model // 48)
+    for ffn in range(cfg.ffn_dim - step, step - 1, -step):
+        candidate = replace(cfg, ffn_dim=ffn)
+        if count_parameters(build_model(candidate, surface_features))["total"] <= ceiling:
+            return candidate
+
+    raise ValueError(f"No ffn_dim brings this configuration under {ceiling:,} parameters")
+
+
+def cfrd_ablations(
+    cfrd_cfg: ModelConfig,
+    surface_features: torch.Tensor | None = None,
+    ceiling: int | None = None,
+) -> dict[str, ModelConfig]:
     """Within-CFRD arms that separate the changes v1.1 shipped together.
 
     v1.1 added a third physical cell, a full-context binding block, a larger
@@ -205,6 +232,13 @@ def cfrd_ablations(cfrd_cfg: ModelConfig) -> dict[str, ModelConfig]:
         variants["cfrd-no-binding-block"] = replace(cfrd_cfg, use_binding_block=False)
     if cfrd_cfg.physical_cells < cfrd_cfg.recurrences:
         variants["cfrd-unfolded"] = replace(cfrd_cfg, physical_cells=cfrd_cfg.recurrences)
+    # The budget arm is the unfolded shape trimmed to ship. It varies two
+    # fields on purpose, so it is added after the one-field ablations.
+    if surface_features is not None and ceiling is not None and "cfrd-unfolded" in variants:
+        trimmed = fit_to_budget(variants["cfrd-unfolded"], surface_features, ceiling)
+        if trimmed is not None:
+            variants["cfrd-unfolded-budget"] = trimmed
+
     if cfrd_cfg.cell_attention != "full":
         # Not an ablation of v1.1 but the arm that tests the replacement for it:
         # keep the fold, give each cell the full context, drop summary memory.
@@ -667,7 +701,7 @@ def main() -> None:
     baselines = match_baselines(cfrd_cfg, cfrd_parameters)
     architectures = {"cfrd": cfrd_cfg, **baselines}
     if args.ablate:
-        architectures.update(cfrd_ablations(cfrd_cfg))
+        architectures.update(cfrd_ablations(cfrd_cfg, surface_features, args.max_parameters))
     if args.deep_supervision_arms:
         architectures.update(deep_supervision_arms(cfrd_cfg, baselines))
     if args.combine:

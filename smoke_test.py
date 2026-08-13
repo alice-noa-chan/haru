@@ -23,6 +23,7 @@ from compare_architectures import (
     combination_arms,
     deep_supervision_arms,
     evenly_spaced_exits,
+    fit_to_budget,
     load_token_stream,
     match_baselines,
 )
@@ -729,6 +730,44 @@ def test_cfrd_ablations_change_one_field_each() -> None:
     baseline_parameters = count_parameters(build_model(reference, features))["total"]
     assert parameters["cfrd-no-binding-block"] < baseline_parameters
     assert parameters["cfrd-unfolded"] > baseline_parameters
+
+
+def test_budget_arm_fits_the_ceiling() -> None:
+    """The shipping arm must be solved from the ceiling, not hard-coded.
+
+    Unfolding at the release shape lands just past 17M parameters, so the arm
+    that can actually ship is a trimmed one. Deriving the width keeps that arm
+    meaningful at any scale rather than only at the size it was written for.
+    """
+
+    reference = build_test_model().cfg
+    features = torch.randn(TEST_VOCAB_SIZE, SURFACE_FEATURE_DIM)
+    unfolded = replace(reference, physical_cells=reference.recurrences)
+    unfolded_parameters = count_parameters(build_model(unfolded, features))["total"]
+
+    # A ceiling the unfolded shape already meets needs no trim at all.
+    assert fit_to_budget(unfolded, features, unfolded_parameters) is None
+
+    ceiling = int(unfolded_parameters * 0.97)
+    trimmed = fit_to_budget(unfolded, features, ceiling)
+    assert trimmed is not None
+    assert trimmed.ffn_dim < unfolded.ffn_dim
+    assert trimmed.physical_cells == unfolded.physical_cells
+    assert count_parameters(build_model(trimmed, features))["total"] <= ceiling
+
+    changed = [f.name for f in fields(ModelConfig) if getattr(trimmed, f.name) != getattr(unfolded, f.name)]
+    assert changed == ["ffn_dim"], f"budget arm changed {changed}"
+
+    with_budget = cfrd_ablations(reference, features, ceiling)
+    assert "cfrd-unfolded-budget" in with_budget
+    assert "cfrd-unfolded-budget" not in cfrd_ablations(reference)
+
+    try:
+        fit_to_budget(unfolded, features, 1)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("An impossible ceiling was accepted")
 
 
 def test_full_context_cells() -> None:
