@@ -13,3 +13,4 @@ data/*
 !data/.gitkeep
 .venv/
 analysis/
+.venv-eval/

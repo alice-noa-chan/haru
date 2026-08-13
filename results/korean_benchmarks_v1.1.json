@@ -1,0 +1,89 @@
+{
+  "export_dir": "C:\\Users\\solso\\AppData\\Local\\Temp\\claude\\C--Users-solso-OneDrive-Desktop-haru\\251d178b-2034-43fe-ba31-8c010945473e\\scratchpad\\haru_v11",
+  "tasks": [
+    "kobest_boolq",
+    "kobest_copa",
+    "kobest_hellaswag",
+    "kobest_sentineg",
+    "kobest_wic"
+  ],
+  "limit": null,
+  "mean_accuracy": 0.44209073054010084,
+  "chance_mean_accuracy": 0.45,
+  "results": [
+    {
+      "task": "kobest_boolq",
+      "accuracy": 0.5021367521367521,
+      "chance": 0.5,
+      "above_chance": 0.002136752136752129,
+      "macro_f1": 0.33428165007112376
+    },
+    {
+      "task": "kobest_copa",
+      "accuracy": 0.5,
+      "chance": 0.5,
+      "above_chance": 0.0,
+      "macro_f1": 0.4997118340163934
+    },
+    {
+      "task": "kobest_hellaswag",
+      "accuracy": 0.224,
+      "chance": 0.25,
+      "above_chance": -0.025999999999999995,
+      "macro_f1": 0.22290321765638083
+    },
+    {
+      "task": "kobest_sentineg",
+      "accuracy": 0.49622166246851385,
+      "chance": 0.5,
+      "above_chance": -0.0037783375314861534,
+      "macro_f1": 0.33164983164983164
+    },
+    {
+      "task": "kobest_wic",
+      "accuracy": 0.4880952380952381,
+      "chance": 0.5,
+      "above_chance": -0.011904761904761918,
+      "macro_f1": 0.328
+    }
+  ],
+  "raw": {
+    "kobest_boolq": {
+      "alias": "kobest_boolq",
+      "acc,none": 0.5021367521367521,
+      "acc_stderr,none": 0.013348645604701182,
+      "f1,none": 0.33428165007112376,
+      "f1_stderr,none": "N/A"
+    },
+    "kobest_copa": {
+      "alias": "kobest_copa",
+      "acc,none": 0.5,
+      "acc_stderr,none": 0.015819299929208316,
+      "f1,none": 0.4997118340163934,
+      "f1_stderr,none": "N/A"
+    },
+    "kobest_hellaswag": {
+      "alias": "kobest_hellaswag",
+      "acc,none": 0.224,
+      "acc_stderr,none": 0.018663994464710808,
+      "f1,none": 0.22290321765638083,
+      "f1_stderr,none": "N/A",
+      "acc_norm,none": 0.256,
+      "acc_norm_stderr,none": 0.019536923574747605
+    },
+    "kobest_sentineg": {
+      "alias": "kobest_sentineg",
+      "acc,none": 0.49622166246851385,
+      "acc_stderr,none": 0.025125227983562776,
+      "f1,none": 0.33164983164983164,
+      "f1_stderr,none": "N/A"
+    },
+    "kobest_wic": {
+      "alias": "kobest_wic",
+      "acc,none": 0.4880952380952381,
+      "acc_stderr,none": 0.014087502464604038,
+      "f1,none": 0.328,
+      "f1_stderr,none": "N/A"
+    }
+  }
+}
