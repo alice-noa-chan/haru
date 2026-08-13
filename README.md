@@ -429,7 +429,7 @@ a GPU uses fp16 with gradient scaling; a GPU uses bf16.
 
 ## Compare on the cloud Cloud
 
-`cloud_train.py` runs the same comparison on the cloud, for when the cloud credits run
+`cloud_compare.py` runs the same comparison on the cloud, for when the cloud credits run
 out. It pins identical package versions, so a result cannot differ because of
 where it ran.
 
@@ -453,9 +453,9 @@ the cloud ls haru-training/data          # must show data.txt, not "0 items"
 Then run any arm set:
 
 ```bash
-python cloud_train.py                                    # 3 arms
-python cloud_train.py --ablate                           # + 3 within-CFRD arms
-python cloud_train.py --ablate --deep-supervision-arms   # + 2 supervision arms
+python cloud_compare.py                                    # 3 arms
+python cloud_compare.py --ablate                           # + 3 within-CFRD arms
+python cloud_compare.py --ablate --deep-supervision-arms   # + 2 supervision arms
 ```
 
 the cloud has no a GPU, so the function requests an a GPU. Every arm shares the same
@@ -490,9 +490,9 @@ the cloud cp the cloud://haru-training/runs/haru-v2-binding/<name>.json results/
 | `compare_architectures.py` | CFRD versus matched dense baselines |
 | `compare_models.py` | Reproducible v1.0/v1.1/35M comparison |
 | `generate.py` | Transformers-based local generation |
-| `cloud_train.py` | the cloud benchmark, preparation, training, and export |
-| `cloud_train.py` | the cloud Cloud architecture comparison |
-| `cloud_train.py` | the cloud pods, GPU and batch-size benchmarking |
+| `cloud_train.py` | Managed-cloud benchmark, preparation, training, and export |
+| `cloud_compare.py` | Managed-cloud architecture comparison |
+| `cloud_benchmark.py` | Rented-GPU throughput and batch-size benchmarking |
 | `download_data.py` | Corpus download, refusing benchmark datasets |
 | `decontaminate.py` | Benchmark n-gram removal from a corpus |
 | `smoke_test.py` | Fast correctness tests |
