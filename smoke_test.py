@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import tempfile
-from dataclasses import asdict, fields
+from dataclasses import asdict, fields, replace
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -24,7 +24,7 @@ from counterfactual_data import (
 )
 from counterfactual_objective import counterfactual_ranking_result, encode_counterfactual_pairs
 from evaluate import make_final_eval_rng
-from model import CFRDLanguageModel, ModelConfig, count_parameters
+from model import CFRDLanguageModel, FullCausalAttention, ModelConfig, count_parameters
 from model_factory import (
     BASELINE_ARCH,
     CFRD_ARCH,
@@ -714,6 +714,60 @@ def test_cfrd_ablations_change_one_field_each() -> None:
     assert parameters["cfrd-unfolded"] > baseline_parameters
 
 
+def test_full_context_cells() -> None:
+    """Full-context cells must stay causal and drop the memory they replace."""
+
+    reference = build_test_model().cfg
+    cfg = replace(reference, cell_attention="full")
+    features = torch.randn(TEST_VOCAB_SIZE, SURFACE_FEATURE_DIM)
+
+    torch.manual_seed(4)
+    model = CFRDLanguageModel(cfg, features)
+    model.eval()
+
+    # Summary memory exists to cross chunk boundaries. With unrestricted
+    # attention there is no boundary left for it to cross, so keeping it would
+    # spend parameters on a path that duplicates the attention.
+    for cell in model.cells:
+        assert cell.summary_memory is None
+        assert isinstance(cell.local_attention, FullCausalAttention)
+
+    x = torch.randint(0, TEST_VOCAB_SIZE, (2, TEST_CONTEXT_LENGTH))
+    y = torch.randint(0, TEST_VOCAB_SIZE, (2, TEST_CONTEXT_LENGTH))
+
+    output = model(x, targets=y)
+    assert output.logits.shape == (2, TEST_CONTEXT_LENGTH, TEST_VOCAB_SIZE)
+    assert set(output.exit_losses) == set(TEST_EXIT_DEPTHS)
+    output.loss.backward()
+    assert all(
+        parameter.grad is not None and torch.isfinite(parameter.grad).all()
+        for parameter in model.parameters()
+        if parameter.requires_grad
+    )
+
+    # Dropping the chunk boundary must not drop causality with it.
+    x1 = torch.randint(0, TEST_VOCAB_SIZE, (1, TEST_CONTEXT_LENGTH))
+    x2 = x1.clone()
+    x2[:, 16:] = torch.randint(0, TEST_VOCAB_SIZE, x2[:, 16:].shape)
+    with torch.no_grad():
+        assert torch.allclose(model(x1).logits[:, :16], model(x2).logits[:, :16], atol=1.0e-6, rtol=1.0e-5)
+
+    # The mode must survive a checkpoint and a Transformers export config.
+    assert ModelConfig.from_checkpoint({"model_config": asdict(cfg)}, TEST_VOCAB_SIZE).cell_attention == "full"
+    assert CFRDConfig.from_model_config(cfg).to_model_config() == cfg
+
+    # Configurations written before this field existed must stay loadable.
+    assert ModelConfig.from_checkpoint({"model_config": {"recurrences": 4}}, TEST_VOCAB_SIZE).cell_attention == "local"
+    assert CFRDConfig(vocab_size=TEST_VOCAB_SIZE).cell_attention == "local"
+
+    for invalid in ("sparse", "Local", ""):
+        try:
+            replace(reference, cell_attention=invalid).validate()
+        except ValueError:
+            continue
+        raise AssertionError(f"cell_attention={invalid!r} was accepted")
+
+
 def print_default_parameter_count() -> None:
     cfg = ModelConfig.from_project_settings(config, config.TOKENIZER_VOCAB_SIZE)
     dummy_features = torch.zeros(config.TOKENIZER_VOCAB_SIZE, SURFACE_FEATURE_DIM)
@@ -815,6 +869,7 @@ def main() -> None:
     test_baseline_checkpoint_resume_and_arch_guard()
     test_matched_sizing_is_exact()
     test_cfrd_ablations_change_one_field_each()
+    test_full_context_cells()
     print_default_parameter_count()
     print("smoke tests passed")
 
