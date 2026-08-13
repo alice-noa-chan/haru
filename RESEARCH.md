@@ -172,7 +172,14 @@ redirect v1.2: at compact scale, folding is not what produces Haru's binding
 behaviour, and the components v1.1 shipped together have to be separated
 before any further capacity is spent on the fold.
 
-## v1.2 direction
+## v1.2 hypothesis, and its refutation
+
+This section states the hypothesis that motivated `cell_attention = "full"`, and
+the ablation result that refuted it. Both are kept: the reasoning was sound and
+the prediction was wrong, and deleting the prediction would leave the next
+reader free to propose it again.
+
+### The hypothesis
 
 The direction test rules out one explanation and points at another. Folding is
 not what produces Haru's binding behaviour at compact scale: a plain dense
@@ -224,6 +231,83 @@ No v1.2 checkpoint should be trained until this table exists. v1.1 was released
 having changed four things at once, which is why nothing in it can be
 attributed, and repeating that with a fifth change would be the same mistake at
 greater cost.
+
+### The result: row two fired
+
+Three seeds, 300 steps, 614,400 tokens per arm per seed, relation objective at
+weight 0.20 in every arm. These numbers are not comparable to the 400-step table
+above; only rows within this table may be compared to each other.
+
+| Arm | Parameters | GFLOPs | Validation loss | Paired delta | Strict pairs | Margin |
+|---|---:|---:|---:|---:|---:|---:|
+| CFRD | 3,339,673 | 1.93 | 4.7273 | reference | 0.110 | +0.16 |
+| Dense, parameter-matched | 3,364,801 | 1.72 | 4.6557 | -0.0715 | 0.203 | +0.53 |
+| Dense, compute-matched | 3,809,089 | 1.95 | 4.6518 | -0.0754 | 0.343 | +0.83 |
+| `cfrd-no-binding-block` | 2,945,687 | 1.73 | 4.7920 | +0.0647 | 0.043 | +0.03 |
+| `cfrd-unfolded` | 3,791,327 | 1.93 | 4.6958 | -0.0315 | 0.043 | +0.04 |
+| `cfrd-full-attention` | 3,166,665 | 1.82 | 4.7911 | +0.0638 | 0.050 | +0.09 |
+
+Every paired delta exceeded its own spread across the three seeds.
+
+**The hypothesis is refuted.** Row one required two things: that removing the
+binding block collapses binding, and that full-context cells recover it. Only
+the first happened. Removing the block took strict pairs from 0.110 to 0.043
+and the decision margin from +0.16 to +0.03, so the block is load-bearing
+inside CFRD. But `cfrd-full-attention` reached 0.050, worse than CFRD itself,
+and lost to CFRD on language-model loss by +0.0638. Giving every cell the full
+context did not reproduce what the binding block does. Whatever the block
+contributes, it is not simply attention range.
+
+**Row two fired.** `cfrd-full-attention` lost to both dense baselines on both
+metrics. So did every other CFRD arm. The best CFRD configuration tested,
+`cfrd-unfolded` at 4.6958, still lost to the parameter-matched dense baseline
+at 4.6557 while carrying 13% more parameters, and its strict pairs sat at 0.043.
+The conclusion fixed in advance stands: the fold itself is the cost, not the
+attention range.
+
+**Row three fired, and narrows the diagnosis.** `cfrd-unfolded` beat CFRD on
+language-model loss by 0.0315, exceeding the spread, so parameter sharing does
+carry a measurable quality price. But it did not improve binding at all, 0.043
+against 0.110. Sharing costs language modelling; it is not what breaks binding.
+
+One reading is not available. At this 300-step budget only the compute-matched
+dense arm is clearly above the 0.25 chance level, and even the
+parameter-matched dense arm sits below it at 0.203. Binding has barely begun to
+emerge in most arms, so the binding column separates CFRD from dense but cannot
+support fine distinctions among the CFRD variants, several of which are pinned
+near zero. The language-model column is the reliable one here: its standard
+deviations run 0.004 to 0.028 and every delta is consistent in sign across all
+three seeds.
+
+Two caveats belong with the refutation. `cfrd-full-attention` carries 5% fewer
+parameters than CFRD because dropping summary memory frees more than full
+attention costs, so a small part of its deficit is capacity rather than
+structure. And the budget is roughly 1,200x smaller than a release run, so this
+tests early optimization rather than converged quality, which is precisely the
+regime where a folded model is most often argued to be at a disadvantage.
+
+### Where this leaves v1.2
+
+No configuration of CFRD tested here reaches a plain dense decoder on either
+metric, at matched parameters or matched compute. The architecture is not
+paying for itself at compact scale under this budget, and three separate
+attempts to locate the component that would justify it, the binding block,
+parameter sharing, and attention range, each failed to close the gap.
+
+That leaves two honest options, and no third:
+
+1. Establish the regime where folding pays before spending more on it. The
+   claim that recurrent depth needs training time to become useful is testable:
+   run the same table at release scale and a release budget on a GPU. Until
+   that exists, "CFRD is better for compact Korean models" is unsupported.
+2. Accept the measurement and make the dense configuration the release path,
+   keeping the parts that are separable from the fold and that a dense model
+   can use unchanged: the relation objective, the Korean surface features, and
+   the tokenizer.
+
+What is no longer defensible is shipping a v1.2 that adds a sixth change to the
+fold and reports the combined result, which is the path v1.0 and v1.1 both
+took.
 
 ## Required validation and limits
 
