@@ -110,6 +110,24 @@ USE_KOREAN_SURFACE_FEATURES = True
 SURFACE_FEATURE_GAIN_INIT = 0.10
 
 # ============================================================================
+# Dense Transformer baseline
+# ============================================================================
+# CFRD reuses three cells six times, so it spends about 1.47x the forward FLOPs
+# of a dense decoder holding the same parameter count. Quoting a single
+# "same parameter count" win would therefore compare unequal compute budgets.
+# Two baselines bracket CFRD instead, both reusing D_MODEL, N_HEAD, and N_KV_HEAD:
+#
+#   parameter-matched   4 layers x ffn 1152 -> 11,521,921 params, 11.80 GFLOPs
+#   compute-matched     7 layers x ffn 1152 -> 16,685,185 params, 17.08 GFLOPs
+#
+# For reference, Haru v1.1 CFRD is 11,634,459 params and 17.31 GFLOPs per
+# 512-token forward. Keep ffn_dim at 1152 (3.0x D_MODEL) in both: matching
+# parameters, depth, and FFN ratio at once is impossible, and thinning the FFN
+# to 512 would handicap the baseline rather than control for the architecture.
+BASELINE_LAYERS = 4
+BASELINE_FFN_DIM = 1152
+
+# ============================================================================
 # Training
 # ============================================================================
 SEED = 1337
