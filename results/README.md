@@ -12,10 +12,14 @@ paired deltas, strict pair accuracies, parameter counts, and measured FLOPs.
 |---|---|---|
 | `architecture_comparison_3seed.json` | `compare_architectures.py --scale small --steps 400 --seeds 3` | RESEARCH.md, "Direction test" |
 | `architecture_ablation_3seed.json` | `compare_architectures.py --scale small --steps 300 --seeds 3 --ablate` | RESEARCH.md, "The result: row two fired"; README, "Result at compact scale" |
+| `architecture_comparison_release.json` | `the cloud run cloud_train.py --action compare` (a GPU, 6,000 steps, 3 seeds) | RESEARCH.md, "Release-scale result"; README, "Result at release scale" |
 
-Both ran on CPU with the 8,192-entry tokenizer at reduced model scale. They are
-direction tests, not release-scale evidence. Step counts differ between the two
-files, so figures may be compared within a file but not across them.
+The first two ran on CPU with the 8,192-entry tokenizer at reduced model scale
+and are direction tests. The release file ran on an a GPU at the full architecture
+with the 12,000-entry tokenizer, and reverses their conclusion.
+
+Step counts, model scale, and tokenizer differ between files, so figures may be
+compared within a file but never across them.
 
 Regenerating either command overwrites `runs/`, not this directory. Copy a new
 result here deliberately, alongside the documentation change that cites it.
