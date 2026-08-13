@@ -8,7 +8,9 @@
 
 Haru is a compact Korean story continuation language model. Its custom Causal
 Folded Recurrent Decoder (CFRD) uses local causal attention, compressed summary
-memory, and reusable decoder cells. Haru v1.1 is the current 11.6-million-
+memory, and reusable decoder cells. Measurements at release scale show the cell
+reuse is the one part that does not pay for itself; see
+[Result at release scale](#result-at-release-scale). Haru v1.1 is the current 11.6-million-
 parameter release; the original 6.8-million-parameter checkpoint remains
 available as Haru v1.0. Both support recurrent inference depths 2, 4, and 6.
 
@@ -225,26 +227,38 @@ new `RUN_NAME` in `config.py`.
 ### Result at release scale
 
 Three seeds, 6,000 steps, 49,152,000 tokens per arm per seed, at the release
-architecture on an a GPU, with the relation objective at weight 0.20 in every arm.
-A positive delta means CFRD won; both are positive on all three seeds and
-exceed the spread of the paired differences.
+architecture on an a GPU, with the relation objective at weight 0.20 in every
+arm. A positive delta means CFRD won. "Beyond spread" marks deltas larger than
+the spread of the paired per-seed differences; the others are noise.
 
-| Arm | Parameters | GFLOPs | Validation loss | vs CFRD | Strict pairs |
-|---|---:|---:|---:|---:|---:|
-| CFRD | 11,634,459 | 17.31 | **3.3765** | reference | **0.413** |
-| Dense, parameter-matched | 11,669,377 | 11.95 | 3.4377 | +0.0612 | 0.260 |
-| Dense, compute-matched | 16,943,233 | 17.34 | 3.3977 | +0.0212 | 0.320 |
+| Arm | Parameters | GFLOPs | Validation loss | vs CFRD | Beyond spread | Strict pairs |
+|---|---:|---:|---:|---:|:---:|---:|
+| CFRD without cell sharing | 17,047,725 | 17.31 | **3.3212** | -0.0586 | yes | 0.370 |
+| CFRD with full-context cells | 10,944,393 | 16.03 | 3.3565 | -0.0233 | yes | 0.253 |
+| CFRD without deep supervision | 11,634,459 | 17.31 | 3.3744 | -0.0054 | yes | **0.377** |
+| CFRD | 11,634,459 | 17.31 | 3.3798 | reference | | 0.263 |
+| Dense, parameter-matched, deep-supervised | 11,669,377 | 11.95 | 3.3842 | +0.0044 | no | 0.313 |
+| Dense, compute-matched | 16,943,233 | 17.34 | 3.3846 | +0.0048 | no | 0.300 |
+| Dense, parameter-matched | 11,669,377 | 11.95 | 3.4294 | +0.0496 | yes | 0.263 |
+| CFRD without binding block | 10,060,057 | 15.70 | 3.4664 | +0.0866 | yes | 0.267 |
 
-**CFRD wins both comparisons.** The compute-matched arm carries 45.6% more
-parameters at equal FLOPs and still loses. On held-out entity binding CFRD
-reaches 0.413 strict pairs with every seed above the 0.25 chance level, while
-the parameter-matched dense arm straddles chance at 0.260.
+**CFRD beats a plain dense decoder, but not because of the folding.** CFRD
+trains with auxiliary exits at depths 2 and 4 that a plain dense baseline does
+not have. Giving the dense arm the same auxiliary exits costs no parameters,
+because the head is tied to the embedding, and closes 91% of the gap. What
+remains, 0.0044, is inside the noise.
 
-This is the first evidence that the architecture does anything. It is not yet
-evidence that *folding* is why: CFRD trains with deep supervision that the
-dense arms do not get, every arm shares CFRD's own tuned learning rate, and the
-budget is still 15x short of a release run. See [RESEARCH.md](RESEARCH.md) for
-the confounds and the order in which they must be removed.
+**The largest effect in the table is removing parameter sharing.** Giving each
+recurrence its own cell wins by 0.0586 on every seed, and also scores best on
+entity binding. The fold is the one component that does not pay for itself.
+The rest do: removing the binding block is the worst result measured, and at a
+matched budget the unfolded model still beats the compute-matched dense arm by
+0.0634.
+
+Strict pair accuracy has a chance level of 0.25 and is too noisy at this budget
+to rank arms: CFRD's own three seeds ran 0.10, 0.23, and 0.46. Only the
+unfolded and no-deep-supervision arms clear chance on every seed. See
+[RESEARCH.md](RESEARCH.md) for per-seed figures and what the table rules out.
 
 ### Result at compact scale
 
@@ -448,9 +462,12 @@ the cloud cp the cloud://haru-training/runs/haru-v2-binding/<name>.json results/
 - No released Haru checkpoint has itself been compared against a matched dense
   Transformer. The release-scale comparison trains fresh arms at 49.2M tokens
   each, so it does not retroactively validate the v1.0 or v1.1 artifacts.
-- CFRD wins the release-scale comparison, but the margin is not yet attributed
-  to folding. Deep supervision is unablated, the shared learning rate is
-  CFRD's own tuned value, and no ablation arms have been run at that scale.
+- CFRD's advantage over a parameter-matched dense decoder is explained by its
+  auxiliary exits, not by the fold. With supervision equalized the two are
+  indistinguishable, and removing parameter sharing is the largest measured
+  gain in the table.
+- The shared 4e-4 learning rate is CFRD's own tuned value and remains the last
+  uncontrolled variable large enough to affect the ranking.
 
 ## Training data notice
 
