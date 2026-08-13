@@ -147,6 +147,19 @@ def test_partial_chunk() -> None:
     assert torch.isfinite(output.logits).all()
 
 
+def test_last_token_logits_match_full_projection() -> None:
+    """Generation may skip unused vocabulary projections without changing scores."""
+
+    model = build_test_model()
+    x = torch.randint(0, TEST_VOCAB_SIZE, (2, TEST_CONTEXT_LENGTH))
+    with torch.no_grad():
+        full_logits = model(x).logits
+        last_logits = model(x, logits_to_keep=1).logits
+
+    assert last_logits.shape == (2, 1, TEST_VOCAB_SIZE)
+    assert torch.equal(last_logits, full_logits[:, -1:, :])
+
+
 def test_binding_block_config_compatibility() -> None:
     """Old checkpoints stay disabled while new HF configs preserve the block."""
 
@@ -467,6 +480,7 @@ def main() -> None:
     test_causality_inside_chunk()
     test_causality_across_chunks()
     test_partial_chunk()
+    test_last_token_logits_match_full_projection()
     test_binding_block_config_compatibility()
     test_binding_block_supervises_every_exit()
     test_final_depth_evaluation_reuses_windows()
