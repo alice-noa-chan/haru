@@ -13,6 +13,7 @@ from transformers.utils import logging as transformers_logging
 
 import config
 from baseline_model import BaselineConfig, BaselineLanguageModel
+from compare_architectures import baseline_parameter_count, match_baselines
 from configuration_cfrd import CFRDConfig
 from counterfactual_data import (
     RELATION_CATEGORIES,
@@ -627,6 +628,56 @@ def test_baseline_checkpoint_resume_and_arch_guard() -> None:
             raise AssertionError("A baseline checkpoint was loaded into CFRD")
 
 
+def test_matched_sizing_is_exact() -> None:
+    """The closed-form sizing must agree with the models it claims to match.
+
+    compare_architectures.py sizes baselines analytically instead of building a
+    candidate per trial. If the formula drifted from BaselineLanguageModel, the
+    comparison would silently report a mismatched control as matched.
+    """
+
+    cfrd_cfg = build_test_model().cfg
+    features = torch.randn(TEST_VOCAB_SIZE, SURFACE_FEATURE_DIM)
+    cfrd_parameters = count_parameters(build_model(cfrd_cfg, features))["total"]
+
+    for name, baseline_cfg in match_baselines(cfrd_cfg, cfrd_parameters).items():
+        predicted = baseline_parameter_count(
+            vocab_size=baseline_cfg.vocab_size,
+            d_model=baseline_cfg.d_model,
+            n_head=baseline_cfg.n_head,
+            n_kv_head=baseline_cfg.n_kv_head,
+            ffn=baseline_cfg.ffn_dim,
+            layers=baseline_cfg.n_layer,
+        )
+        actual = count_parameters(build_model(baseline_cfg, features))["total"]
+        assert predicted == actual, f"{name}: predicted {predicted:,} but built {actual:,}"
+
+        # Both baselines inherit everything CFRD does not vary, so a difference
+        # in results cannot be blamed on context, heads, or the embedding path.
+        assert baseline_cfg.context_length == cfrd_cfg.context_length
+        assert (baseline_cfg.d_model, baseline_cfg.n_head, baseline_cfg.n_kv_head) == (
+            cfrd_cfg.d_model,
+            cfrd_cfg.n_head,
+            cfrd_cfg.n_kv_head,
+        )
+        assert baseline_cfg.use_surface_features == cfrd_cfg.use_surface_features
+
+    matched = match_baselines(cfrd_cfg, cfrd_parameters)
+    parameter_matched = matched["baseline-param-matched"]
+    compute_matched = matched["baseline-compute-matched"]
+
+    # The parameter-matched arm must actually hold parameters.
+    parameter_error = (
+        abs(count_parameters(build_model(parameter_matched, features))["total"] - cfrd_parameters) / cfrd_parameters
+    )
+    assert parameter_error < 0.02, f"parameter match drifted to {parameter_error:.2%}"
+
+    # The compute-matched arm must actually hold sequential depth.
+    expected_depth = cfrd_cfg.recurrences + (1 if cfrd_cfg.use_binding_block else 0)
+    assert compute_matched.n_layer == expected_depth
+    assert compute_matched.ffn_dim == parameter_matched.ffn_dim
+
+
 def print_default_parameter_count() -> None:
     cfg = ModelConfig.from_project_settings(config, config.TOKENIZER_VOCAB_SIZE)
     dummy_features = torch.zeros(config.TOKENIZER_VOCAB_SIZE, SURFACE_FEATURE_DIM)
@@ -721,6 +772,7 @@ def main() -> None:
     test_model_factory_dispatch()
     test_untagged_checkpoint_reads_as_cfrd()
     test_baseline_checkpoint_resume_and_arch_guard()
+    test_matched_sizing_is_exact()
     print_default_parameter_count()
     print("smoke tests passed")
 
