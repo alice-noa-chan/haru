@@ -45,16 +45,21 @@ class BaselineConfig:
     n_layer: int = 4
     rope_theta: float = 10_000.0
     dropout: float = 0.0
+    # Intermediate layers that also project through the language-model head.
+    # Empty means one exit, an ordinary decoder. Set this to give the baseline
+    # the same deep supervision CFRD gets, so a CFRD win cannot be explained by
+    # auxiliary gradient signal the control never received.
+    auxiliary_exit_layers: tuple[int, ...] = ()
+    aux_exit_loss_weight: float = 0.15
     use_surface_features: bool = True
     surface_feature_dim: int = SURFACE_FEATURE_DIM
     surface_feature_gain_init: float = 0.10
 
     @property
     def exit_depths(self) -> tuple[int, ...]:
-        """The dense stack has exactly one exit, so training and evaluation
-        helpers written against CFRD's multi-exit interface keep working."""
+        """Supervised depths, final last, matching CFRD's interface."""
 
-        return (self.n_layer,)
+        return tuple(sorted({*self.auxiliary_exit_layers, self.n_layer}))
 
     def validate(self) -> None:
         positive_integers = {
@@ -75,6 +80,12 @@ class BaselineConfig:
             raise ValueError("n_head must be divisible by n_kv_head")
         if not 0.0 <= self.dropout < 1.0:
             raise ValueError("dropout must be in the range [0, 1)")
+        if any(depth <= 0 or depth > self.n_layer for depth in self.auxiliary_exit_layers):
+            raise ValueError("Every auxiliary exit layer must be between 1 and n_layer")
+        if self.n_layer in self.auxiliary_exit_layers:
+            raise ValueError("The final layer is always supervised and must not be listed as auxiliary")
+        if len(set(self.auxiliary_exit_layers)) != len(self.auxiliary_exit_layers):
+            raise ValueError("auxiliary_exit_layers must be unique")
 
     @classmethod
     def from_checkpoint(cls, checkpoint: dict, vocab_size: int) -> "BaselineConfig":
@@ -87,6 +98,8 @@ class BaselineConfig:
         allowed = {field.name for field in fields(cls)}
         values = {key: value for key, value in raw.items() if key in allowed}
         values["vocab_size"] = vocab_size
+        if "auxiliary_exit_layers" in values:
+            values["auxiliary_exit_layers"] = tuple(values["auxiliary_exit_layers"])
         return cls(**values)
 
     @classmethod
@@ -236,16 +249,41 @@ class BaselineLanguageModel(nn.Module):
             raise ValueError("logits_to_keep cannot be used when targets are provided")
 
         x = self._embed(token_ids)
-        for block in self.blocks:
-            x = block(x, self.rope_cos, self.rope_sin)
 
-        logits = self._logits(x, logits_to_keep)
-
-        loss: torch.Tensor | None = None
         exit_losses: dict[int, torch.Tensor] = {}
+        auxiliary_depths = set(self.cfg.auxiliary_exit_layers)
+        final_logits: torch.Tensor | None = None
+
+        for index, block in enumerate(self.blocks):
+            x = block(x, self.rope_cos, self.rope_sin)
+            depth = index + 1
+
+            is_final = depth == self.cfg.n_layer
+            # Auxiliary heads exist only to shape training. Skipping them at
+            # inference keeps the eval-time cost of this arm honest.
+            if not is_final and not (targets is not None and depth in auxiliary_depths):
+                continue
+
+            depth_logits = self._logits(x, logits_to_keep if is_final else 0)
+            if is_final:
+                final_logits = depth_logits
+            if targets is not None:
+                exit_losses[depth] = F.cross_entropy(
+                    depth_logits.reshape(-1, depth_logits.size(-1)),
+                    targets.reshape(-1),
+                )
+
+        assert final_logits is not None
+
+        final_loss: torch.Tensor | None = None
+        total_loss: torch.Tensor | None = None
 
         if targets is not None:
-            loss = F.cross_entropy(logits.reshape(-1, logits.size(-1)), targets.reshape(-1))
-            exit_losses[self.cfg.n_layer] = loss
+            final_loss = exit_losses[self.cfg.n_layer]
+            auxiliary = [value for depth, value in exit_losses.items() if depth != self.cfg.n_layer]
+            if auxiliary:
+                total_loss = final_loss + self.cfg.aux_exit_loss_weight * torch.stack(auxiliary).mean()
+            else:
+                total_loss = final_loss
 
-        return ModelOutput(logits=logits, loss=loss, final_loss=loss, exit_losses=exit_losses)
+        return ModelOutput(logits=final_logits, loss=total_loss, final_loss=final_loss, exit_losses=exit_losses)

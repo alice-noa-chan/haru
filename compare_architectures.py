@@ -136,6 +136,53 @@ def match_baselines(cfrd_cfg: ModelConfig, cfrd_parameters: int) -> dict[str, Ba
     }
 
 
+def evenly_spaced_exits(n_layer: int, count: int) -> tuple[int, ...]:
+    """Auxiliary depths at the same fractions of the stack CFRD supervises.
+
+    CFRD exits at 2, 4, and 6 of 6, so its auxiliary heads sit at one third and
+    two thirds of the stack. Reproducing the fractions rather than the literal
+    depths is what makes the dense arm's supervision comparable at any depth.
+    """
+
+    fractions = [(index + 1) / (count + 1) for index in range(count)]
+    depths = {max(1, min(n_layer - 1, round(fraction * n_layer))) for fraction in fractions}
+    return tuple(sorted(depths))
+
+
+def deep_supervision_arms(
+    cfrd_cfg: ModelConfig,
+    baselines: dict[str, BaselineConfig],
+) -> dict[str, ModelConfig | BaselineConfig]:
+    """Arms that isolate deep supervision from the architecture.
+
+    CFRD optimizes `final_loss + 0.15 x mean(auxiliary exits)` while a plain
+    dense decoder has one exit, so CFRD receives gradient signal the control
+    never gets. That difference is not the fold, and RESEARCH.md records it as
+    the confound most likely to explain a CFRD win without involving folding.
+
+    Both directions are measured, because either alone is ambiguous: removing
+    supervision from CFRD, and giving the parameter-matched dense arm the same
+    supervision at the same fractions of its depth.
+    """
+
+    arms: dict[str, ModelConfig | BaselineConfig] = {}
+
+    if cfrd_cfg.aux_exit_loss_weight > 0.0:
+        arms["cfrd-no-deep-supervision"] = replace(cfrd_cfg, aux_exit_loss_weight=0.0)
+
+    reference = baselines.get("baseline-param-matched")
+    if reference is not None and not reference.auxiliary_exit_layers:
+        auxiliary = evenly_spaced_exits(reference.n_layer, len(cfrd_cfg.exit_depths) - 1)
+        if auxiliary:
+            arms["baseline-deep-supervised"] = replace(
+                reference,
+                auxiliary_exit_layers=auxiliary,
+                aux_exit_loss_weight=cfrd_cfg.aux_exit_loss_weight,
+            )
+
+    return arms
+
+
 def cfrd_ablations(cfrd_cfg: ModelConfig) -> dict[str, ModelConfig]:
     """Within-CFRD arms that separate the changes v1.1 shipped together.
 
@@ -506,6 +553,12 @@ def parse_arguments() -> argparse.Namespace:
         "so leaving this off measures the one thing CFRD was not built for.",
     )
     parser.add_argument(
+        "--deep-supervision-arms",
+        action="store_true",
+        help="Add arms that isolate deep supervision: CFRD without it, and the parameter-matched "
+        "dense baseline with it. Without these the auxiliary exits are a confound, not a control.",
+    )
+    parser.add_argument(
         "--ablate",
         action="store_true",
         help="Add within-CFRD arms that remove the binding block and parameter sharing, so v1.1's "
@@ -543,9 +596,12 @@ def main() -> None:
     cfrd_parameters = count_parameters(build_model(cfrd_cfg, surface_features))["total"]
     # Baselines are sized against the full CFRD, never against an ablated one,
     # so every arm in the table is matched to the same reference.
-    architectures = {"cfrd": cfrd_cfg, **match_baselines(cfrd_cfg, cfrd_parameters)}
+    baselines = match_baselines(cfrd_cfg, cfrd_parameters)
+    architectures = {"cfrd": cfrd_cfg, **baselines}
     if args.ablate:
         architectures.update(cfrd_ablations(cfrd_cfg))
+    if args.deep_supervision_arms:
+        architectures.update(deep_supervision_arms(cfrd_cfg, baselines))
 
     print(f"Loading up to {args.corpus_lines:,} records from {config.DATA_DIR / 'data.txt'}", flush=True)
     stream = load_token_stream(tokenizer, args.corpus_lines, config.DATA_DIR / "data.txt", args.max_tokens)

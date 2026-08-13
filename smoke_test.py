@@ -19,6 +19,8 @@ from compare_architectures import (
     ENCODE_BATCH_LINES,
     baseline_parameter_count,
     cfrd_ablations,
+    deep_supervision_arms,
+    evenly_spaced_exits,
     load_token_stream,
     match_baselines,
 )
@@ -839,6 +841,107 @@ def test_token_stream_batching_and_cap() -> None:
             pass
         else:
             raise AssertionError("An empty corpus produced a stream")
+
+
+def test_baseline_deep_supervision() -> None:
+    """Auxiliary exits must add gradient signal without adding capacity."""
+
+    plain = build_test_baseline().cfg
+    supervised = replace(plain, auxiliary_exit_layers=(1, 2), aux_exit_loss_weight=0.15)
+    features = torch.randn(TEST_VOCAB_SIZE, SURFACE_FEATURE_DIM)
+
+    torch.manual_seed(5)
+    plain_model = BaselineLanguageModel(plain, features)
+    torch.manual_seed(5)
+    supervised_model = BaselineLanguageModel(supervised, features)
+
+    # The head is tied to the embedding, so extra exits must cost nothing. If
+    # they did, this arm would test capacity rather than supervision.
+    assert count_parameters(plain_model)["total"] == count_parameters(supervised_model)["total"]
+    assert supervised.exit_depths == (1, 2, TEST_BASELINE_LAYERS)
+
+    x = torch.randint(0, TEST_VOCAB_SIZE, (2, TEST_CONTEXT_LENGTH))
+    y = torch.randint(0, TEST_VOCAB_SIZE, (2, TEST_CONTEXT_LENGTH))
+
+    output = supervised_model(x, targets=y)
+    assert set(output.exit_losses) == {1, 2, TEST_BASELINE_LAYERS}
+    assert output.final_loss is output.exit_losses[TEST_BASELINE_LAYERS]
+    # Total must exceed the final loss, or the auxiliary heads are inert.
+    assert output.loss.item() > output.final_loss.item()
+
+    expected = output.final_loss + 0.15 * torch.stack([output.exit_losses[1], output.exit_losses[2]]).mean()
+    assert torch.allclose(output.loss, expected)
+
+    # Auxiliary heads shape training only. Without targets they must not run,
+    # or this arm would also be slower at inference and stop being a clean
+    # control for supervision alone.
+    projections = 0
+    original_logits = BaselineLanguageModel._logits
+
+    def counting_logits(self, x, logits_to_keep=0):
+        nonlocal projections
+        projections += 1
+        return original_logits(self, x, logits_to_keep)
+
+    BaselineLanguageModel._logits = counting_logits
+    try:
+        with torch.no_grad():
+            inference = supervised_model(x)
+        assert projections == 1, f"inference projected {projections} times, not once"
+    finally:
+        BaselineLanguageModel._logits = original_logits
+
+    assert inference.exit_losses == {}
+    assert inference.logits.shape == (2, TEST_CONTEXT_LENGTH, TEST_VOCAB_SIZE)
+
+    output.loss.backward()
+    assert all(
+        parameter.grad is not None and torch.isfinite(parameter.grad).all()
+        for parameter in supervised_model.parameters()
+        if parameter.requires_grad
+    )
+
+    # A weight of zero must reduce the objective to plain cross-entropy, which
+    # is what the cfrd-no-deep-supervision arm relies on.
+    zeroed = BaselineLanguageModel(replace(supervised, aux_exit_loss_weight=0.0), features)
+    zero_output = zeroed(x, targets=y)
+    assert torch.equal(zero_output.loss, zero_output.final_loss)
+
+    for invalid in ((0,), (TEST_BASELINE_LAYERS,), (TEST_BASELINE_LAYERS + 1,), (1, 1)):
+        try:
+            replace(plain, auxiliary_exit_layers=invalid).validate()
+        except ValueError:
+            continue
+        raise AssertionError(f"auxiliary_exit_layers={invalid} was accepted")
+
+
+def test_deep_supervision_arms_isolate_the_confound() -> None:
+    """The two arms must differ from their references only in supervision."""
+
+    cfrd_cfg = build_test_model().cfg
+    baselines = match_baselines(cfrd_cfg, count_parameters(build_test_model())["total"])
+    arms = deep_supervision_arms(cfrd_cfg, baselines)
+    assert set(arms) == {"cfrd-no-deep-supervision", "baseline-deep-supervised"}
+
+    no_supervision = arms["cfrd-no-deep-supervision"]
+    changed = [f.name for f in fields(ModelConfig) if getattr(no_supervision, f.name) != getattr(cfrd_cfg, f.name)]
+    assert changed == ["aux_exit_loss_weight"]
+    assert no_supervision.aux_exit_loss_weight == 0.0
+
+    reference = baselines["baseline-param-matched"]
+    supervised = arms["baseline-deep-supervised"]
+    changed = [f.name for f in fields(BaselineConfig) if getattr(supervised, f.name) != getattr(reference, f.name)]
+    assert set(changed) == {"auxiliary_exit_layers"} or set(changed) == {
+        "auxiliary_exit_layers",
+        "aux_exit_loss_weight",
+    }
+    assert supervised.aux_exit_loss_weight == cfrd_cfg.aux_exit_loss_weight
+
+    # Auxiliary depths must sit at CFRD's own fractions, not at fixed layers,
+    # so the two architectures are supervised comparably at any depth.
+    assert len(supervised.auxiliary_exit_layers) == len(cfrd_cfg.exit_depths) - 1
+    assert all(1 <= depth < supervised.n_layer for depth in supervised.auxiliary_exit_layers)
+    assert evenly_spaced_exits(6, 2) == (2, 4)
 
 
 def print_default_parameter_count() -> None:
