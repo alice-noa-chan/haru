@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import tempfile
+from dataclasses import asdict
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import sentencepiece as spm
@@ -10,6 +12,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from transformers.utils import logging as transformers_logging
 
 import config
+from baseline_model import BaselineConfig, BaselineLanguageModel
 from configuration_cfrd import CFRDConfig
 from counterfactual_data import (
     RELATION_CATEGORIES,
@@ -21,6 +24,16 @@ from counterfactual_data import (
 from counterfactual_objective import counterfactual_ranking_result, encode_counterfactual_pairs
 from evaluate import make_final_eval_rng
 from model import CFRDLanguageModel, ModelConfig, count_parameters
+from model_factory import (
+    BASELINE_ARCH,
+    CFRD_ARCH,
+    architecture_of_checkpoint,
+    architecture_of_config,
+    build_model,
+    build_model_config,
+    model_config_from_checkpoint,
+    normalize_architecture,
+)
 from modeling_cfrd import CFRDForCausalLM
 from surface_features import SURFACE_FEATURE_DIM
 from tokenization_cfrd import CFRDTokenizer
@@ -64,6 +77,29 @@ def build_test_model() -> CFRDLanguageModel:
 
     features = torch.randn(TEST_VOCAB_SIZE, SURFACE_FEATURE_DIM)
     model = CFRDLanguageModel(cfg, features)
+    model.eval()
+    return model
+
+
+TEST_BASELINE_LAYERS = 3
+TEST_BASELINE_FFN_DIM = 192
+
+
+def build_test_baseline() -> BaselineLanguageModel:
+    cfg = BaselineConfig(
+        vocab_size=TEST_VOCAB_SIZE,
+        context_length=TEST_CONTEXT_LENGTH,
+        d_model=TEST_D_MODEL,
+        n_head=TEST_N_HEAD,
+        n_kv_head=TEST_N_KV_HEAD,
+        ffn_dim=TEST_BASELINE_FFN_DIM,
+        n_layer=TEST_BASELINE_LAYERS,
+        use_surface_features=True,
+        surface_feature_dim=SURFACE_FEATURE_DIM,
+    )
+
+    features = torch.randn(TEST_VOCAB_SIZE, SURFACE_FEATURE_DIM)
+    model = BaselineLanguageModel(cfg, features)
     model.eval()
     return model
 
@@ -404,6 +440,193 @@ def test_transformers_tokenizer_roundtrip() -> None:
     assert decoded == sample
 
 
+def test_baseline_shapes_and_exit() -> None:
+    """The baseline must satisfy the ModelOutput contract shared code relies on."""
+
+    model = build_test_baseline()
+    x = torch.randint(0, TEST_VOCAB_SIZE, (2, TEST_CONTEXT_LENGTH))
+    y = torch.randint(0, TEST_VOCAB_SIZE, (2, TEST_CONTEXT_LENGTH))
+
+    output = model(x, targets=y)
+    assert output.logits.shape == (2, TEST_CONTEXT_LENGTH, TEST_VOCAB_SIZE)
+    assert output.loss is not None
+    assert output.final_loss is not None
+    # train.py preallocates its running totals from cfg.exit_depths, so the
+    # single dense exit has to appear under exactly that key.
+    assert model.cfg.exit_depths == (TEST_BASELINE_LAYERS,)
+    assert set(output.exit_losses) == {TEST_BASELINE_LAYERS}
+    assert torch.equal(output.loss, output.final_loss)
+
+
+def test_baseline_backward_pass() -> None:
+    torch.manual_seed(0)
+    model = build_test_baseline()
+    model.train()
+    x = torch.randint(0, TEST_VOCAB_SIZE, (2, TEST_CONTEXT_LENGTH))
+    y = torch.randint(0, TEST_VOCAB_SIZE, (2, TEST_CONTEXT_LENGTH))
+
+    output = model(x, targets=y)
+    assert output.loss is not None
+    output.loss.backward()
+
+    gradients = [parameter.grad for parameter in model.parameters() if parameter.requires_grad]
+    assert gradients
+    assert all(gradient is not None for gradient in gradients)
+    assert all(torch.isfinite(gradient).all() for gradient in gradients if gradient is not None)
+
+
+def test_baseline_causality() -> None:
+    """A control with broken causality would understate CFRD, not just differ."""
+
+    torch.manual_seed(3)
+    model = build_test_baseline()
+
+    x1 = torch.randint(0, TEST_VOCAB_SIZE, (1, TEST_CONTEXT_LENGTH))
+    x2 = x1.clone()
+    x2[:, 16:] = torch.randint(0, TEST_VOCAB_SIZE, x2[:, 16:].shape)
+
+    with torch.no_grad():
+        y1 = model(x1).logits
+        y2 = model(x2).logits
+
+    assert torch.allclose(y1[:, :16], y2[:, :16], atol=1.0e-6, rtol=1.0e-5)
+
+
+def test_baseline_last_token_logits_match_full_projection() -> None:
+    model = build_test_baseline()
+    x = torch.randint(0, TEST_VOCAB_SIZE, (2, TEST_CONTEXT_LENGTH))
+    with torch.no_grad():
+        full_logits = model(x).logits
+        last_logits = model(x, logits_to_keep=1).logits
+
+    assert last_logits.shape == (2, 1, TEST_VOCAB_SIZE)
+    assert torch.equal(last_logits, full_logits[:, -1:, :])
+
+
+def test_baseline_rejects_recurrent_depth() -> None:
+    """A dense stack must not answer a recurrent-depth sweep with one number.
+
+    evaluate.py loops over cfg.exit_depths and passes each as `recurrences`.
+    Accepting and ignoring a shallower depth would emit three identical rows
+    that look like a depth comparison.
+    """
+
+    model = build_test_baseline()
+    x = torch.randint(0, TEST_VOCAB_SIZE, (2, TEST_CONTEXT_LENGTH))
+
+    with torch.no_grad():
+        assert model(x, recurrences=None).logits.shape[1] == TEST_CONTEXT_LENGTH
+        assert model(x, recurrences=TEST_BASELINE_LAYERS).logits.shape[1] == TEST_CONTEXT_LENGTH
+
+    for depth in (1, TEST_BASELINE_LAYERS - 1, TEST_BASELINE_LAYERS + 1):
+        try:
+            model(x, recurrences=depth)
+        except ValueError:
+            continue
+        raise AssertionError(f"The baseline silently accepted recurrences={depth}")
+
+
+def test_model_factory_dispatch() -> None:
+    """config.MODEL_ARCH must fully determine which model a run builds."""
+
+    settings = SimpleNamespace(**{name: getattr(config, name) for name in dir(config) if name.isupper()})
+    features = torch.randn(TEST_VOCAB_SIZE, SURFACE_FEATURE_DIM)
+
+    for architecture, expected_type in ((CFRD_ARCH, CFRDLanguageModel), (BASELINE_ARCH, BaselineLanguageModel)):
+        settings.MODEL_ARCH = architecture
+        model_cfg = build_model_config(settings, TEST_VOCAB_SIZE)
+        assert architecture_of_config(model_cfg) == architecture
+
+        model = build_model(model_cfg, features)
+        assert isinstance(model, expected_type)
+
+        checkpoint = {"model_arch": architecture, "model_config": asdict(model_cfg)}
+        assert architecture_of_checkpoint(checkpoint) == architecture
+        assert model_config_from_checkpoint(checkpoint, TEST_VOCAB_SIZE) == model_cfg
+
+    try:
+        normalize_architecture("transformer")
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("An unknown architecture name was accepted")
+
+
+def test_untagged_checkpoint_reads_as_cfrd() -> None:
+    """Released v1.0 and v1.1 checkpoints predate the model_arch tag."""
+
+    legacy = {"model_config": asdict(build_test_model().cfg)}
+    assert "model_arch" not in legacy
+    assert architecture_of_checkpoint(legacy) == CFRD_ARCH
+
+    restored = model_config_from_checkpoint(legacy, TEST_VOCAB_SIZE)
+    assert isinstance(restored, ModelConfig)
+    assert restored == build_test_model().cfg
+
+
+def test_baseline_checkpoint_resume_and_arch_guard() -> None:
+    """The baseline needs exact resume, and must never load CFRD weights."""
+
+    torch.manual_seed(7)
+    device = torch.device("cpu")
+    model = build_test_baseline()
+    model.train()
+    optimizer = configure_optimizer(model, device)
+
+    x = torch.randint(0, TEST_VOCAB_SIZE, (2, TEST_CONTEXT_LENGTH))
+    y = torch.randint(0, TEST_VOCAB_SIZE, (2, TEST_CONTEXT_LENGTH))
+    output = model(x, targets=y)
+    assert output.loss is not None
+    output.loss.backward()
+    optimizer.step()
+
+    lm_rng = np.random.default_rng(11)
+    counterfactual_rng = np.random.default_rng(12)
+
+    with tempfile.TemporaryDirectory() as directory:
+        path = Path(directory) / "baseline.pt"
+        save_checkpoint(path, model, optimizer, 5, 640, 1.25, model.cfg, "hash", lm_rng, counterfactual_rng)
+
+        saved = torch.load(path, map_location="cpu", weights_only=False)
+        assert saved["checkpoint_version"] == 5
+        assert saved["model_arch"] == BASELINE_ARCH
+
+        restored_model = build_test_baseline()
+        restored_model.train()
+        restored_optimizer = configure_optimizer(restored_model, device)
+        step, tokens_seen, best_val_loss, _ = restore_checkpoint(
+            path,
+            restored_model,
+            restored_optimizer,
+            model.cfg,
+            "hash",
+            np.random.default_rng(0),
+            np.random.default_rng(0),
+        )
+
+        assert (step, tokens_seen, best_val_loss) == (5, 640, 1.25)
+        for original, restored in zip(model.parameters(), restored_model.parameters()):
+            assert torch.equal(original, restored)
+
+        # Loading a baseline checkpoint into CFRD must fail on the architecture,
+        # not on an unreadable list of non-overlapping config fields.
+        cfrd_model = build_test_model()
+        try:
+            restore_checkpoint(
+                path,
+                cfrd_model,
+                configure_optimizer(cfrd_model, device),
+                cfrd_model.cfg,
+                "hash",
+                np.random.default_rng(0),
+                np.random.default_rng(0),
+            )
+        except ValueError as error:
+            assert BASELINE_ARCH in str(error) and CFRD_ARCH in str(error)
+        else:
+            raise AssertionError("A baseline checkpoint was loaded into CFRD")
+
+
 def print_default_parameter_count() -> None:
     cfg = ModelConfig.from_project_settings(config, config.TOKENIZER_VOCAB_SIZE)
     dummy_features = torch.zeros(config.TOKENIZER_VOCAB_SIZE, SURFACE_FEATURE_DIM)
@@ -490,6 +713,14 @@ def main() -> None:
     test_counterfactual_sampler()
     test_counterfactual_objective_backward()
     test_transformers_tokenizer_roundtrip()
+    test_baseline_shapes_and_exit()
+    test_baseline_backward_pass()
+    test_baseline_causality()
+    test_baseline_last_token_logits_match_full_projection()
+    test_baseline_rejects_recurrent_depth()
+    test_model_factory_dispatch()
+    test_untagged_checkpoint_reads_as_cfrd()
+    test_baseline_checkpoint_resume_and_arch_guard()
     print_default_parameter_count()
     print("smoke tests passed")
 
