@@ -119,20 +119,27 @@ SURFACE_FEATURE_GAIN_INIT = 0.10
 # would otherwise write its checkpoints beside an unrelated experiment.
 MODEL_ARCH = "cfrd"
 
-# CFRD reuses three cells six times, so it spends about 1.47x the forward FLOPs
+# CFRD reuses three cells six times, so it spends about 1.45x the forward FLOPs
 # of a dense decoder holding the same parameter count. Quoting a single
 # "same parameter count" win would therefore compare unequal compute budgets.
-# Two baselines bracket CFRD instead, both reusing D_MODEL, N_HEAD, and N_KV_HEAD:
+# Two baselines bracket CFRD instead, both reusing D_MODEL, N_HEAD, N_KV_HEAD,
+# and CONTEXT_LENGTH. Measured against Haru v1.1 CFRD, which is 11,634,459
+# parameters and 17.31 GFLOPs per 512-token forward:
 #
-#   parameter-matched   4 layers x ffn 1152 -> 11,521,921 params, 11.80 GFLOPs
-#   compute-matched     7 layers x ffn 1152 -> 16,685,185 params, 17.08 GFLOPs
+#   parameter-matched   4 layers x ffn 1184 -> 11,669,377 params, 11.95 GFLOPs
+#                       parameters +0.30%, FLOPs -30.98%
+#   compute-matched     7 layers x ffn 1184 -> 16,943,233 params, 17.34 GFLOPs
+#                       parameters +45.63%, FLOPs +0.21%
 #
-# For reference, Haru v1.1 CFRD is 11,634,459 params and 17.31 GFLOPs per
-# 512-token forward. Keep ffn_dim at 1152 (3.0x D_MODEL) in both: matching
-# parameters, depth, and FFN ratio at once is impossible, and thinning the FFN
-# to 512 would handicap the baseline rather than control for the architecture.
+# ffn_dim stays at 1184 (3.08x D_MODEL, matching CFRD's own cell proportion) in
+# both arms. Matching parameters, depth, and FFN ratio at once is impossible;
+# the parameter-and-depth matched option needs ffn 512 (1.33x D_MODEL), which
+# would handicap the baseline rather than control for the architecture.
+#
+# These are the values compare_architectures.py derives automatically. Set them
+# here only to train a single baseline arm through train.py.
 BASELINE_LAYERS = 4
-BASELINE_FFN_DIM = 1152
+BASELINE_FFN_DIM = 1184
 
 # ============================================================================
 # Training
