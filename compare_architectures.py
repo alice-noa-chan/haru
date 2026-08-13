@@ -383,6 +383,7 @@ def relation_metrics(
         tokenizer,
         model.cfg.context_length,
         device,
+        config.COUNTERFACTUAL_PAD_MULTIPLE,
     )
 
     with autocast_context(device):
@@ -455,6 +456,7 @@ def train_arm(
                     tokenizer,
                     model_cfg.context_length,
                     device,
+                    config.COUNTERFACTUAL_PAD_MULTIPLE,
                 )
                 relation = counterfactual_ranking_result(model, relation_batch, config.COUNTERFACTUAL_MARGIN)
                 total_loss = total_loss + args.relation_weight * relation.loss

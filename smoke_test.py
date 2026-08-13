@@ -34,7 +34,7 @@ from counterfactual_data import (
     CounterfactualPair,
     CounterfactualSampler,
 )
-from counterfactual_objective import counterfactual_ranking_result, encode_counterfactual_pairs
+from counterfactual_objective import candidate_scores, counterfactual_ranking_result, encode_counterfactual_pairs
 from evaluate import make_final_eval_rng
 from model import CFRDLanguageModel, FullCausalAttention, ModelConfig, count_parameters
 from model_factory import (
@@ -1001,6 +1001,65 @@ def test_parameter_ceiling_is_enforced_before_training() -> None:
         assert f"{ceiling:,}" in message
     else:
         raise AssertionError("An arm above the ceiling was accepted")
+
+
+def test_relation_padding_is_score_preserving() -> None:
+    """Padding must fix the batch shape without moving any score.
+
+    Relation prompts vary in length, so this batch arrives at a new shape almost
+    every step while the language-model batch stays fixed, and torch.compile
+    recompiles instead of paying off. Padding is only safe because attention is
+    causal and score_mask excludes everything outside the candidate span; if
+    either stopped holding, the objective would change silently.
+    """
+
+    class CharacterTokenizer:
+        pad_id = 0
+
+        def encode(self, text: str, add_bos: bool = False, add_eos: bool = False) -> list[int]:
+            ids = [4 + (ord(character) % (TEST_VOCAB_SIZE - 4)) for character in text]
+            return ([2] if add_bos else []) + ids + ([3] if add_eos else [])
+
+    pair = CounterfactualPair(
+        category="test",
+        template_id="test:0",
+        entity_a="A",
+        entity_b="B",
+        prompt_a="A=x; B=y; A?",
+        prompt_b="A=y; B=x; A?",
+        candidates=("x", "y"),
+    )
+
+    tokenizer = CharacterTokenizer()
+    device = torch.device("cpu")
+    plain = encode_counterfactual_pairs((pair,), tokenizer, TEST_CONTEXT_LENGTH, device)
+    padded = encode_counterfactual_pairs((pair,), tokenizer, TEST_CONTEXT_LENGTH, device, pad_to_multiple_of=16)
+
+    assert padded.input_ids.shape[1] % 16 == 0
+    assert padded.input_ids.shape[1] > plain.input_ids.shape[1]
+    assert padded.score_mask.sum() == plain.score_mask.sum()
+
+    model = build_test_model()
+    with torch.no_grad():
+        plain_scores = candidate_scores(model(plain.input_ids).logits, plain)
+        padded_scores = candidate_scores(model(padded.input_ids).logits, padded)
+    assert torch.allclose(plain_scores, padded_scores, atol=1.0e-6), "padding moved the candidate scores"
+
+    # A stride that would push the batch past the context must fail loudly
+    # rather than silently truncate the candidate span.
+    try:
+        encode_counterfactual_pairs((pair,), tokenizer, TEST_CONTEXT_LENGTH, device, pad_to_multiple_of=1024)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("Padding beyond the context length was accepted")
+
+    for invalid in (0, -1):
+        try:
+            encode_counterfactual_pairs((pair,), tokenizer, TEST_CONTEXT_LENGTH, device, pad_to_multiple_of=invalid)
+        except ValueError:
+            continue
+        raise AssertionError(f"pad_to_multiple_of={invalid} was accepted")
 
 
 def print_default_parameter_count() -> None:

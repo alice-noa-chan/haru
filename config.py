@@ -171,6 +171,12 @@ COUNTERFACTUAL_EVAL_PAIRS = 100
 # Keep relation sampling independent from packed-LM window sampling so changing
 # either objective does not silently change the other objective's data order.
 COUNTERFACTUAL_SEED_OFFSET = 100_000
+# Round the relation batch's time dimension up to this stride. Prompt lengths
+# vary, so without it the model sees a new shape almost every step (16 distinct
+# shapes in 40 draws) while the language-model batch stays fixed, and
+# torch.compile recompiles continuously instead of paying off. Attention is
+# causal and score_mask excludes the padding, so scores are unchanged.
+COUNTERFACTUAL_PAD_MULTIPLE = 64
 
 LOG_INTERVAL = 10
 EVAL_INTERVAL = 250
