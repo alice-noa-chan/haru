@@ -213,7 +213,37 @@ so they stay matched when the architecture changes. To train a single dense arm
 through the normal pipeline instead, set `MODEL_ARCH = "dense-baseline"` and a
 new `RUN_NAME` in `config.py`.
 
-No release-scale result exists yet.
+### Result at compact scale
+
+**No release-scale comparison exists yet.** The published v1.0 and v1.1
+checkpoints have never been measured against a matched dense decoder, so the
+version table above cannot separate the architecture from its parameter count
+and training budget.
+
+A CPU-scale replication has been run: six arms, three seeds, 300 steps,
+614,400 tokens per arm per seed, at 3.3M parameters rather than 11.6M. Every
+paired delta exceeded its own spread across seeds.
+
+| Arm | Parameters | GFLOPs | Validation loss | vs CFRD | Strict pairs |
+|---|---:|---:|---:|---:|---:|
+| CFRD | 3,339,673 | 1.93 | 4.7273 | reference | 0.110 |
+| Dense, parameter-matched | 3,364,801 | 1.72 | **4.6557** | -0.0715 | 0.203 |
+| Dense, compute-matched | 3,809,089 | 1.95 | **4.6518** | -0.0754 | **0.343** |
+| CFRD without binding block | 2,945,687 | 1.73 | 4.7920 | +0.0647 | 0.043 |
+| CFRD without cell sharing | 3,791,327 | 1.93 | 4.6958 | -0.0315 | 0.043 |
+| CFRD with full-context cells | 3,166,665 | 1.82 | 4.7911 | +0.0638 | 0.050 |
+
+No CFRD configuration reached a plain dense decoder on either metric, at
+matched parameters or at matched compute. Strict pair accuracy has a chance
+level of 0.25, since both directions of a pair must flip.
+
+This is a small-scale, short-budget result: roughly 1,200x fewer training
+tokens than a release run, at under a third of the parameters. It does not
+show that CFRD fails at release scale. It does show that the architecture's
+advantage has never been demonstrated anywhere, and that the burden is on the
+next release to produce it rather than assume it. See
+[RESEARCH.md](RESEARCH.md) for the per-seed figures and what the result rules
+out.
 
 ## Train from source
 
@@ -334,6 +364,9 @@ a GPU uses fp16 with gradient scaling; a GPU uses bf16.
   Transformer. `compare_architectures.py` runs that comparison, but no
   release-scale result exists yet, so the v1.1 numbers above cannot separate
   the CFRD architecture from its parameter count and training budget.
+- At compact scale and a short budget, no CFRD configuration beat a matched
+  dense decoder on validation loss or entity binding. The architecture's
+  advantage is currently unmeasured rather than established.
 
 ## Training data notice
 
