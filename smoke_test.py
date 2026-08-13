@@ -19,6 +19,8 @@ from compare_architectures import (
     ENCODE_BATCH_LINES,
     baseline_parameter_count,
     cfrd_ablations,
+    check_parameter_budget,
+    combination_arms,
     deep_supervision_arms,
     evenly_spaced_exits,
     load_token_stream,
@@ -942,6 +944,63 @@ def test_deep_supervision_arms_isolate_the_confound() -> None:
     assert len(supervised.auxiliary_exit_layers) == len(cfrd_cfg.exit_depths) - 1
     assert all(1 <= depth < supervised.n_layer for depth in supervised.auxiliary_exit_layers)
     assert evenly_spaced_exits(6, 2) == (2, 4)
+
+
+def test_combination_arm_carries_both_changes() -> None:
+    """The combined arm must vary exactly the two fields it claims to combine."""
+
+    reference = build_test_model().cfg
+    arms = combination_arms(reference)
+    assert set(arms) == {"cfrd-unfolded-full-attention"}
+
+    combined = arms["cfrd-unfolded-full-attention"]
+    changed = {f.name for f in fields(ModelConfig) if getattr(combined, f.name) != getattr(reference, f.name)}
+    assert changed == {"physical_cells", "cell_attention"}
+    assert combined.physical_cells == reference.recurrences
+    assert combined.cell_attention == "full"
+
+    # Each half also exists as a single-field ablation, which is what makes the
+    # combination interpretable rather than just another configuration.
+    singles = cfrd_ablations(reference)
+    assert singles["cfrd-unfolded"].physical_cells == combined.physical_cells
+    assert singles["cfrd-full-attention"].cell_attention == combined.cell_attention
+
+    features = torch.randn(TEST_VOCAB_SIZE, SURFACE_FEATURE_DIM)
+    x = torch.randint(0, TEST_VOCAB_SIZE, (2, TEST_CONTEXT_LENGTH))
+    y = torch.randint(0, TEST_VOCAB_SIZE, (2, TEST_CONTEXT_LENGTH))
+    model = build_model(combined, features)
+    output = model(x, targets=y)
+    assert torch.isfinite(output.loss)
+
+    # Already-combined configurations must not regenerate the arm.
+    assert combination_arms(combined) == {}
+
+
+def test_parameter_ceiling_is_enforced_before_training() -> None:
+    """An oversized arm must fail at setup, not after a full run.
+
+    Haru's premise is being small. Discovering an arm is over budget only when
+    the table is read costs the whole run and produces a number that cannot be
+    shipped.
+    """
+
+    reference = build_test_model().cfg
+    features = torch.randn(TEST_VOCAB_SIZE, SURFACE_FEATURE_DIM)
+    arms = {"cfrd": reference, **cfrd_ablations(reference)}
+
+    counts = check_parameter_budget(arms, features, 10**9)
+    assert set(counts) == set(arms)
+    assert counts["cfrd-unfolded"] > counts["cfrd"]
+
+    ceiling = counts["cfrd"]
+    try:
+        check_parameter_budget(arms, features, ceiling)
+    except ValueError as error:
+        message = str(error)
+        assert "cfrd-unfolded" in message
+        assert f"{ceiling:,}" in message
+    else:
+        raise AssertionError("An arm above the ceiling was accepted")
 
 
 def print_default_parameter_count() -> None:
