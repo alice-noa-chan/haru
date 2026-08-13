@@ -136,6 +136,9 @@ COUNTERFACTUAL_LOSS_WEIGHT = 0.20
 COUNTERFACTUAL_PAIRS_PER_MICRO_BATCH = 5
 COUNTERFACTUAL_MARGIN = 0.50
 COUNTERFACTUAL_EVAL_PAIRS = 100
+# Keep relation sampling independent from packed-LM window sampling so changing
+# either objective does not silently change the other objective's data order.
+COUNTERFACTUAL_SEED_OFFSET = 100_000
 
 LOG_INTERVAL = 10
 EVAL_INTERVAL = 250

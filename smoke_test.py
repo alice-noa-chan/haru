@@ -210,36 +210,95 @@ def test_final_depth_evaluation_reuses_windows() -> None:
 
 
 def test_exact_sampler_resume() -> None:
-    """Checkpoint restore must continue the exact random batch sequence."""
+    """Checkpoint restore must continue both independent sampler sequences."""
 
     model = build_test_model()
     optimizer = configure_optimizer(model, torch.device("cpu"))
-    rng = np.random.default_rng(123)
-    rng.integers(0, 10_000, size=100)
+    lm_rng = np.random.default_rng(123)
+    counterfactual_rng = np.random.default_rng(456)
+    lm_rng.integers(0, 10_000, size=100)
+    counterfactual_rng.integers(0, 10_000, size=50)
 
     with tempfile.TemporaryDirectory() as temp_dir:
         path = Path(temp_dir) / "checkpoint.pt"
-        save_checkpoint(path, model, optimizer, 7, 1234, 2.0, model.cfg, "test-hash", rng)
-        expected_pairs = CounterfactualSampler("train").sample_batch(5, rng)
-        expected = rng.integers(0, 10_000, size=20)
+        save_checkpoint(
+            path,
+            model,
+            optimizer,
+            7,
+            1234,
+            2.0,
+            model.cfg,
+            "test-hash",
+            lm_rng,
+            counterfactual_rng,
+        )
+        expected_pairs = CounterfactualSampler("train").sample_batch(5, counterfactual_rng)
+        expected = lm_rng.integers(0, 10_000, size=20)
 
         restored_model = build_test_model()
         restored_optimizer = configure_optimizer(restored_model, torch.device("cpu"))
-        restored_rng = np.random.default_rng(999)
-        step, tokens_seen, best_loss = restore_checkpoint(
+        restored_lm_rng = np.random.default_rng(999)
+        restored_counterfactual_rng = np.random.default_rng(888)
+        step, tokens_seen, best_loss, rng_mode = restore_checkpoint(
             path,
             restored_model,
             restored_optimizer,
             model.cfg,
             "test-hash",
-            restored_rng,
+            restored_lm_rng,
+            restored_counterfactual_rng,
         )
-        actual_pairs = CounterfactualSampler("train").sample_batch(5, restored_rng)
-        actual = restored_rng.integers(0, 10_000, size=20)
+        actual_pairs = CounterfactualSampler("train").sample_batch(5, restored_counterfactual_rng)
+        actual = restored_lm_rng.integers(0, 10_000, size=20)
 
     assert step == 7
     assert tokens_seen == 1234
     assert best_loss == 2.0
+    assert rng_mode == "separate"
+    assert actual_pairs == expected_pairs
+    assert np.array_equal(actual, expected)
+
+
+def test_legacy_shared_sampler_resume() -> None:
+    """Version-3 checkpoints must preserve their historical shared RNG sequence."""
+
+    model = build_test_model()
+    optimizer = configure_optimizer(model, torch.device("cpu"))
+    shared_rng = np.random.default_rng(321)
+    shared_rng.integers(0, 10_000, size=100)
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        path = Path(temp_dir) / "checkpoint.pt"
+        save_checkpoint(path, model, optimizer, 7, 1234, 2.0, model.cfg, "test-hash", shared_rng, shared_rng)
+        checkpoint = torch.load(path, map_location="cpu", weights_only=False)
+        checkpoint["checkpoint_version"] = 3
+        checkpoint.pop("training_rng_mode")
+        checkpoint["train_rng_state"] = checkpoint.pop("lm_rng_state")
+        checkpoint.pop("counterfactual_rng_state")
+        checkpoint["optimizer_config"].pop("counterfactual_seed_offset")
+        torch.save(checkpoint, path)
+
+        expected_pairs = CounterfactualSampler("train").sample_batch(5, shared_rng)
+        expected = shared_rng.integers(0, 10_000, size=20)
+
+        restored_model = build_test_model()
+        restored_optimizer = configure_optimizer(restored_model, torch.device("cpu"))
+        restored_lm_rng = np.random.default_rng(999)
+        unused_counterfactual_rng = np.random.default_rng(888)
+        _, _, _, rng_mode = restore_checkpoint(
+            path,
+            restored_model,
+            restored_optimizer,
+            model.cfg,
+            "test-hash",
+            restored_lm_rng,
+            unused_counterfactual_rng,
+        )
+        actual_pairs = CounterfactualSampler("train").sample_batch(5, restored_lm_rng)
+        actual = restored_lm_rng.integers(0, 10_000, size=20)
+
+    assert rng_mode == "shared"
     assert actual_pairs == expected_pairs
     assert np.array_equal(actual, expected)
 
@@ -410,6 +469,7 @@ def main() -> None:
     test_binding_block_supervises_every_exit()
     test_final_depth_evaluation_reuses_windows()
     test_exact_sampler_resume()
+    test_legacy_shared_sampler_resume()
     test_transformers_auto_model_roundtrip()
     test_counterfactual_sampler()
     test_counterfactual_objective_backward()
