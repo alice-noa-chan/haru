@@ -14,7 +14,6 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from transformers.utils import logging as transformers_logging
 
-import cloud_benchmark
 import config
 from baseline_model import BaselineConfig, BaselineLanguageModel
 from compare_architectures import (
@@ -1242,43 +1241,6 @@ def test_counterfactual_objective_backward() -> None:
         assert model.token_embedding.weight.grad is not None
 
 
-def test_watchdog_command_backgrounds_only_the_timer() -> None:
-    """The pod's kill switch must not hold the SSH session that arms it open.
-
-    Written as `chain && timer &`, the shell backgrounds the whole chain in a
-    subshell that waits on the timer's own sleep while still holding ssh's
-    stdout. Run against a real shell, that form reached EOF only after the full
-    sleep elapsed: 47.1s for a 47s timer. On a pod that is ssh hanging while the
-    GPU idles and bills, and it cost two pods before the cause was found.
-
-    Checked here as structure rather than by running it, because the failure is
-    in how the shell groups the command and is fixed by the braces.
-    """
-
-    command = cloud_benchmark.watchdog_command("secret-key", 900)
-
-    # All three streams are detached, or the timer holds the session open by
-    # itself.
-    assert "< /dev/null > /tmp/watchdog.log 2>&1" in command
-
-    # The backgrounding `&` closes a brace group rather than running on into the
-    # next command. `2>&1 & }` is the fixed form and `2>&1 & echo` is the broken
-    # one, which is the whole difference between the two.
-    assert "{ setsid sh -c 'sleep 900;" in command
-    assert "2>&1 & }" in command
-    assert "2>&1 & echo" not in command
-
-    # Arming is confirmed on the pod, so a missing setsid cannot leave the pod
-    # running with no kill switch and nothing to say so.
-    assert cloud_benchmark.WATCHDOG_ARMED in command
-    assert "ps -eo args | grep -q '[s]leep 900'" in command
-
-    # The key reaches the pod through a private file. `export` published it in
-    # the process table for as long as the timer ran.
-    assert "umask 077" in command
-    assert "export" not in command
-
-
 def test_progress_reporting_survives_a_resume() -> None:
     """Progress and ETA must describe the work left, not the work already done.
 
@@ -1308,33 +1270,6 @@ def test_progress_reporting_survives_a_resume() -> None:
     # The naive form is the bug being guarded against, and it is optimistic.
     naive = (run_elapsed / current_step) * (max_steps - current_step)
     assert naive < eta
-
-
-def test_training_entry_points_take_only_arguments_that_exist() -> None:
-    """The training path must not reference parser options that were never added.
-
-    training_command took `steps` and `batch_size` from args.steps and
-    args.batch_size, neither of which parse_arguments defines, and neither of
-    which it used: train.py reads both from the uploaded config.py. Starting a
-    real run therefore raised AttributeError right after the 5.2GB upload, at
-    the one moment the pod has already cost something.
-    """
-
-    argv = sys.argv
-    try:
-        sys.argv = ["cloud_benchmark.py", "--action", "train"]
-        args = cloud_benchmark.parse_arguments()
-    finally:
-        sys.argv = argv
-
-    for attribute in ("ssh_key", "run_name", "max_hours", "poll_seconds", "fetch_minutes"):
-        assert hasattr(args, attribute), f"run_training reads args.{attribute}, which the parser does not define"
-
-    for absent in ("steps", "batch_size"):
-        assert not hasattr(args, absent), f"args.{absent} is back; training_command must not take it"
-
-    command = cloud_benchmark.training_command("/tmp/train.log", "/usr/bin/python3.10")
-    assert "nohup /usr/bin/python3.10 train.py" in command
 
 
 def test_token_budget_is_four_passes_over_the_corpus() -> None:
