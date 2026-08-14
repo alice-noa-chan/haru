@@ -56,7 +56,11 @@ TOKENIZER_VOCAB_SIZE = 12_000
 # 2.502 at 32k), so the usual "Korean is agglutinative, prefer unigram" did not
 # hold here. See results/tokenizer_comparison.json.
 TOKENIZER_MODEL_TYPE = "bpe"
-TOKENIZER_CHARACTER_COVERAGE = 1.0
+# Below 1.0 because the mixed corpus contains 36,970 distinct characters,
+# mostly Han, emoji and symbols, and full coverage would demand a vocabulary
+# entry for every one of them: SentencePiece refuses outright at 12,000.
+# Rare characters fall through to byte_fallback, which is what it is for.
+TOKENIZER_CHARACTER_COVERAGE = 0.9995
 TOKENIZER_BYTE_FALLBACK = True
 TOKENIZER_MAX_SENTENCES = 2_000_000
 TOKENIZER_MAX_SENTENCE_LENGTH = 16_384
@@ -162,7 +166,21 @@ PRECISION = "bf16"  # "bf16", "fp16", "fp32"
 
 BATCH_SIZE = 32
 GRAD_ACCUM_STEPS = 8
-TARGET_TOKENS = 800_000_000
+# Four passes over the 2,598,939,881 packed tokens, at 612 tokens per
+# parameter. Chinchilla's 20:1 answers a different question, which is how to
+# split a fixed compute budget between parameters and data; with the parameter
+# count fixed at 17M, the model is far from saturated at 20:1. v1.1 scored at
+# chance on every KoBEST task after 47 tokens per parameter.
+#
+# Four is the ceiling rather than the appetite: repeated data holds most of its
+# value to roughly four epochs and falls away sharply after, so a fifth pass
+# buys much less than the first did. Overfitting is not the binding constraint
+# here, since 17M parameters cannot memorize 2.6B tokens; underfitting is.
+#
+# Windows are sampled with replacement (get_random_batch), so this is a token
+# budget rather than four ordered passes, and repeats fall randomly through
+# training instead of in blocks.
+TARGET_TOKENS = 10_395_759_524
 
 LEARNING_RATE = 4.0e-4
 MIN_LEARNING_RATE = 4.0e-5
