@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sys
 import tempfile
 from collections.abc import Callable
@@ -54,7 +55,7 @@ from model_factory import (
 from modeling_cfrd import CFRDForCausalLM
 from surface_features import SURFACE_FEATURE_DIM
 from tokenization_cfrd import CFRDTokenizer
-from train import configure_optimizer, restore_checkpoint, save_checkpoint
+from train import configure_optimizer, format_duration, restore_checkpoint, save_checkpoint
 
 # Small synthetic setup that does not require a trained tokenizer.
 TEST_VOCAB_SIZE = 512
@@ -1276,6 +1277,77 @@ def test_watchdog_command_backgrounds_only_the_timer() -> None:
     # the process table for as long as the timer ran.
     assert "umask 077" in command
     assert "export" not in command
+
+
+def test_progress_reporting_survives_a_resume() -> None:
+    """Progress and ETA must describe the work left, not the work already done.
+
+    The v2.0 run is tens of hours on interruptible hardware, so it will resume
+    at least once. An ETA computed as elapsed/current_step would divide this
+    process's elapsed time by steps a previous process ran, and report a wildly
+    short remaining time exactly when the number is being relied on.
+    """
+
+    assert format_duration(0) == "0h00m"
+    assert format_duration(90) == "0h01m"
+    assert format_duration(32 * 3600 + 5 * 60) == "32h05m"
+    assert format_duration(float("inf")) == "?"
+    assert format_duration(-1) == "?"
+
+    max_steps, start_step, current_step = 1000, 600, 700
+    run_elapsed = 100.0
+
+    # The rate belongs to the 100 steps this process ran, not to all 700.
+    steps_done = current_step - start_step
+    eta = (run_elapsed / steps_done) * (max_steps - current_step)
+    assert eta == 300.0, "ETA must extrapolate from this process's own steps"
+
+    # Progress is still absolute: 700 of 1000 steps is 70% however it got there.
+    assert current_step / max_steps == 0.7
+
+    # The naive form is the bug being guarded against, and it is optimistic.
+    naive = (run_elapsed / current_step) * (max_steps - current_step)
+    assert naive < eta
+
+
+def test_training_entry_points_take_only_arguments_that_exist() -> None:
+    """The training path must not reference parser options that were never added.
+
+    training_command took `steps` and `batch_size` from args.steps and
+    args.batch_size, neither of which parse_arguments defines, and neither of
+    which it used: train.py reads both from the uploaded config.py. Starting a
+    real run therefore raised AttributeError right after the 5.2GB upload, at
+    the one moment the pod has already cost something.
+    """
+
+    argv = sys.argv
+    try:
+        sys.argv = ["cloud_benchmark.py", "--action", "train"]
+        args = cloud_benchmark.parse_arguments()
+    finally:
+        sys.argv = argv
+
+    for attribute in ("ssh_key", "run_name", "max_hours", "poll_seconds", "fetch_minutes"):
+        assert hasattr(args, attribute), f"run_training reads args.{attribute}, which the parser does not define"
+
+    for absent in ("steps", "batch_size"):
+        assert not hasattr(args, absent), f"args.{absent} is back; training_command must not take it"
+
+    command = cloud_benchmark.training_command("/tmp/train.log", "/usr/bin/python3.10")
+    assert "nohup /usr/bin/python3.10 train.py" in command
+
+
+def test_token_budget_is_four_passes_over_the_corpus() -> None:
+    """The configured budget must match the corpus that was actually packed."""
+
+    meta_path = config.PACKED_DIR / "meta.json"
+    if not meta_path.exists():
+        return
+
+    train_tokens = json.loads(meta_path.read_text(encoding="utf-8"))["train_tokens"]
+    assert config.TARGET_TOKENS == 4 * train_tokens, (
+        f"TARGET_TOKENS {config.TARGET_TOKENS:,} is not four passes over {train_tokens:,} packed tokens"
+    )
 
 
 def discover_tests() -> list[tuple[str, Callable[[], None]]]:

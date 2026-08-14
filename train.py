@@ -118,6 +118,21 @@ def get_random_batch(
     return x, y
 
 
+def format_duration(seconds: float) -> str:
+    """Render a duration as hours and minutes, for a run measured in days.
+
+    Seconds are useless at this length and a raw float is worse: the v2.0 run
+    is tens of hours, so the only readable form is the one a person can compare
+    against a wall clock.
+    """
+
+    if seconds < 0 or seconds != seconds or seconds == float("inf"):
+        return "?"
+
+    total_minutes = int(seconds // 60)
+    return f"{total_minutes // 60}h{total_minutes % 60:02d}m"
+
+
 def learning_rate_for_step(step: int, max_steps: int) -> float:
     """Linear warmup followed by cosine decay."""
 
@@ -598,9 +613,21 @@ def main() -> None:
         current_step = step + 1
 
         if current_step % config.LOG_INTERVAL == 0 or current_step == 1:
+            # Progress is measured over the steps this process will actually
+            # run. After a resume, start_step is not zero, so dividing elapsed
+            # time by current_step would date the rate from a run that already
+            # ended and report an ETA for work already done.
+            progress = current_step / max_steps
+            run_elapsed = time.perf_counter() - wall_start
+            steps_done = current_step - start_step
+            steps_left = max_steps - current_step
+            eta_seconds = (run_elapsed / steps_done) * steps_left if steps_done > 0 else float("inf")
+
             row = {
                 "step": current_step,
                 "max_steps": max_steps,
+                "progress": progress,
+                "eta_seconds": eta_seconds,
                 "tokens_seen": tokens_seen,
                 "loss": accumulated_loss,
                 "final_loss": accumulated_final_loss,
@@ -614,6 +641,7 @@ def main() -> None:
             }
             append_jsonl(config.TRAIN_LOG_PATH, row)
             print(
+                f"[{progress:5.1%} eta {format_duration(eta_seconds)}] "
                 f"step={current_step:6d}/{max_steps} "
                 f"tokens={tokens_seen:,} "
                 f"loss={accumulated_loss:.4f} "
