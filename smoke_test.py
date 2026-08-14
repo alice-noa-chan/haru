@@ -36,6 +36,7 @@ from counterfactual_data import (
     CounterfactualSampler,
 )
 from counterfactual_objective import candidate_scores, counterfactual_ranking_result, encode_counterfactual_pairs
+from data_utils import iter_data_files
 from decontaminate import filter_corpus
 from evaluate import make_final_eval_rng
 from model import CFRDLanguageModel, FullCausalAttention, ModelConfig, count_parameters
@@ -1126,6 +1127,34 @@ def test_corpus_writers_emit_lf() -> None:
 
         # Byte growth with nothing dropped is the symptom that exposed this.
         assert len(written) < len(source.read_bytes())
+
+
+def test_cleaned_corpora_supersede_their_originals() -> None:
+    """A decontaminated corpus must replace its source, not join it.
+
+    Both files sit in data/ side by side. Reading both would train on the exact
+    benchmark passages the cleaned copy exists to remove, and would count every
+    surviving line twice, so the decontamination pass would be worse than
+    useless: it would look done while changing nothing.
+    """
+
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        for name in ("stories.txt", "webtext.txt", "webtext.clean.txt", "notes.jsonl"):
+            (root / name).write_text("text\n", encoding="utf-8", newline="\n")
+
+        selected = {path.name for path in iter_data_files(root)}
+        assert "webtext.clean.txt" in selected
+        assert "webtext.txt" not in selected, "the contaminated original was still selected"
+        # A corpus with no cleaned copy is untouched.
+        assert "stories.txt" in selected
+        assert "notes.jsonl" in selected
+
+    # The real data directory must obey the same rule.
+    live = {path.name for path in iter_data_files()}
+    for name in live:
+        if name.endswith(".clean.txt"):
+            assert name[: -len(".clean.txt")] + ".txt" not in live
 
 
 def print_default_parameter_count() -> None:

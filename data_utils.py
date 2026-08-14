@@ -45,14 +45,31 @@ def restore_text_from_tokenizer(text: str) -> str:
     return text.replace(config.NEWLINE_ESCAPE_TOKEN, config.NEWLINE_TOKEN)
 
 
+# Suffix decontaminate.py gives a cleaned corpus. The original is kept on disk
+# but must never be trained on once a cleaned copy exists.
+CLEAN_SUFFIX = ".clean.txt"
+
+
 def iter_data_files(data_dir: Path | None = None) -> list[Path]:
-    """Return supported data files recursively in deterministic order."""
+    """Return supported data files recursively in deterministic order.
+
+    A corpus that has been decontaminated exists twice on disk: `webtext.txt`
+    and `webtext.clean.txt`. Reading both would train on the benchmark text the
+    clean copy exists to remove, and would count every other line twice, so the
+    original is dropped wherever a cleaned copy is present.
+    """
 
     root = data_dir or config.DATA_DIR
     if not root.exists():
         return []
 
     files = [path for path in root.rglob("*") if path.is_file() and path.suffix.lower() in {".txt", ".jsonl"}]
+
+    superseded = {
+        path.with_name(path.name[: -len(CLEAN_SUFFIX)] + ".txt") for path in files if path.name.endswith(CLEAN_SUFFIX)
+    }
+    files = [path for path in files if path not in superseded]
+
     return sorted(files, key=lambda p: p.as_posix())
 
 
