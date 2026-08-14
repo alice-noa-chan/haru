@@ -13,6 +13,7 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from transformers.utils import logging as transformers_logging
 
+import cloud_benchmark
 import config
 from baseline_model import BaselineConfig, BaselineLanguageModel
 from compare_architectures import (
@@ -1238,6 +1239,43 @@ def test_counterfactual_objective_backward() -> None:
         assert 0.0 <= result.decision_accuracy.item() <= 1.0
         assert 0.0 <= result.strict_pair_accuracy.item() <= 1.0
         assert model.token_embedding.weight.grad is not None
+
+
+def test_watchdog_command_backgrounds_only_the_timer() -> None:
+    """The pod's kill switch must not hold the SSH session that arms it open.
+
+    Written as `chain && timer &`, the shell backgrounds the whole chain in a
+    subshell that waits on the timer's own sleep while still holding ssh's
+    stdout. Run against a real shell, that form reached EOF only after the full
+    sleep elapsed: 47.1s for a 47s timer. On a pod that is ssh hanging while the
+    GPU idles and bills, and it cost two pods before the cause was found.
+
+    Checked here as structure rather than by running it, because the failure is
+    in how the shell groups the command and is fixed by the braces.
+    """
+
+    command = cloud_benchmark.watchdog_command("secret-key", 900)
+
+    # All three streams are detached, or the timer holds the session open by
+    # itself.
+    assert "< /dev/null > /tmp/watchdog.log 2>&1" in command
+
+    # The backgrounding `&` closes a brace group rather than running on into the
+    # next command. `2>&1 & }` is the fixed form and `2>&1 & echo` is the broken
+    # one, which is the whole difference between the two.
+    assert "{ setsid sh -c 'sleep 900;" in command
+    assert "2>&1 & }" in command
+    assert "2>&1 & echo" not in command
+
+    # Arming is confirmed on the pod, so a missing setsid cannot leave the pod
+    # running with no kill switch and nothing to say so.
+    assert cloud_benchmark.WATCHDOG_ARMED in command
+    assert "ps -eo args | grep -q '[s]leep 900'" in command
+
+    # The key reaches the pod through a private file. `export` published it in
+    # the process table for as long as the timer ran.
+    assert "umask 077" in command
+    assert "export" not in command
 
 
 def discover_tests() -> list[tuple[str, Callable[[], None]]]:
