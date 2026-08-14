@@ -14,15 +14,15 @@ CODE_DIR = Path(__file__).resolve().parent
 ROOT_DIR = Path(os.environ.get("HARU_STORAGE_DIR", os.environ.get("CFRD_STORAGE_DIR", CODE_DIR))).resolve()
 DATA_DIR = ROOT_DIR / "data"
 TOKENIZER_DIR = ROOT_DIR / "tokenizer"
-RUN_NAME = "haru-v2-binding"
-RELEASE_VERSION = "1.1"
-HUGGINGFACE_MODEL_ID = "gaon12/haru_1.1"
-PREVIOUS_HUGGINGFACE_MODEL_ID = "gaon12/haru"
+RUN_NAME = "haru-v2-unfolded"
+RELEASE_VERSION = "2.0"
+HUGGINGFACE_MODEL_ID = "gaon12/haru_2.0"
+PREVIOUS_HUGGINGFACE_MODEL_ID = "gaon12/haru_1.1"
 PACKED_DIR = ROOT_DIR / "packed" / RUN_NAME
 RUN_DIR = ROOT_DIR / "runs" / RUN_NAME
 
-TOKENIZER_MODEL_PATH = TOKENIZER_DIR / "tiny_ko_12k.model"
-TOKENIZER_VOCAB_PATH = TOKENIZER_DIR / "tiny_ko_12k.vocab"
+TOKENIZER_MODEL_PATH = TOKENIZER_DIR / "haru_v2_12k.model"
+TOKENIZER_VOCAB_PATH = TOKENIZER_DIR / "haru_v2_12k.vocab"
 TRAIN_BIN_PATH = PACKED_DIR / "train.bin"
 VAL_BIN_PATH = PACKED_DIR / "val.bin"
 PACKED_META_PATH = PACKED_DIR / "meta.json"
@@ -51,7 +51,11 @@ NEWLINE_ESCAPE_TOKEN = "<|literal_nl|>"
 # Tokenizer
 # ============================================================================
 TOKENIZER_VOCAB_SIZE = 12_000
-TOKENIZER_MODEL_TYPE = "unigram"
+# BPE, measured. It beat unigram at every vocabulary size tried on the actual
+# corpus (2.056 vs 2.114 chars/token at 12k, 2.326 vs 2.401 at 24k, 2.413 vs
+# 2.502 at 32k), so the usual "Korean is agglutinative, prefer unigram" did not
+# hold here. See results/tokenizer_comparison.json.
+TOKENIZER_MODEL_TYPE = "bpe"
 TOKENIZER_CHARACTER_COVERAGE = 1.0
 TOKENIZER_BYTE_FALLBACK = True
 TOKENIZER_MAX_SENTENCES = 2_000_000
@@ -73,7 +77,9 @@ CHUNK_SIZE = 64
 D_MODEL = 384
 N_HEAD = 6
 N_KV_HEAD = 2
-FFN_DIM = 1024
+# Trimmed from 1024 so the unfolded model lands at 16,983,213 parameters,
+# inside the 17M ceiling that 1024 misses by 47,725.
+FFN_DIM = 1016
 ROPE_THETA = 10_000.0
 DROPOUT = 0.0
 
@@ -87,7 +93,10 @@ MEMORY_HEADS = 4
 MEMORY_RECENCY_BIAS_INIT = 0.10
 
 # Three physical cells are reused in alternating order for six recurrent steps.
-PHYSICAL_CELLS = 3
+# Unfolded: one cell per recurrence. Sharing cells lost by 0.0583 validation
+# loss beyond the paired spread at release scale, and by a similar margin at
+# compact scale. It is the only result that survived every scale tested.
+PHYSICAL_CELLS = 6
 RECURRENCES = 6
 
 # Finish the recurrent stack with one non-recurrent, full-context causal block.
@@ -98,7 +107,10 @@ USE_BINDING_BLOCK = True
 # Apply the shared LM head at recurrent depths 2, 4, and 6 during training.
 # Depth 6 is the main objective; earlier depths receive auxiliary supervision.
 EXIT_DEPTHS = (2, 4, 6)
-AUX_EXIT_LOSS_WEIGHT = 0.15
+# Zero, measured. Deep supervision helped the dense control and hurt this
+# model on both axes: removing it improved validation loss by 0.0054 beyond
+# the spread and strict pair accuracy from 0.263 to 0.377.
+AUX_EXIT_LOSS_WEIGHT = 0.0
 
 # Keep repeatedly applied residual updates small. The model also multiplies each
 # update by 1 / sqrt(RECURRENCES).
