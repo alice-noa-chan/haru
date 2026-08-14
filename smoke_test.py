@@ -1157,14 +1157,22 @@ def test_cleaned_corpora_supersede_their_originals() -> None:
             assert name[: -len(".clean.txt")] + ".txt" not in live
 
 
-def print_default_parameter_count() -> None:
+def test_default_configuration_fits_the_budget() -> None:
+    """config.py must build a model inside the ceiling the project ships to.
+
+    The previous version pinned 11,634,459, the v1.1 shape. Pinning one number
+    makes every deliberate configuration change look like a regression, so this
+    checks the constraint that actually holds across releases: under 20M, with
+    17M as the working ceiling.
+    """
+
     cfg = ModelConfig.from_project_settings(config, config.TOKENIZER_VOCAB_SIZE)
-    dummy_features = torch.zeros(config.TOKENIZER_VOCAB_SIZE, SURFACE_FEATURE_DIM)
-    model = CFRDLanguageModel(cfg, dummy_features)
-    counts = count_parameters(model)
-    assert counts["total"] == 11_634_459
-    assert 8_000_000 <= counts["total"] <= 12_000_000
-    print(f"default total parameters: {counts['total']:,}")
+    model = CFRDLanguageModel(cfg, torch.zeros(config.TOKENIZER_VOCAB_SIZE, SURFACE_FEATURE_DIM))
+    total = count_parameters(model)["total"]
+
+    assert total <= 17_000_000, f"config.py builds {total:,} parameters, past the 17M working ceiling"
+    assert total > 5_000_000, f"config.py builds only {total:,} parameters; something is misconfigured"
+    print(f"default total parameters: {total:,}")
 
 
 def test_counterfactual_sampler() -> None:
@@ -1258,7 +1266,6 @@ def main() -> None:
         except Exception as error:
             raise AssertionError(f"{name} failed: {error}") from error
 
-    print_default_parameter_count()
     # Print the count so a test that stops being discovered is visible rather
     # than silently absent, which is the failure the manual list allowed.
     print(f"{len(tests)} smoke tests passed")
