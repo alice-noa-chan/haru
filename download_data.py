@@ -68,11 +68,24 @@ PROTECTED_FILES = {"data.txt"}
 
 
 def refuse_benchmarks(repo: str) -> None:
-    lowered = repo.lower()
+    """Refuse evaluation sets, matching the dataset name rather than the owner.
+
+    Matching the whole repository path rejected HAERAE-HUB/KOREAN-WEBTEXT, a
+    training corpus, because the organisation also publishes HAE-RAE Bench. The
+    owner says who released a dataset, not what it is.
+
+    Separators are stripped before matching so HAE_RAE_BENCH and haerae-bench
+    both still fail, which the previous whole-path check would have missed for
+    the underscored spelling.
+    """
+
+    name = repo.rsplit("/", 1)[-1].lower()
+    condensed = name.replace("-", "").replace("_", "").replace(".", "")
+
     for marker in BENCHMARK_MARKERS:
-        if marker in lowered:
+        if marker in condensed:
             raise ValueError(
-                f"Refusing to download {repo!r}: it matches the benchmark marker {marker!r}. "
+                f"Refusing to download {repo!r}: its name matches the benchmark marker {marker!r}. "
                 "Training on evaluation data would invalidate every score this project reports."
             )
 
