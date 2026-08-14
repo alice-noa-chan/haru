@@ -1,0 +1,96 @@
+{
+  "d_model": 384,
+  "results": [
+    {
+      "model_type": "current (unigram, stories only)",
+      "vocab_size": 12000,
+      "chars_per_token": 1.3962692249870152,
+      "byte_fallback_rate": 0.06910364507241477,
+      "embedding_parameters": 4608000,
+      "per_corpus_chars_per_token": {
+        "textbooks.clean.txt": 1.4284126007664013,
+        "webtext.clean.txt": 1.3797539027509798,
+        "wikipedia.clean.txt": 1.1986041065693336,
+        "data.txt": 2.898916243900416
+      }
+    },
+    {
+      "model_type": "unigram",
+      "vocab_size": 12000,
+      "chars_per_token": 1.9207997853300658,
+      "byte_fallback_rate": 0.002531854422565461,
+      "embedding_parameters": 4608000,
+      "per_corpus_chars_per_token": {
+        "textbooks.clean.txt": 2.5739297280158886,
+        "webtext.clean.txt": 1.7461066949369182,
+        "wikipedia.clean.txt": 1.62606474255942,
+        "data.txt": 1.512029114295963
+      }
+    },
+    {
+      "model_type": "unigram",
+      "vocab_size": 24000,
+      "chars_per_token": 2.1840674163572023,
+      "byte_fallback_rate": 0.0028788740968829734,
+      "embedding_parameters": 9216000,
+      "per_corpus_chars_per_token": {
+        "textbooks.clean.txt": 2.855117602606086,
+        "webtext.clean.txt": 1.998264384046477,
+        "wikipedia.clean.txt": 1.8422217069723983,
+        "data.txt": 1.8409182184280117
+      }
+    },
+    {
+      "model_type": "unigram",
+      "vocab_size": 32000,
+      "chars_per_token": 2.272490097332555,
+      "byte_fallback_rate": 0.0029954262527049145,
+      "embedding_parameters": 12288000,
+      "per_corpus_chars_per_token": {
+        "textbooks.clean.txt": 2.924635461169706,
+        "webtext.clean.txt": 2.0878273795520332,
+        "wikipedia.clean.txt": 1.9293139074242245,
+        "data.txt": 1.94429777696396
+      }
+    },
+    {
+      "model_type": "bpe",
+      "vocab_size": 12000,
+      "chars_per_token": 1.9735446390871065,
+      "byte_fallback_rate": 0.002601378738567706,
+      "embedding_parameters": 4608000,
+      "per_corpus_chars_per_token": {
+        "textbooks.clean.txt": 2.6351015679604695,
+        "webtext.clean.txt": 1.7920946192553235,
+        "wikipedia.clean.txt": 1.6504170761995796,
+        "data.txt": 1.6531577515973024
+      }
+    },
+    {
+      "model_type": "bpe",
+      "vocab_size": 24000,
+      "chars_per_token": 2.247436788290076,
+      "byte_fallback_rate": 0.002962402857042571,
+      "embedding_parameters": 9216000,
+      "per_corpus_chars_per_token": {
+        "textbooks.clean.txt": 3.0047262774850028,
+        "webtext.clean.txt": 2.0476688241658136,
+        "wikipedia.clean.txt": 1.8625469635231442,
+        "data.txt": 1.8910896892528
+      }
+    },
+    {
+      "model_type": "bpe",
+      "vocab_size": 32000,
+      "chars_per_token": 2.344767577815567,
+      "byte_fallback_rate": 0.0030906970144003393,
+      "embedding_parameters": 12288000,
+      "per_corpus_chars_per_token": {
+        "textbooks.clean.txt": 3.11317058977567,
+        "webtext.clean.txt": 2.1399679274326906,
+        "wikipedia.clean.txt": 1.9435630194387856,
+        "data.txt": 2.005383760264885
+      }
+    }
+  ]
+}

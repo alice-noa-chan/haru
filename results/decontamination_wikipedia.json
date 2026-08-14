@@ -1,0 +1,21 @@
+{
+  "ngram": 40,
+  "tasks": [
+    "kobest_boolq",
+    "kobest_copa",
+    "kobest_hellaswag",
+    "kobest_sentineg",
+    "kobest_wic"
+  ],
+  "splits": [
+    "test",
+    "validation"
+  ],
+  "corpora": {
+    "wikipedia.txt": {
+      "kept": 513836,
+      "dropped": 1589,
+      "drop_rate": 0.0030828927584032593
+    }
+  }
+}
