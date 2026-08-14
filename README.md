@@ -254,12 +254,12 @@ python compare_architectures.py --scale small --ablate     # plus within-CFRD ar
 python compare_architectures.py --scale release            # GPU, config.py architecture
 ```
 
-On the cloud, the release-scale table is one command against the corpus and
-tokenizer already on the volume:
+The release scale needs a GPU and the packed corpus; the same two commands run
+anywhere one is available:
 
 ```bash
-python -m the cloud run --detach cloud_train.py --action compare
-python -m the cloud run --detach cloud_train.py --action compare --ablate
+python compare_architectures.py --scale release
+python compare_architectures.py --scale release --ablate
 ```
 
 Baseline shapes are derived from the CFRD configuration rather than hard-coded,
@@ -270,8 +270,9 @@ new `RUN_NAME` in `config.py`.
 ### Result at release scale
 
 Three seeds, 6,000 steps, 49,152,000 tokens per arm per seed, at the release
-architecture on an a GPU, with the relation objective at weight 0.20 in every
-arm. A positive delta means CFRD won. "Beyond spread" marks deltas larger than
+architecture, with the relation objective at weight 0.20 in every arm. Every
+arm in a table ran on one GPU of the same type, so the comparison does not
+depend on which type that was. A positive delta means CFRD won. "Beyond spread" marks deltas larger than
 the spread of the paired per-seed differences; the others are noise.
 
 | Arm | Parameters | GFLOPs | Validation loss | vs CFRD | Beyond spread | Strict pairs |
@@ -387,89 +388,6 @@ model card, generation configuration, and `model.safetensors` under
 `runs/<RUN_NAME>/transformers/`. It then reloads the directory through
 AutoClasses and verifies all serialized tensors and output logits.
 
-## Train on the cloud
-
-Install and authenticate the cloud:
-
-```bash
-python -m pip install -r requirements-the cloud.txt
-python -m the cloud setup
-```
-
-Prepare data and start a detached a GPU run:
-
-```bash
-python -m the cloud run cloud_train.py --action benchmark
-python -m the cloud run cloud_train.py --action upload
-python -m the cloud run cloud_train.py --action prepare
-python -m the cloud run --detach cloud_train.py --action train --gpu a GPU --batch-size 16
-```
-
-Evaluate and export after training:
-
-```bash
-python -m the cloud run cloud_train.py --action evaluate
-python -m the cloud run cloud_train.py --action export
-```
-
-Compare CFRD against matched dense baselines at the release architecture:
-
-```bash
-python -m the cloud run --detach cloud_train.py --action compare
-python -m the cloud run --detach cloud_train.py --action compare --ablate
-```
-
-Defaults are 6,000 steps and 3 seeds, or 49.2M tokens per arm per seed.
-`--action benchmark` reports measured throughput and a cost estimate for 800M
-tokens; the three-arm table costs roughly 0.55x that figure and the six-arm
-`--ablate` form roughly 1.1x.
-
-The the cloud app and persistent Volume are named `haru` and `haru-training`.
-a GPU uses fp16 with gradient scaling; a GPU uses bf16.
-
-## Compare on the cloud Cloud
-
-`cloud_compare.py` runs the same comparison on the cloud, for when the cloud credits run
-out. It pins identical package versions, so a result cannot differ because of
-where it ran.
-
-```bash
-uv tool install the cloud-client
-the cloud configure default --token <API_KEY>
-the cloud volume create haru-training
-```
-
-Upload the corpus and tokenizer once. **Do this from Linux or WSL, not from
-Windows**: the Windows client joins the volume name and key with a backslash,
-and `the cloud cp --no-multipart` reports a completed transfer while writing
-nothing at all. Always confirm afterwards.
-
-```bash
-the cloud cp data/data.txt the cloud://haru-training/data/data.txt
-the cloud cp tokenizer/tiny_ko_12k.model the cloud://haru-training/tokenizer/tiny_ko_12k.model
-the cloud ls haru-training/data          # must show data.txt, not "0 items"
-```
-
-Then run any arm set:
-
-```bash
-python cloud_compare.py                                    # 3 arms
-python cloud_compare.py --ablate                           # + 3 within-CFRD arms
-python cloud_compare.py --ablate --deep-supervision-arms   # + 2 supervision arms
-```
-
-the cloud has no a GPU, so the function requests an a GPU. Every arm shares the same
-GPU, so the comparison is unaffected. `headless=True` keeps the run alive after
-the client disconnects, which matters because these tables run for hours.
-
-Results are named after the arm set and budget, for example
-`architecture_release_ablate_deepsup_6000steps_3seeds.json`, and land on the
-volume under `runs/<RUN_NAME>/`. Fetch one with:
-
-```bash
-the cloud cp the cloud://haru-training/runs/haru-v2-binding/<name>.json results/
-```
-
 ## Project files
 
 | File | Purpose |
@@ -490,9 +408,6 @@ the cloud cp the cloud://haru-training/runs/haru-v2-binding/<name>.json results/
 | `compare_architectures.py` | CFRD versus matched dense baselines |
 | `compare_models.py` | Reproducible v1.0/v1.1/35M comparison |
 | `generate.py` | Transformers-based local generation |
-| `cloud_train.py` | Managed-cloud benchmark, preparation, training, and export |
-| `cloud_compare.py` | Managed-cloud architecture comparison |
-| `cloud_benchmark.py` | Rented-GPU throughput and batch-size benchmarking |
 | `download_data.py` | Corpus download, refusing benchmark datasets |
 | `decontaminate.py` | Benchmark n-gram removal from a corpus |
 | `smoke_test.py` | Fast correctness tests |

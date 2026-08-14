@@ -16,3 +16,11 @@ analysis/
 .venv-eval/
 .flash/
 .cloud_session.json
+cloud_benchmark.py
+cloud_train.py
+cloud_compare.py
+plan_budget.py
+requirements-the cloud.txt
+.cloudignore
+results/batch_sweep.json
+packed/**/*.zst

@@ -11,7 +11,7 @@
   "relation_weight": 0.2,
   "relation_pairs_per_step": 5,
   "relation_eval_pairs": 100,
-  "tokenizer": "/__cloud/volumes/volume/tokenizer/tiny_ko_12k.model",
+  "tokenizer": "tokenizer/tiny_ko_12k.model",
   "vocab_size": 12000,
   "train_tokens": 196000000,
   "validation_tokens": 4000000,

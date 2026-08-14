@@ -387,7 +387,7 @@ Haru has ever had that the architecture does anything at all.
 
 ## Eight-arm release table: the fold is not what wins
 
-Steps 1 and 2 above were run together on an a GPU: three seeds, 6,000 steps,
+Steps 1 and 2 above were run together on one GPU: three seeds, 6,000 steps,
 49,152,000 tokens per arm per seed, relation objective at 0.20 everywhere. This
 table supersedes the three-arm one, which lacked the supervision controls.
 
