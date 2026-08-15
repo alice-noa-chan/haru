@@ -170,22 +170,33 @@ See [RESEARCH.md](RESEARCH.md) for related work.
 
 ## Version comparison
 
-All three models were evaluated with their native tokenizers. Cross-model
-forced-choice accuracy uses the same 42 cases for which both candidates have
-matched token lengths in every tokenizer. Bits per character (BPC) normalizes
-the shared-text language-model score for tokenizer differences; lower is
-better.
+All four models were evaluated with their native tokenizers. Cross-model
+forced-choice accuracy uses the 37 cases for which both candidates have matched
+token lengths in every tokenizer; adding v2.0's tokenizer reduced that shared
+set from 42, so the v1.0 and v1.1 accuracies here differ from earlier releases
+of this table because the case set changed, not the models. Bits per character
+(BPC) normalizes the shared-text language-model score for tokenizer
+differences; lower is better, and it is the one number here that compares
+directly across all four.
 
-| Model | Parameters | Factual choice | Counterfactual strict pairs | BPC |
+| Model | Parameters | BPC | Factual choice | Counterfactual strict pairs |
 |---|---:|---:|---:|---:|
-| Haru v1.0 | 6,793,363 | 18/42 (42.9%) | 0/100 | 2.668 |
-| Haru v1.1 | 11,634,459 | **20/42 (47.6%)** | **21/100** | **2.631** |
-| Tiny-Ko-Stories-35M | 34,217,856 | 15/42 (35.7%) | 2/100 | 2.681 |
+| **Haru v2.0** | 16,983,213 | **2.562** | **20/37 (54.1%)** | **25/100** |
+| Haru v1.1 | 11,634,459 | 2.631 | 16/37 (43.2%) | 21/100 |
+| Haru v1.0 | 6,793,363 | 2.668 | 17/37 (45.9%) | 0/100 |
+| Tiny-Ko-Stories-35M | 34,217,856 | 2.681 | 15/37 (40.5%) | 2/100 |
 
-The v1.1 counterfactual gain is concentrated in location (16/20 strict pairs)
-and ownership (4/20). Speaker attribution and transfer remain 0/20, so v1.1 is
-still a research checkpoint rather than a solved entity-binding model. Run
-`python compare_models.py` to reproduce the three-way comparison.
+On narrative text Haru v2.0 leads all three metrics while using half the
+parameters of Tiny-Ko-Stories-35M. BPC is the fair comparison: 2.562 against
+2.681 on identical text.
+
+The counterfactual column is this project's own task, and Haru is trained
+against it while the reference model is not, so 25/100 versus 2/100 measures
+the objective as much as the model. Read it as evidence that the relation
+objective does something on held-out phrasings, not as a general capability
+comparison.
+
+Run `python compare_models.py` to reproduce the four-way comparison.
 
 ## Recurrent depth
 

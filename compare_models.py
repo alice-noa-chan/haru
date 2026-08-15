@@ -35,6 +35,12 @@ MODEL_SPECS = {
         "training_tokens": 753_664_000,
         "architecture": "3 recurrent cells, 6 passes, final binding block",
     },
+    "haru_v2_17m": {
+        "directory": ROOT / "runs" / "haru-v2-unfolded" / "transformers",
+        "parameters": 16_983_213,
+        "training_tokens": 4_259_840_000,
+        "architecture": "6 independent cells, 6 passes, final binding block",
+    },
     "tiny_ko_stories_35m": {
         "directory": ROOT / "reference_models" / "Tiny-Ko-Stories-35M",
         "parameters": 34_217_856,
@@ -394,8 +400,12 @@ def compare(output_path: Path) -> dict[str, Any]:
     cases = build_cases()
     counterfactual_pairs = build_counterfactual_validation_pairs()
     runners: dict[str, HaruRunner | ReferenceRunner] = {
+        # Adding an entry to MODEL_SPECS is not enough on its own; a model has
+        # to be listed here too, and a missing one is silent. v2.0 was added
+        # above and simply did not appear in the results.
         "haru_released_6.8m": HaruRunner(MODEL_SPECS["haru_released_6.8m"]["directory"]),
         "haru_current_11.6m": HaruRunner(MODEL_SPECS["haru_current_11.6m"]["directory"]),
+        "haru_v2_17m": HaruRunner(MODEL_SPECS["haru_v2_17m"]["directory"]),
         "tiny_ko_stories_35m": ReferenceRunner(MODEL_SPECS["tiny_ko_stories_35m"]["directory"]),
     }
 
@@ -416,6 +426,10 @@ def compare(output_path: Path) -> dict[str, Any]:
         "models": {},
     }
     common_case_ids = set(range(len(cases)))
+
+    missing = sorted(set(MODEL_SPECS) - set(runners))
+    if missing:
+        raise ValueError(f"MODEL_SPECS lists {missing} but no runner was built for them")
 
     for name, runner in runners.items():
         started = time.perf_counter()
