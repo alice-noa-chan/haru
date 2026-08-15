@@ -21,6 +21,7 @@ paired deltas, strict pair accuracies, parameter counts, and measured FLOPs.
 | `korean_benchmarks_v2.0_step31000.json` | the same, at step 31,000; the second of two points used to decide whether more tokens were still buying benchmark accuracy | README, "Korean benchmarks" |
 | `korean_benchmarks_minpeter_tiny-ko-20m-base.json` | same harness and task list, run locally on that model | README, "Against other sub-20M Korean models" |
 | `korean_benchmarks_minpeter_tiny-ko-20m-sft.json` | same harness and task list, run locally on that model | README, "Against other sub-20M Korean models" |
+| `korean_benchmarks_gaon12_haru_1.1.json` | v1.1 re-scored locally through the same harness as the comparison models; reproduces the published v1.1 figures to within 0.0002 per task | README, "Against other sub-20M Korean models" |
 | `decontamination_textbooks.json` | `decontaminate.py data/textbooks.txt` | data/datasets.md, decontamination log |
 
 The first two ran on CPU with the 8,192-entry tokenizer at reduced model scale
