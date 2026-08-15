@@ -72,6 +72,24 @@ def build_model_card(
 ) -> str:
     """Create a small self-contained README for the exported model directory."""
 
+    # Both claims used to be fixed strings that described v1.x. Published for
+    # v2.0 they were false and mutually contradictory: the header promised
+    # depths 2, 4 and 6 while the evaluation table below it showed depth 2 at
+    # perplexity 6605. Early exit only works when the intermediate exits are
+    # trained, so derive the claim from the weight that trains them.
+    supervised = config.AUX_EXIT_LOSS_WEIGHT > 0.0
+    depths = model_config.exit_depths
+    if supervised and len(depths) > 1:
+        listed = ", ".join(str(d) for d in depths[:-1])
+        depth_claim = f"recurrent inference depths {listed} and {depths[-1]}"
+        supervised_depths = str(depths)
+    else:
+        depth_claim = f"recurrent depth {model_config.recurrences} only"
+        supervised_depths = (
+            f"none; AUX_EXIT_LOSS_WEIGHT is {config.AUX_EXIT_LOSS_WEIGHT}, so the "
+            f"depth {' and '.join(str(d) for d in depths[:-1])} exits are untrained"
+        )
+
     return f"""---
 library_name: transformers
 pipeline_tag: text-generation
@@ -86,8 +104,8 @@ tags:
 # Haru v{config.RELEASE_VERSION}
 
 Haru is a compact Korean story continuation model built with the custom CFRD
-causal architecture. It has {parameter_count:,} parameters and supports
-recurrent inference depths 2, 4, and 6.
+causal architecture. It has {parameter_count:,} parameters and runs at
+{depth_claim}.
 
 - [Source code](https://github.com/alice-noa-chan/haru)
 - [Interactive demo](https://huggingface.co/spaces/gaon12/haru)
@@ -122,7 +140,7 @@ print(tokenizer.decode(output[0], skip_special_tokens=True))
 
 - Parameters: {parameter_count:,}
 - Context length: {model_config.context_length}
-- Recurrent depths supervised during training: {model_config.exit_depths}
+- Recurrent depths supervised during training: {supervised_depths}
 - Exported checkpoint step: {int(checkpoint.get("step", 0))}
 - Training tokens seen: {int(checkpoint.get("tokens_seen", 0)):,}
 
