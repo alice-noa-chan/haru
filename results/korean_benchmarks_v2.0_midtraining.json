@@ -1,0 +1,93 @@
+{
+  "export_dir": "runs\\haru-v2-unfolded\\transformers",
+  "tasks": [
+    "kobest_boolq",
+    "kobest_copa",
+    "kobest_hellaswag",
+    "kobest_sentineg",
+    "kobest_wic"
+  ],
+  "limit": null,
+  "mean_accuracy": 0.4652058302552005,
+  "chance_mean_accuracy": 0.45,
+  "results": [
+    {
+      "task": "kobest_boolq",
+      "accuracy": 0.5007122507122507,
+      "chance": 0.5,
+      "above_chance": 0.0007122507122506727,
+      "macro_f1": 0.35176682669350395
+    },
+    {
+      "task": "kobest_copa",
+      "accuracy": 0.531,
+      "chance": 0.5,
+      "above_chance": 0.031000000000000028,
+      "macro_f1": 0.5297769498465509
+    },
+    {
+      "task": "kobest_hellaswag",
+      "accuracy": 0.31,
+      "chance": 0.25,
+      "above_chance": 0.06,
+      "macro_f1": 0.3077337363355305
+    },
+    {
+      "task": "kobest_sentineg",
+      "accuracy": 0.49622166246851385,
+      "chance": 0.5,
+      "above_chance": -0.0037783375314861534,
+      "macro_f1": 0.3640266564141997
+    },
+    {
+      "task": "kobest_wic",
+      "accuracy": 0.4880952380952381,
+      "chance": 0.5,
+      "above_chance": -0.011904761904761918,
+      "macro_f1": 0.328
+    }
+  ],
+  "raw": {
+    "kobest_boolq": {
+      "alias": "kobest_boolq",
+      "acc,none": 0.5007122507122507,
+      "acc_stderr,none": 0.01334875395475671,
+      "f1,none": 0.35176682669350395,
+      "f1_stderr,none": "N/A"
+    },
+    "kobest_copa": {
+      "alias": "kobest_copa",
+      "acc,none": 0.531,
+      "acc_stderr,none": 0.01578886595953901,
+      "f1,none": 0.5297769498465509,
+      "f1_stderr,none": "N/A"
+    },
+    "kobest_hellaswag": {
+      "alias": "kobest_hellaswag",
+      "acc,none": 0.31,
+      "acc_stderr,none": 0.02070404102172479,
+      "f1,none": 0.3077337363355305,
+      "f1_stderr,none": "N/A",
+      "acc_norm,none": 0.4,
+      "acc_norm_stderr,none": 0.0219308441207285
+    },
+    "kobest_sentineg": {
+      "alias": "kobest_sentineg",
+      "acc,none": 0.49622166246851385,
+      "acc_stderr,none": 0.025125227983562776,
+      "f1,none": 0.3640266564141997,
+      "f1_stderr,none": "N/A"
+    },
+    "kobest_wic": {
+      "alias": "kobest_wic",
+      "acc,none": 0.4880952380952381,
+      "acc_stderr,none": 0.014087502464604038,
+      "f1,none": 0.328,
+      "f1_stderr,none": "N/A"
+    }
+  },
+  "checkpoint": "runs/haru-v2-unfolded/latest.pt at step 31,250",
+  "training_tokens": 4096000000,
+  "target_tokens": 10395759524,
+  "note": "Mid-training probe at 39.6% of the four-epoch budget, taken to rehearse the export and evaluation path before the run finishes. Not a release score."
+}
