@@ -498,3 +498,127 @@ This design targets entity and role hallucinations caused by weak contextual
 binding. It cannot guarantee factual truth, recover knowledge absent from the
 training data, or turn Haru into an instruction-following assistant. Those
 claims require separate data, retrieval, calibration, and safety evaluation.
+
+## v2.0 outcome, and where v2.1 should look
+
+v2.0 unfolded the recurrent stack to six independent cells, retrained the
+tokenizer, decontaminated a 2.6B-token corpus, and trained on 4.26B tokens. It
+is the first Haru above chance on KoBEST: mean 0.469 against a chance mean of
+0.450, above chance on four of five tasks, and hellaswag 0.314 against a 0.25
+chance level. v1.1 was at or below chance on all five.
+
+Four results from that run constrain what to try next, and three of them rule
+things out.
+
+### More tokens is exhausted at this parameter count
+
+The run was budgeted for 10.4B tokens and stopped at 4.26B, because two KoBEST
+measurements 1.5B tokens apart disagreed by +0.003 on the mean. That is inside
+the harness's own noise: at 500 to 1,404 examples per task the standard error
+is roughly 0.012 to 0.022, and two of the five tasks were identical to three
+decimal places across those 1.5B tokens.
+
+Validation loss agreed, falling 0.688 per 1,000 steps early and 0.0012 per
+1,000 steps by step 31,000, a 500-fold collapse in rate.
+
+The lesson is narrower than "data does not help". It is that at 17M
+parameters, past roughly 2.5B tokens, additional tokens of *this* corpus stop
+producing measurable benchmark movement. Raising the token budget again
+without changing anything else is the one direction the measurements already
+exclude.
+
+### The relation objective did not generalise, and corrupted checkpoint choice
+
+Training relation loss reached exactly 0.0000 with 100% strict-pair accuracy,
+while the held-out figure went from 41% early to 27% late: it memorised the
+training entity permutations. It was worth 0/100 to 21/100 on v1.1's own
+pairs, so this is a regression in how it was used, not proof the idea is
+wrong.
+
+It also broke `best.pt`. Selection uses `final_loss + 0.20 * relation_loss`,
+and over the last 20 validations the language-model term varied by 0.0053
+while the weighted relation term varied by 0.1615 -- so the saved "best"
+checkpoint was chosen by the noisier term at 30x the weight of the thing being
+measured, landing on step 19,750 when the best language-model loss was at
+31,250. `select_checkpoint.py` now reports this; a release should not depend
+on a tool noticing it.
+
+For v2.1: hold the relation entity pool disjoint between train and validation
+by construction, weight the objective by held-out rather than training
+performance, or drop it from checkpoint selection entirely and keep it as a
+diagnostic.
+
+### Unfolding cost the variable-depth capability
+
+v2.0 scores 3.385 at depth 6, 5.561 at depth 4 and 8.796 at depth 2, where
+v1.1 degraded gracefully across all three. Early exit was never a property of
+recurrence by itself; it came from reusing the same cells at every depth plus
+deep supervision training the intermediate exits. v2.0 removed both, and the
+capability went with them.
+
+If variable-depth inference matters, it has to be paid for: either keep cell
+reuse, or keep independent cells and restore a non-zero deep-supervision
+weight, and then measure whether the depth-6 quality that unfolding bought
+survives. That trade has not been measured.
+
+### On narrative text specifically, the architecture is ahead of its class
+
+KoBEST measures general Korean understanding, which is not what Haru is for.
+On the project's own narrative comparison, scored with matched-length forced
+choice and bits per character over shared story text, v2.0 leads every model
+tested including one twice its size:
+
+| Model | Parameters | BPC | Factual choice | Strict pairs |
+|---|---:|---:|---:|---:|
+| Haru v2.0 | 16,983,213 | **2.562** | 20/37 | 25/100 |
+| Haru v1.1 | 11,634,459 | 2.631 | 16/37 | 21/100 |
+| Haru v1.0 | 6,793,363 | 2.668 | 17/37 | 0/100 |
+| Tiny-Ko-Stories-35M | 34,217,856 | 2.681 | 15/37 | 2/100 |
+
+BPC is the load-bearing column: it normalises for tokenizer differences, so
+2.562 against 2.681 on identical text is a real gap rather than an artefact of
+vocabulary. The strict-pair column is this project's own objective, which Haru
+trains against and the reference model does not, so it measures the objective
+as much as the model.
+
+This is the strongest evidence that CFRD at 17M is competitive where it was
+aimed, and it sharpens the corpus question above: the diverse mix bought
+general-benchmark movement that stalled, while the narrative result is where
+the architecture actually shows. A story-weighted corpus is therefore not just
+cheaper to test than more parameters, it is testing the case the model already
+wins.
+
+### Generation fails in ways benchmark accuracy does not show
+
+Read against the corpus mix, the failures are specific. Story continuation is
+close to usable. Encyclopaedic prompts reproduce surface form without content,
+including wiki markup, because Wikipedia is in the corpus. Expository and
+factual prompts collapse into repetition within a sentence or two, and entity
+reference is unreliable enough to produce "the boy rescued the boy".
+
+None of that is visible in a KoBEST mean, and none of it is likely to be fixed
+by the axis that was just exhausted.
+
+### What to try, in order
+
+1. **Raise the parameter ceiling.** 17M was a self-imposed bound, and the
+   token axis is now known to be saturated beneath it. The sub-20M comparison
+   suggests the whole class is near the floor: Haru v2.0 at +0.019 above
+   chance, tiny-ko-20m-sft at +0.013, tiny-ko-20m-base at +0.007, all four
+   models tested below chance on wic. A 40 to 60M model on the same corpus is
+   the cheapest test of whether the ceiling is capacity rather than method.
+
+2. **Narrow the corpus to the target domain.** v2.0 trained on stories,
+   encyclopaedic text, textbooks and web text, and generates all four badly
+   except stories. A story-only or story-weighted corpus at the same parameter
+   count tests whether the diverse mix was buying anything for the stated task.
+
+3. **Fix the relation objective's generalisation before re-enabling it in
+   selection**, as above.
+
+4. **Decide whether variable depth is a requirement.** If it is, the
+   unfold-versus-deep-supervision trade needs measuring rather than assuming.
+
+Items 1 and 2 are the ones that can move the result; 3 and 4 are corrections to
+regressions this run introduced. Only 2 is cheap enough to run as a control
+alongside 1.

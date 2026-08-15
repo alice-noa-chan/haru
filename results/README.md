@@ -22,6 +22,7 @@ paired deltas, strict pair accuracies, parameter counts, and measured FLOPs.
 | `korean_benchmarks_minpeter_tiny-ko-20m-base.json` | same harness and task list, run locally on that model | README, "Against other sub-20M Korean models" |
 | `korean_benchmarks_minpeter_tiny-ko-20m-sft.json` | same harness and task list, run locally on that model | README, "Against other sub-20M Korean models" |
 | `korean_benchmarks_gaon12_haru_1.1.json` | v1.1 re-scored locally through the same harness as the comparison models; reproduces the published v1.1 figures to within 0.0002 per task | README, "Against other sub-20M Korean models" |
+| `model_family_comparison.json` | `compare_models.py` over v1.0, v1.1, v2.0 and Tiny-Ko-Stories-35M | README, "Version comparison"; RESEARCH.md, "On narrative text specifically" |
 | `decontamination_textbooks.json` | `decontaminate.py data/textbooks.txt` | data/datasets.md, decontamination log |
 
 The first two ran on CPU with the 8,192-entry tokenizer at reduced model scale

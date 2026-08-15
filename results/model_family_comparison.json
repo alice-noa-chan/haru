@@ -1,0 +1,6113 @@
+{
+  "settings": {
+    "device": "cpu",
+    "threads": 8,
+    "forced_choice_cases": 50,
+    "generation": {
+      "max_new_tokens": 80,
+      "temperature": 0.55,
+      "top_p": 0.9,
+      "top_k": 40,
+      "repetition_penalty": 1.08,
+      "seed": 42
+    }
+  },
+  "models": {
+    "haru_released_6.8m": {
+      "parameters": 6793363,
+      "training_tokens": 800063488,
+      "architecture": "2 recurrent cells, 6 passes",
+      "matched_case_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49
+      ],
+      "forced_choice_rows": [
+        {
+          "case_id": 0,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": false,
+          "margin_nats": -0.26729393005371094
+        },
+        {
+          "case_id": 1,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -0.3925342559814453
+        },
+        {
+          "case_id": 2,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -1.9438858032226562
+        },
+        {
+          "case_id": 3,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": true,
+          "margin_nats": 3.203592300415039
+        },
+        {
+          "case_id": 4,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -6.733808517456055
+        },
+        {
+          "case_id": 5,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": false,
+          "margin_nats": -0.3505516052246094
+        },
+        {
+          "case_id": 6,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -0.4584465026855469
+        },
+        {
+          "case_id": 7,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 2.767332077026367
+        },
+        {
+          "case_id": 8,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": false,
+          "margin_nats": -3.5412235260009766
+        },
+        {
+          "case_id": 9,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 0.6117820739746094
+        },
+        {
+          "case_id": 10,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": true,
+          "margin_nats": 0.37426185607910156
+        },
+        {
+          "case_id": 11,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -3.493572235107422
+        },
+        {
+          "case_id": 12,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -4.262973785400391
+        },
+        {
+          "case_id": 13,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": true,
+          "margin_nats": 1.6662979125976562
+        },
+        {
+          "case_id": 14,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -1.2204036712646484
+        },
+        {
+          "case_id": 15,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": false,
+          "margin_nats": -0.1543426513671875
+        },
+        {
+          "case_id": 16,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 3.0166282653808594
+        },
+        {
+          "case_id": 17,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -1.9733524322509766
+        },
+        {
+          "case_id": 18,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": false,
+          "margin_nats": -2.1486034393310547
+        },
+        {
+          "case_id": 19,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -1.7918281555175781
+        },
+        {
+          "case_id": 20,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": true,
+          "margin_nats": 0.2434234619140625
+        },
+        {
+          "case_id": 21,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 0.33913230895996094
+        },
+        {
+          "case_id": 22,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -1.4278850555419922
+        },
+        {
+          "case_id": 23,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": true,
+          "margin_nats": 2.338054656982422
+        },
+        {
+          "case_id": 24,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 5.773288726806641
+        },
+        {
+          "case_id": 25,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": true,
+          "margin_nats": 0.04479026794433594
+        },
+        {
+          "case_id": 26,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 5.423418045043945
+        },
+        {
+          "case_id": 27,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 6.039281845092773
+        },
+        {
+          "case_id": 28,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": false,
+          "margin_nats": -2.6652793884277344
+        },
+        {
+          "case_id": 29,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -2.622854232788086
+        },
+        {
+          "case_id": 30,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": false,
+          "margin_nats": -0.5499076843261719
+        },
+        {
+          "case_id": 31,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -1.2919902801513672
+        },
+        {
+          "case_id": 32,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 3.5139389038085938
+        },
+        {
+          "case_id": 33,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": true,
+          "margin_nats": 2.4689903259277344
+        },
+        {
+          "case_id": 34,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 0.08939552307128906
+        },
+        {
+          "case_id": 35,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": true,
+          "margin_nats": 0.5369243621826172
+        },
+        {
+          "case_id": 36,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 2.0278186798095703
+        },
+        {
+          "case_id": 37,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -0.6011104583740234
+        },
+        {
+          "case_id": 38,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": false,
+          "margin_nats": -2.788463592529297
+        },
+        {
+          "case_id": 39,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 0.6427421569824219
+        },
+        {
+          "case_id": 40,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": false,
+          "margin_nats": -0.18980979919433594
+        },
+        {
+          "case_id": 41,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -0.3925342559814453
+        },
+        {
+          "case_id": 42,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -1.9438858032226562
+        },
+        {
+          "case_id": 43,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 2.456340789794922
+        },
+        {
+          "case_id": 44,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -6.733808517456055
+        },
+        {
+          "case_id": 45,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": false,
+          "margin_nats": -0.10207176208496094
+        },
+        {
+          "case_id": 46,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -0.4584465026855469
+        },
+        {
+          "case_id": 47,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 2.767332077026367
+        },
+        {
+          "case_id": 48,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -2.788224220275879
+        },
+        {
+          "case_id": 49,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 0.6117820739746094
+        }
+      ],
+      "shared_text": {
+        "texts": 5,
+        "characters": 409,
+        "tokens": 197,
+        "nll_nats": 756.267204284668,
+        "bits_per_character": 2.667635562856849
+      },
+      "counterfactual_validation": {
+        "decision_correct": 100,
+        "decision_total": 200,
+        "decision_accuracy": 0.5,
+        "strict_pair_correct": 0,
+        "strict_pair_total": 100,
+        "strict_pair_accuracy": 0.0,
+        "prediction_flip_count": 0,
+        "mean_margin": 0.006093529065450065,
+        "by_category": {
+          "location": {
+            "decision_correct": 20,
+            "decision_total": 40,
+            "strict_pair_correct": 0,
+            "strict_pair_total": 20
+          },
+          "ownership": {
+            "decision_correct": 20,
+            "decision_total": 40,
+            "strict_pair_correct": 0,
+            "strict_pair_total": 20
+          },
+          "speaker": {
+            "decision_correct": 20,
+            "decision_total": 40,
+            "strict_pair_correct": 0,
+            "strict_pair_total": 20
+          },
+          "state": {
+            "decision_correct": 20,
+            "decision_total": 40,
+            "strict_pair_correct": 0,
+            "strict_pair_total": 20
+          },
+          "transfer": {
+            "decision_correct": 20,
+            "decision_total": 40,
+            "strict_pair_correct": 0,
+            "strict_pair_total": 20
+          }
+        },
+        "rows": [
+          {
+            "pair_id": 0,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.5478897094726562,
+            "second_margin": -1.5399303436279297
+          },
+          {
+            "pair_id": 1,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.6097857157389317,
+            "second_margin": -0.5455487569173183
+          },
+          {
+            "pair_id": 2,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 2.5279401143391933,
+            "second_margin": -2.437043507893881
+          },
+          {
+            "pair_id": 3,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.9891910552978516,
+            "second_margin": 1.1174564361572266
+          },
+          {
+            "pair_id": 4,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.7598800659179688,
+            "second_margin": 2.6639938354492188
+          },
+          {
+            "pair_id": 5,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.981739044189453,
+            "second_margin": 2.989154815673828
+          },
+          {
+            "pair_id": 6,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.2322139739990234,
+            "second_margin": 1.2118339538574219
+          },
+          {
+            "pair_id": 7,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.7742996215820312,
+            "second_margin": 2.759906768798828
+          },
+          {
+            "pair_id": 8,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 2.4755496978759766,
+            "second_margin": -2.4271373748779297
+          },
+          {
+            "pair_id": 9,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.430002212524414,
+            "second_margin": 2.447662353515625
+          },
+          {
+            "pair_id": 10,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.6653146743774414,
+            "second_margin": -1.6814632415771484
+          },
+          {
+            "pair_id": 11,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -3.497273763020832,
+            "second_margin": 3.471342722574869
+          },
+          {
+            "pair_id": 12,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.9081821441650391,
+            "second_margin": 0.8612289428710938
+          },
+          {
+            "pair_id": 13,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.245718002319336,
+            "second_margin": 1.3028316497802734
+          },
+          {
+            "pair_id": 14,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.541372299194336,
+            "second_margin": 1.602996826171875
+          },
+          {
+            "pair_id": 15,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -5.205966949462891,
+            "second_margin": 5.198375701904297
+          },
+          {
+            "pair_id": 16,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.960700988769533,
+            "second_margin": 2.9768435160319022
+          },
+          {
+            "pair_id": 17,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.3861846923828125,
+            "second_margin": -0.35808563232421875
+          },
+          {
+            "pair_id": 18,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.2920284271240234,
+            "second_margin": 1.3046855926513672
+          },
+          {
+            "pair_id": 19,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.779634475708008,
+            "second_margin": 2.746286392211914
+          },
+          {
+            "pair_id": 20,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.9512481689453125,
+            "second_margin": 1.0087242126464844
+          },
+          {
+            "pair_id": 21,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.21502304077148438,
+            "second_margin": -0.2808825174967442
+          },
+          {
+            "pair_id": 22,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.1288490295410156,
+            "second_margin": 1.115309715270996
+          },
+          {
+            "pair_id": 23,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 3.7060718536376953,
+            "second_margin": -3.7042741775512695
+          },
+          {
+            "pair_id": 24,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -5.080488204956055,
+            "second_margin": 5.061957359313965
+          },
+          {
+            "pair_id": 25,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.532819112141926,
+            "second_margin": -1.5667902628580723
+          },
+          {
+            "pair_id": 26,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.0522918701171875,
+            "second_margin": -1.0991954803466797
+          },
+          {
+            "pair_id": 27,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 3.488832473754883,
+            "second_margin": -3.4567909240722656
+          },
+          {
+            "pair_id": 28,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.8138313293457031,
+            "second_margin": -0.7423362731933594
+          },
+          {
+            "pair_id": 29,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -4.939465522766113,
+            "second_margin": 4.968235015869141
+          },
+          {
+            "pair_id": 30,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.4428723653157558,
+            "second_margin": -0.40317853291829486
+          },
+          {
+            "pair_id": 31,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.552988052368164,
+            "second_margin": 1.7509746551513672
+          },
+          {
+            "pair_id": 32,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.2956619262695312,
+            "second_margin": 1.2292184829711914
+          },
+          {
+            "pair_id": 33,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 2.1521975199381522,
+            "second_margin": -2.095120747884115
+          },
+          {
+            "pair_id": 34,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.0409317016601562,
+            "second_margin": 1.0033798217773438
+          },
+          {
+            "pair_id": 35,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -3.4819399515787754,
+            "second_margin": 3.455801645914713
+          },
+          {
+            "pair_id": 36,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.8221359252929688,
+            "second_margin": 0.8788414001464844
+          },
+          {
+            "pair_id": 37,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -5.502819061279297,
+            "second_margin": 5.401557922363281
+          },
+          {
+            "pair_id": 38,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.9778909683227539,
+            "second_margin": 1.068460464477539
+          },
+          {
+            "pair_id": 39,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.5260753631591797,
+            "second_margin": 0.5714282989501953
+          },
+          {
+            "pair_id": 40,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 2.491727828979492,
+            "second_margin": -2.4719371795654297
+          },
+          {
+            "pair_id": 41,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.2870941162109375,
+            "second_margin": 1.3020515441894531
+          },
+          {
+            "pair_id": 42,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.42031383514404297,
+            "second_margin": 0.3270225524902344
+          },
+          {
+            "pair_id": 43,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.9112358093261719,
+            "second_margin": 1.9964752197265625
+          },
+          {
+            "pair_id": 44,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.7017091115315761,
+            "second_margin": -0.6468690236409511
+          },
+          {
+            "pair_id": 45,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -5.524622917175293,
+            "second_margin": 5.380008697509766
+          },
+          {
+            "pair_id": 46,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -3.1274595260620117,
+            "second_margin": 3.0991086959838867
+          },
+          {
+            "pair_id": 47,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.24510447184244732,
+            "second_margin": -0.346435546875
+          },
+          {
+            "pair_id": 48,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 2.320049285888672,
+            "second_margin": -2.3539867401123047
+          },
+          {
+            "pair_id": 49,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.378206253051758,
+            "second_margin": 2.322458267211914
+          },
+          {
+            "pair_id": 50,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.0807050069173183,
+            "second_margin": 0.10201390584309955
+          },
+          {
+            "pair_id": 51,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.5495624542236328,
+            "second_margin": 0.5476341247558594
+          },
+          {
+            "pair_id": 52,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.8443431854248047,
+            "second_margin": 1.7764778137207031
+          },
+          {
+            "pair_id": 53,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -14.075178146362305,
+            "second_margin": 14.101157506306967
+          },
+          {
+            "pair_id": 54,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.3274497985839844,
+            "second_margin": -0.4157848358154297
+          },
+          {
+            "pair_id": 55,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 3.2437973022460938,
+            "second_margin": -3.3453617095947266
+          },
+          {
+            "pair_id": 56,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.8268585205078125,
+            "second_margin": 0.9774227142333984
+          },
+          {
+            "pair_id": 57,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.42645772298176965,
+            "second_margin": 0.4562441507975272
+          },
+          {
+            "pair_id": 58,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.3891124725341797,
+            "second_margin": -0.3301410675048828
+          },
+          {
+            "pair_id": 59,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.864879608154297,
+            "second_margin": 2.8101107279459647
+          },
+          {
+            "pair_id": 60,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -3.4819399515787754,
+            "second_margin": 3.455801645914713
+          },
+          {
+            "pair_id": 61,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.45035362243652344,
+            "second_margin": -0.3886737823486328
+          },
+          {
+            "pair_id": 62,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.7066879272460938,
+            "second_margin": -0.516322135925293
+          },
+          {
+            "pair_id": 63,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -15.546030680338541,
+            "second_margin": 15.498792012532553
+          },
+          {
+            "pair_id": 64,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.3918685913085938,
+            "second_margin": 1.3900470733642578
+          },
+          {
+            "pair_id": 65,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.6886920928955078,
+            "second_margin": -0.5719146728515625
+          },
+          {
+            "pair_id": 66,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 2.0347760518391933,
+            "second_margin": -1.984396616617838
+          },
+          {
+            "pair_id": 67,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.7475757598876953,
+            "second_margin": -0.8721847534179688
+          },
+          {
+            "pair_id": 68,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.6453428268432617,
+            "second_margin": 2.636776924133301
+          },
+          {
+            "pair_id": 69,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -14.062701543172201,
+            "second_margin": 14.084369023640951
+          },
+          {
+            "pair_id": 70,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -14.201824188232422,
+            "second_margin": 14.242406209309896
+          },
+          {
+            "pair_id": 71,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 4.2307497660319004,
+            "second_margin": -4.263172149658203
+          },
+          {
+            "pair_id": 72,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.8893699645996094,
+            "second_margin": 1.9458513259887695
+          },
+          {
+            "pair_id": 73,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -4.008082389831543,
+            "second_margin": 3.974654197692871
+          },
+          {
+            "pair_id": 74,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.9392242431640625,
+            "second_margin": 2.0747032165527344
+          },
+          {
+            "pair_id": 75,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.3918685913085938,
+            "second_margin": 1.3900470733642578
+          },
+          {
+            "pair_id": 76,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.5687332153320312,
+            "second_margin": -0.5040340423583984
+          },
+          {
+            "pair_id": 77,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -4.704094886779785,
+            "second_margin": 4.740833282470703
+          },
+          {
+            "pair_id": 78,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.2825279235839844,
+            "second_margin": -0.2565816243489589
+          },
+          {
+            "pair_id": 79,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -5.483171463012695,
+            "second_margin": 5.489625930786133
+          },
+          {
+            "pair_id": 80,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.445575714111328,
+            "second_margin": 2.4801673889160156
+          },
+          {
+            "pair_id": 81,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -3.458277702331543,
+            "second_margin": 3.553691864013672
+          },
+          {
+            "pair_id": 82,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.983926137288412,
+            "second_margin": -1.9329846700032558
+          },
+          {
+            "pair_id": 83,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.7265071868896484,
+            "second_margin": -0.5746498107910156
+          },
+          {
+            "pair_id": 84,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.24045753479003906,
+            "second_margin": 0.2698777516682931
+          },
+          {
+            "pair_id": 85,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.1678714752197266,
+            "second_margin": -1.1476001739501953
+          },
+          {
+            "pair_id": 86,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.970358530680336,
+            "second_margin": 2.9761428833007812
+          },
+          {
+            "pair_id": 87,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.631265640258789,
+            "second_margin": 1.5394668579101562
+          },
+          {
+            "pair_id": 88,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 4.918863296508789,
+            "second_margin": -4.938943862915039
+          },
+          {
+            "pair_id": 89,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -14.678995132446289,
+            "second_margin": 14.625631968180338
+          },
+          {
+            "pair_id": 90,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.6757841110229492,
+            "second_margin": -0.663116455078125
+          },
+          {
+            "pair_id": 91,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.7090225219726562,
+            "second_margin": 1.6513042449951172
+          },
+          {
+            "pair_id": 92,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -3.5878000259399414,
+            "second_margin": 3.718172073364258
+          },
+          {
+            "pair_id": 93,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.7841752370198574,
+            "second_margin": -0.723536491394043
+          },
+          {
+            "pair_id": 94,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.2870941162109375,
+            "second_margin": 1.3020515441894531
+          },
+          {
+            "pair_id": 95,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.7150697708129883,
+            "second_margin": -0.6705156962076817
+          },
+          {
+            "pair_id": 96,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.6362590789794922,
+            "second_margin": -0.6141891479492188
+          },
+          {
+            "pair_id": 97,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.912110646565754,
+            "second_margin": 2.9622548421223946
+          },
+          {
+            "pair_id": 98,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.5473346710205078,
+            "second_margin": -0.5920372009277344
+          },
+          {
+            "pair_id": 99,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.2595844268798828,
+            "second_margin": -0.26642608642578125
+          }
+        ]
+      },
+      "generations": [
+        {
+          "prompt": "서윤이는 금빛 단추를 유리병에 넣어 찬장 위에 두었어요. 민호에게 병을 건드리지 말라고 했지만, 잠시 뒤 부엌에서 쨍그랑 소리가 났어요. 서윤이가 달려가 보니",
+          "continuation": "작은 금이 없는 것을 알았어요. “왜 이렇게 안 들려요?” 하고 물었어요. 민수는 “나는 못하겠어요” 하고 말했어요.  서윤이는 고개를 끄덕였어요. 둘은 함께 바닥을 닦고 그릇을 닦았어요.  민서는 “고마워요” 하고 웃었어요. 김선비는 고맙다며 작은 과자를 주었어요. “다음엔 같이 먹어요",
+          "generated_tokens": 80,
+          "continuation_characters": 161,
+          "seconds": 1.4213080999907106,
+          "tokens_per_second": 56.286177501220784,
+          "characters_per_second": 113.27593222120683
+        },
+        {
+          "prompt": "토끼는 다리를 다쳐 경주에 나가지 않았고 거북이만 출발선에 섰어요. 종이 울리자",
+          "continuation": "큰 바람이 불어 다리가 흔들렸어요. 토끼는 겁이 났지만 용기를 내어 한 걸음 물러섰어요. 거북은 천천히 건너며 다리를 건넜어요. 토끼는 자기가 만든 것을 보여 주고 싶었지만 천천히 다가가지 않았어요. 다리 밑에 작은 나뭇잎을 끼우면 길이 보였어요. 토끼는 지혜롭게 도우니 다리가 덜 흔들릴 수 있었어요.",
+          "generated_tokens": 68,
+          "continuation_characters": 169,
+          "seconds": 1.0933717000007164,
+          "tokens_per_second": 62.1929395099173,
+          "characters_per_second": 154.5677467231768
+        },
+        {
+          "prompt": "“내일 네 책을 돌려줄게.” 은지가 말했어요. 다음 날 은지는 준호를 만나",
+          "continuation": "러 먼 마을로 떠났어요. 은찬이는 “내 이야기도 시작할 수 있어요” 하고 말했어요. 둘은 서로 손을 꼭 잡고 골목 끝까지 걸었어요.  집에 닿자 백장군은 “다음엔 같이 읽자” 하고 말했어요.  도깨비는 고개를 끄덕였어요. 둘은 서로 미안하다고 말하며 화해했고, 헤어짐은 조금 쓸쓸했어요.",
+          "generated_tokens": 80,
+          "continuation_characters": 160,
+          "seconds": 1.2730515000002924,
+          "tokens_per_second": 62.84113407822199,
+          "characters_per_second": 125.68226815644398
+        }
+      ],
+      "elapsed_seconds": 9.8039151999983,
+      "forced_choice_common": {
+        "correct": 17,
+        "total": 37,
+        "accuracy": 0.4594594594594595,
+        "mean_margin_nats": -0.178656732713854,
+        "by_category": {
+          "location": {
+            "correct": 4,
+            "total": 10
+          },
+          "negation": {
+            "correct": 0,
+            "total": 2
+          },
+          "persistent_state": {
+            "correct": 5,
+            "total": 10
+          },
+          "speaker_role": {
+            "correct": 5,
+            "total": 10
+          },
+          "transfer": {
+            "correct": 3,
+            "total": 5
+          }
+        }
+      }
+    },
+    "haru_current_11.6m": {
+      "parameters": 11634459,
+      "training_tokens": 753664000,
+      "architecture": "3 recurrent cells, 6 passes, final binding block",
+      "matched_case_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49
+      ],
+      "forced_choice_rows": [
+        {
+          "case_id": 0,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": false,
+          "margin_nats": -4.305572509765625
+        },
+        {
+          "case_id": 1,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 3.739948272705078
+        },
+        {
+          "case_id": 2,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 0.22065353393554688
+        },
+        {
+          "case_id": 3,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": true,
+          "margin_nats": 3.7620677947998047
+        },
+        {
+          "case_id": 4,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -8.27511978149414
+        },
+        {
+          "case_id": 5,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": true,
+          "margin_nats": 3.5460205078125
+        },
+        {
+          "case_id": 6,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -1.8425884246826172
+        },
+        {
+          "case_id": 7,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 0.7646007537841797
+        },
+        {
+          "case_id": 8,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": false,
+          "margin_nats": -4.4415740966796875
+        },
+        {
+          "case_id": 9,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 4.479605674743652
+        },
+        {
+          "case_id": 10,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": false,
+          "margin_nats": -4.243207931518555
+        },
+        {
+          "case_id": 11,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -1.9689979553222656
+        },
+        {
+          "case_id": 12,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -4.812530517578125
+        },
+        {
+          "case_id": 13,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": true,
+          "margin_nats": 2.4745540618896484
+        },
+        {
+          "case_id": 14,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 0.376861572265625
+        },
+        {
+          "case_id": 15,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": true,
+          "margin_nats": 3.990877151489258
+        },
+        {
+          "case_id": 16,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 4.358516693115234
+        },
+        {
+          "case_id": 17,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -3.8541011810302734
+        },
+        {
+          "case_id": 18,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": false,
+          "margin_nats": -3.1541175842285156
+        },
+        {
+          "case_id": 19,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -0.1212015151977539
+        },
+        {
+          "case_id": 20,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": false,
+          "margin_nats": -4.296056747436523
+        },
+        {
+          "case_id": 21,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 3.078014373779297
+        },
+        {
+          "case_id": 22,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -0.029115676879882812
+        },
+        {
+          "case_id": 23,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": true,
+          "margin_nats": 1.9201393127441406
+        },
+        {
+          "case_id": 24,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 7.2298126220703125
+        },
+        {
+          "case_id": 25,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": true,
+          "margin_nats": 2.7886505126953125
+        },
+        {
+          "case_id": 26,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 3.3703460693359375
+        },
+        {
+          "case_id": 27,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 6.249546051025391
+        },
+        {
+          "case_id": 28,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": false,
+          "margin_nats": -2.4490270614624023
+        },
+        {
+          "case_id": 29,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -4.66597843170166
+        },
+        {
+          "case_id": 30,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": false,
+          "margin_nats": -3.844156265258789
+        },
+        {
+          "case_id": 31,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 1.1333999633789062
+        },
+        {
+          "case_id": 32,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 4.627132415771484
+        },
+        {
+          "case_id": 33,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": true,
+          "margin_nats": 2.3415660858154297
+        },
+        {
+          "case_id": 34,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -0.7988491058349609
+        },
+        {
+          "case_id": 35,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": true,
+          "margin_nats": 4.363822937011719
+        },
+        {
+          "case_id": 36,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -1.0870132446289062
+        },
+        {
+          "case_id": 37,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -2.193674087524414
+        },
+        {
+          "case_id": 38,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": false,
+          "margin_nats": -2.797588348388672
+        },
+        {
+          "case_id": 39,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -1.0279922485351562
+        },
+        {
+          "case_id": 40,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": false,
+          "margin_nats": -5.403903961181641
+        },
+        {
+          "case_id": 41,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 3.739948272705078
+        },
+        {
+          "case_id": 42,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 0.22065353393554688
+        },
+        {
+          "case_id": 43,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 2.1002330780029297
+        },
+        {
+          "case_id": 44,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -8.27511978149414
+        },
+        {
+          "case_id": 45,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": true,
+          "margin_nats": 4.054252624511719
+        },
+        {
+          "case_id": 46,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -1.8425884246826172
+        },
+        {
+          "case_id": 47,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 0.7646007537841797
+        },
+        {
+          "case_id": 48,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -2.6122684478759766
+        },
+        {
+          "case_id": 49,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 4.479605674743652
+        }
+      ],
+      "shared_text": {
+        "texts": 5,
+        "characters": 409,
+        "tokens": 182,
+        "nll_nats": 745.9372177124023,
+        "bits_per_character": 2.6311978601667336
+      },
+      "counterfactual_validation": {
+        "decision_correct": 117,
+        "decision_total": 200,
+        "decision_accuracy": 0.585,
+        "strict_pair_correct": 21,
+        "strict_pair_total": 100,
+        "strict_pair_accuracy": 0.21,
+        "prediction_flip_count": 25,
+        "mean_margin": 1.296670435667038,
+        "by_category": {
+          "location": {
+            "decision_correct": 36,
+            "decision_total": 40,
+            "strict_pair_correct": 16,
+            "strict_pair_total": 20
+          },
+          "ownership": {
+            "decision_correct": 23,
+            "decision_total": 40,
+            "strict_pair_correct": 4,
+            "strict_pair_total": 20
+          },
+          "speaker": {
+            "decision_correct": 17,
+            "decision_total": 40,
+            "strict_pair_correct": 0,
+            "strict_pair_total": 20
+          },
+          "state": {
+            "decision_correct": 21,
+            "decision_total": 40,
+            "strict_pair_correct": 1,
+            "strict_pair_total": 20
+          },
+          "transfer": {
+            "decision_correct": 20,
+            "decision_total": 40,
+            "strict_pair_correct": 0,
+            "strict_pair_total": 20
+          }
+        },
+        "rows": [
+          {
+            "pair_id": 0,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.7296295166015625,
+            "second_margin": -1.2227287292480469
+          },
+          {
+            "pair_id": 1,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 4.7384185791015625,
+            "second_margin": 0.7098544438680019
+          },
+          {
+            "pair_id": 2,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -7.297764460245768,
+            "second_margin": 8.62792142232259
+          },
+          {
+            "pair_id": 3,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.9205837249755859,
+            "second_margin": 1.185593605041504
+          },
+          {
+            "pair_id": 4,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -5.42473030090332,
+            "second_margin": 7.047954559326172
+          },
+          {
+            "pair_id": 5,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.016158103942871,
+            "second_margin": -1.3143692016601562
+          },
+          {
+            "pair_id": 6,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 3.7082176208496094,
+            "second_margin": 2.9146251678466797
+          },
+          {
+            "pair_id": 7,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 5.414564768473307,
+            "second_margin": -2.20324452718099
+          },
+          {
+            "pair_id": 8,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": -1.11018705368042,
+            "second_margin": -0.2326183319091797
+          },
+          {
+            "pair_id": 9,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -4.176690101623535,
+            "second_margin": 7.130100250244141
+          },
+          {
+            "pair_id": 10,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.8884773254394531,
+            "second_margin": -0.7275667190551758
+          },
+          {
+            "pair_id": 11,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 5.565228144327799,
+            "second_margin": 0.7369511922200527
+          },
+          {
+            "pair_id": 12,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.454587936401367,
+            "second_margin": 1.5044975280761719
+          },
+          {
+            "pair_id": 13,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 4.566572666168213,
+            "second_margin": 3.927083969116211
+          },
+          {
+            "pair_id": 14,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -5.6841325759887695,
+            "second_margin": 6.398287773132324
+          },
+          {
+            "pair_id": 15,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.2106189727783203,
+            "second_margin": 5.734698295593262
+          },
+          {
+            "pair_id": 16,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 3.604777018229166,
+            "second_margin": -1.3596661885579433
+          },
+          {
+            "pair_id": 17,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.4158792495727539,
+            "second_margin": 0.39562129974365234
+          },
+          {
+            "pair_id": 18,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.3828258514404297,
+            "second_margin": 1.019540786743164
+          },
+          {
+            "pair_id": 19,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -4.973421096801758,
+            "second_margin": 7.787350654602051
+          },
+          {
+            "pair_id": 20,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": -0.19077301025390625,
+            "second_margin": -0.6849422454833984
+          },
+          {
+            "pair_id": 21,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -6.110210418701172,
+            "second_margin": 6.349933624267578
+          },
+          {
+            "pair_id": 22,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.4169635772705078,
+            "second_margin": 0.6558952331542969
+          },
+          {
+            "pair_id": 23,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 5.742120742797852,
+            "second_margin": -3.802766799926758
+          },
+          {
+            "pair_id": 24,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 8.717903137207031,
+            "second_margin": 9.708296775817871
+          },
+          {
+            "pair_id": 25,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 3.695006688435873,
+            "second_margin": -3.288818359375
+          },
+          {
+            "pair_id": 26,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": -0.3052701950073242,
+            "second_margin": -0.7006664276123047
+          },
+          {
+            "pair_id": 27,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.3074913024902344,
+            "second_margin": 1.2403125762939453
+          },
+          {
+            "pair_id": 28,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 0.8142023086547852,
+            "second_margin": 1.4091033935546875
+          },
+          {
+            "pair_id": 29,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 8.281311988830566,
+            "second_margin": 10.126893997192383
+          },
+          {
+            "pair_id": 30,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 9.385061899820965,
+            "second_margin": -3.6667579015096035
+          },
+          {
+            "pair_id": 31,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 2.2131872177124023,
+            "second_margin": -1.5665807723999023
+          },
+          {
+            "pair_id": 32,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 3.759943962097168,
+            "second_margin": -4.937402725219727
+          },
+          {
+            "pair_id": 33,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -6.969491322835287,
+            "second_margin": 7.403228759765624
+          },
+          {
+            "pair_id": 34,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.7177352905273438,
+            "second_margin": 1.3454885482788086
+          },
+          {
+            "pair_id": 35,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 6.134723663330077,
+            "second_margin": -4.762456258138021
+          },
+          {
+            "pair_id": 36,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 3.871643543243408,
+            "second_margin": -4.641292572021484
+          },
+          {
+            "pair_id": 37,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 7.738773345947266,
+            "second_margin": 8.96635627746582
+          },
+          {
+            "pair_id": 38,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 4.607500076293945,
+            "second_margin": -5.0401177406311035
+          },
+          {
+            "pair_id": 39,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.00750732421875,
+            "second_margin": 1.3821392059326172
+          },
+          {
+            "pair_id": 40,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.7583703994750977,
+            "second_margin": -0.8305540084838867
+          },
+          {
+            "pair_id": 41,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 3.2114168802897147,
+            "second_margin": -3.4578692118326817
+          },
+          {
+            "pair_id": 42,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 5.62899112701416,
+            "second_margin": -4.962416648864746
+          },
+          {
+            "pair_id": 43,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -6.348507881164551,
+            "second_margin": 6.851189613342285
+          },
+          {
+            "pair_id": 44,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 3.748266537984213,
+            "second_margin": 1.477738380432129
+          },
+          {
+            "pair_id": 45,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 8.299207210540771,
+            "second_margin": 9.589024543762207
+          },
+          {
+            "pair_id": 46,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -5.5846848487854,
+            "second_margin": 5.377943277359009
+          },
+          {
+            "pair_id": 47,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -6.1189816792805996,
+            "second_margin": 5.802440007527668
+          },
+          {
+            "pair_id": 48,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 8.217561721801758,
+            "second_margin": -4.991863250732422
+          },
+          {
+            "pair_id": 49,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.8463802337646484,
+            "second_margin": 0.80242919921875
+          },
+          {
+            "pair_id": 50,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 3.10949452718099,
+            "second_margin": -2.9366111755371085
+          },
+          {
+            "pair_id": 51,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.2894134521484375,
+            "second_margin": -1.859853744506836
+          },
+          {
+            "pair_id": 52,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -6.651176452636719,
+            "second_margin": 9.164875030517578
+          },
+          {
+            "pair_id": 53,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 10.144036889076233,
+            "second_margin": 7.6653486887613935
+          },
+          {
+            "pair_id": 54,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 2.7449235916137695,
+            "second_margin": -3.932708263397217
+          },
+          {
+            "pair_id": 55,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 2.7388038635253906,
+            "second_margin": -1.809356689453125
+          },
+          {
+            "pair_id": 56,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -3.8310799598693848,
+            "second_margin": 3.7444162368774414
+          },
+          {
+            "pair_id": 57,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 3.5947494506835938,
+            "second_margin": 9.273704369862875
+          },
+          {
+            "pair_id": 58,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 0.9204864501953125,
+            "second_margin": 0.16984081268310547
+          },
+          {
+            "pair_id": 59,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 6.208843231201173,
+            "second_margin": -2.107606887817383
+          },
+          {
+            "pair_id": 60,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 6.134723663330077,
+            "second_margin": -4.762456258138021
+          },
+          {
+            "pair_id": 61,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.8295660018920898,
+            "second_margin": -0.7892799377441406
+          },
+          {
+            "pair_id": 62,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.6338491439819336,
+            "second_margin": 1.502049446105957
+          },
+          {
+            "pair_id": 63,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 8.906982858975729,
+            "second_margin": 8.162178993225098
+          },
+          {
+            "pair_id": 64,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 3.001800537109375,
+            "second_margin": -5.268979549407959
+          },
+          {
+            "pair_id": 65,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.8557825088500977,
+            "second_margin": -2.513904571533203
+          },
+          {
+            "pair_id": 66,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -7.627051671346028,
+            "second_margin": 8.604397773742676
+          },
+          {
+            "pair_id": 67,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -6.132934093475342,
+            "second_margin": 5.37392520904541
+          },
+          {
+            "pair_id": 68,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.900233268737793,
+            "second_margin": -0.9912166595458984
+          },
+          {
+            "pair_id": 69,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 9.098310430844625,
+            "second_margin": 8.307695706685383
+          },
+          {
+            "pair_id": 70,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 9.2202920516332,
+            "second_margin": 7.110263506571452
+          },
+          {
+            "pair_id": 71,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 4.269555727640787,
+            "second_margin": -2.5739714304606114
+          },
+          {
+            "pair_id": 72,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -3.556337356567383,
+            "second_margin": 3.928089141845703
+          },
+          {
+            "pair_id": 73,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.48099708557128906,
+            "second_margin": -1.829463005065918
+          },
+          {
+            "pair_id": 74,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.1131324768066406,
+            "second_margin": 0.6903772354125977
+          },
+          {
+            "pair_id": 75,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 3.001800537109375,
+            "second_margin": -5.268979549407959
+          },
+          {
+            "pair_id": 76,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 0.4777679443359375,
+            "second_margin": 0.782893180847168
+          },
+          {
+            "pair_id": 77,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -8.937222003936768,
+            "second_margin": 8.92816162109375
+          },
+          {
+            "pair_id": 78,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 2.51012929280599,
+            "second_margin": -1.8608741760253906
+          },
+          {
+            "pair_id": 79,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.1351566314697266,
+            "second_margin": 4.875676155090332
+          },
+          {
+            "pair_id": 80,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.7900962829589844,
+            "second_margin": 2.36834716796875
+          },
+          {
+            "pair_id": 81,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -5.827608108520508,
+            "second_margin": 6.321686744689941
+          },
+          {
+            "pair_id": 82,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -8.248301823933918,
+            "second_margin": 9.136154810587565
+          },
+          {
+            "pair_id": 83,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.5619897842407227,
+            "second_margin": 0.3151683807373047
+          },
+          {
+            "pair_id": 84,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.4928922653198242,
+            "second_margin": 9.542400201161703
+          },
+          {
+            "pair_id": 85,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": -0.8609094619750977,
+            "second_margin": -0.3653879165649414
+          },
+          {
+            "pair_id": 86,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 6.092942555745443,
+            "second_margin": -3.7710730234781904
+          },
+          {
+            "pair_id": 87,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.1813411712646484,
+            "second_margin": 0.49725341796875
+          },
+          {
+            "pair_id": 88,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 4.465616226196289,
+            "second_margin": -4.470270156860352
+          },
+          {
+            "pair_id": 89,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 10.054414590199789,
+            "second_margin": 8.654426892598469
+          },
+          {
+            "pair_id": 90,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 4.791590690612793,
+            "second_margin": -5.280510902404785
+          },
+          {
+            "pair_id": 91,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.8000249862670898,
+            "second_margin": -0.8775749206542969
+          },
+          {
+            "pair_id": 92,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.7376928329467773,
+            "second_margin": 0.8101701736450195
+          },
+          {
+            "pair_id": 93,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 0.03168932596842389,
+            "second_margin": 4.252768198649088
+          },
+          {
+            "pair_id": 94,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 3.2114168802897147,
+            "second_margin": -3.4578692118326817
+          },
+          {
+            "pair_id": 95,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 4.776985168457031,
+            "second_margin": 1.8015330632527675
+          },
+          {
+            "pair_id": 96,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 1.2945451736450195,
+            "second_margin": 0.04196739196777344
+          },
+          {
+            "pair_id": 97,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 5.063261032104492,
+            "second_margin": -4.1311098734537754
+          },
+          {
+            "pair_id": 98,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.5884637832641602,
+            "second_margin": -1.360982894897461
+          },
+          {
+            "pair_id": 99,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.9557933807373047,
+            "second_margin": -1.013920783996582
+          }
+        ]
+      },
+      "generations": [
+        {
+          "prompt": "서윤이는 금빛 단추를 유리병에 넣어 찬장 위에 두었어요. 민호에게 병을 건드리지 말라고 했지만, 잠시 뒤 부엌에서 쨍그랑 소리가 났어요. 서윤이가 달려가 보니",
+          "continuation": "작은 북이 너무 크게 울렸어요. 북은 콩콩 소리를 내며 바닥에 떨어졌어요. 민서는 깜짝 놀라 북을 내려놓았어요. “미안해요, 내가 너무 세게 쳤어요.” 하고 말했어요. 민서는 고개를 숙이고 “미안해, 너무 많이 미안해요” 했어요. 둘은 북을 함께 잡고 따뜻한 차를 마셨어요. 평범한 하루에도 새 발견이 숨어 있었어요.",
+          "generated_tokens": 65,
+          "continuation_characters": 177,
+          "seconds": 1.1463613999949303,
+          "tokens_per_second": 56.7011415425253,
+          "characters_per_second": 154.40157004656888
+        },
+        {
+          "prompt": "토끼는 다리를 다쳐 경주에 나가지 않았고 거북이만 출발선에 섰어요. 종이 울리자",
+          "continuation": "토끼는 “나도 할 수 있어요” 하고 말했어요. 토끼는 “나는 안 돼요?” 하고 물었어요. 토끼는 “내 귀가 너무 작아요” 하고 대답했어요. 토끼는 잠깐 생각하고 토끼 귀로 귀를 대 보았어요. 토끼는 “같이 하면 더 재미있어요” 하고 웃었어요. 둘은 누가 더 잘하나보다 함께 웃는 게 더 좋다는 걸 알았어요.",
+          "generated_tokens": 75,
+          "continuation_characters": 171,
+          "seconds": 1.2253071999875829,
+          "tokens_per_second": 61.20914004321532,
+          "characters_per_second": 139.55683929853092
+        },
+        {
+          "prompt": "“내일 네 책을 돌려줄게.” 은지가 말했어요. 다음 날 은지는 준호를 만나",
+          "continuation": "러 떠났어요. 준호는 \"아픈 친구를 구해요\" 하고 말했어요. 둘은 책장을 넘기며 작은 여행 이야기를 읽었어요. 은지는 책 속의 길을 손가락으로 가리켰어요. 은지는 책 속 여행을 마치고 책을 덮었어요. 은지는 이별 인사를 하며 다시 만날 날을 기다렸어요.",
+          "generated_tokens": 63,
+          "continuation_characters": 141,
+          "seconds": 1.0153220999927726,
+          "tokens_per_second": 62.049274806929205,
+          "characters_per_second": 138.8721864726511
+        }
+      ],
+      "elapsed_seconds": 9.798386100010248,
+      "forced_choice_common": {
+        "correct": 16,
+        "total": 37,
+        "accuracy": 0.43243243243243246,
+        "mean_margin_nats": -0.4295882920961122,
+        "by_category": {
+          "location": {
+            "correct": 5,
+            "total": 10
+          },
+          "negation": {
+            "correct": 0,
+            "total": 2
+          },
+          "persistent_state": {
+            "correct": 5,
+            "total": 10
+          },
+          "speaker_role": {
+            "correct": 4,
+            "total": 10
+          },
+          "transfer": {
+            "correct": 2,
+            "total": 5
+          }
+        }
+      }
+    },
+    "haru_v2_17m": {
+      "parameters": 16983213,
+      "training_tokens": 4259840000,
+      "architecture": "6 independent cells, 6 passes, final binding block",
+      "matched_case_ids": [
+        0,
+        2,
+        3,
+        4,
+        5,
+        6,
+        8,
+        9,
+        10,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        42,
+        43,
+        44,
+        45,
+        46,
+        48,
+        49
+      ],
+      "forced_choice_rows": [
+        {
+          "case_id": 0,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": true,
+          "margin_nats": 0.4331836700439453
+        },
+        {
+          "case_id": 1,
+          "category": "transfer",
+          "token_matched": false,
+          "expected_tokens": 5,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -6.280780792236328
+        },
+        {
+          "case_id": 2,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -1.350442886352539
+        },
+        {
+          "case_id": 3,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": true,
+          "margin_nats": 3.0073490142822266
+        },
+        {
+          "case_id": 4,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -1.3488845825195312
+        },
+        {
+          "case_id": 5,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": false,
+          "margin_nats": -0.7653903961181641
+        },
+        {
+          "case_id": 6,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 1.9129314422607422
+        },
+        {
+          "case_id": 7,
+          "category": "negation",
+          "token_matched": false,
+          "expected_tokens": 5,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -6.123115539550781
+        },
+        {
+          "case_id": 8,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": false,
+          "margin_nats": -3.5336570739746094
+        },
+        {
+          "case_id": 9,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": true,
+          "margin_nats": 0.20589065551757812
+        },
+        {
+          "case_id": 10,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": true,
+          "margin_nats": 0.8474102020263672
+        },
+        {
+          "case_id": 11,
+          "category": "transfer",
+          "token_matched": false,
+          "expected_tokens": 4,
+          "contradiction_tokens": 5,
+          "correct": false,
+          "margin_nats": -2.8648853302001953
+        },
+        {
+          "case_id": 12,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -6.352636337280273
+        },
+        {
+          "case_id": 13,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": true,
+          "margin_nats": 3.2963085174560547
+        },
+        {
+          "case_id": 14,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": true,
+          "margin_nats": 4.064609527587891
+        },
+        {
+          "case_id": 15,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": false,
+          "margin_nats": -0.5844173431396484
+        },
+        {
+          "case_id": 16,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": true,
+          "margin_nats": 7.428607940673828
+        },
+        {
+          "case_id": 17,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -2.935239791870117
+        },
+        {
+          "case_id": 18,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": false,
+          "margin_nats": -3.679872512817383
+        },
+        {
+          "case_id": 19,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -5.752769470214844
+        },
+        {
+          "case_id": 20,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": true,
+          "margin_nats": 0.5550918579101562
+        },
+        {
+          "case_id": 21,
+          "category": "transfer",
+          "token_matched": false,
+          "expected_tokens": 5,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -3.412759780883789
+        },
+        {
+          "case_id": 22,
+          "category": "negation",
+          "token_matched": false,
+          "expected_tokens": 4,
+          "contradiction_tokens": 5,
+          "correct": true,
+          "margin_nats": 5.943367004394531
+        },
+        {
+          "case_id": 23,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 6,
+          "contradiction_tokens": 6,
+          "correct": true,
+          "margin_nats": 2.9923267364501953
+        },
+        {
+          "case_id": 24,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -1.1101112365722656
+        },
+        {
+          "case_id": 25,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": false,
+          "margin_nats": -0.20528602600097656
+        },
+        {
+          "case_id": 26,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 4.024065017700195
+        },
+        {
+          "case_id": 27,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 8.213998794555664
+        },
+        {
+          "case_id": 28,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 6,
+          "contradiction_tokens": 6,
+          "correct": false,
+          "margin_nats": -3.343219757080078
+        },
+        {
+          "case_id": 29,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": false,
+          "margin_nats": -0.9946613311767578
+        },
+        {
+          "case_id": 30,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": true,
+          "margin_nats": 0.9955673217773438
+        },
+        {
+          "case_id": 31,
+          "category": "transfer",
+          "token_matched": false,
+          "expected_tokens": 4,
+          "contradiction_tokens": 5,
+          "correct": false,
+          "margin_nats": -2.439678192138672
+        },
+        {
+          "case_id": 32,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 2.656862258911133
+        },
+        {
+          "case_id": 33,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 2.451658248901367
+        },
+        {
+          "case_id": 34,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": false,
+          "margin_nats": -3.675016403198242
+        },
+        {
+          "case_id": 35,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": false,
+          "margin_nats": -0.8746509552001953
+        },
+        {
+          "case_id": 36,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": true,
+          "margin_nats": 0.9422721862792969
+        },
+        {
+          "case_id": 37,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 0.19045066833496094
+        },
+        {
+          "case_id": 38,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -2.9029693603515625
+        },
+        {
+          "case_id": 39,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 4.0271759033203125
+        },
+        {
+          "case_id": 40,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": true,
+          "margin_nats": 0.7158908843994141
+        },
+        {
+          "case_id": 41,
+          "category": "transfer",
+          "token_matched": false,
+          "expected_tokens": 5,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -6.280780792236328
+        },
+        {
+          "case_id": 42,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -1.350442886352539
+        },
+        {
+          "case_id": 43,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": true,
+          "margin_nats": 3.158580780029297
+        },
+        {
+          "case_id": 44,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -1.3488845825195312
+        },
+        {
+          "case_id": 45,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 7,
+          "contradiction_tokens": 7,
+          "correct": false,
+          "margin_nats": -0.5687541961669922
+        },
+        {
+          "case_id": 46,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 1.9129314422607422
+        },
+        {
+          "case_id": 47,
+          "category": "negation",
+          "token_matched": false,
+          "expected_tokens": 5,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -6.123115539550781
+        },
+        {
+          "case_id": 48,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": false,
+          "margin_nats": -3.4102210998535156
+        },
+        {
+          "case_id": 49,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 5,
+          "contradiction_tokens": 5,
+          "correct": true,
+          "margin_nats": 0.20589065551757812
+        }
+      ],
+      "shared_text": {
+        "texts": 5,
+        "characters": 409,
+        "tokens": 179,
+        "nll_nats": 726.3081817626953,
+        "bits_per_character": 2.561958953511297
+      },
+      "counterfactual_validation": {
+        "decision_correct": 122,
+        "decision_total": 200,
+        "decision_accuracy": 0.61,
+        "strict_pair_correct": 25,
+        "strict_pair_total": 100,
+        "strict_pair_accuracy": 0.25,
+        "prediction_flip_count": 28,
+        "mean_margin": 1.5141589188575744,
+        "by_category": {
+          "location": {
+            "decision_correct": 29,
+            "decision_total": 40,
+            "strict_pair_correct": 9,
+            "strict_pair_total": 20
+          },
+          "ownership": {
+            "decision_correct": 20,
+            "decision_total": 40,
+            "strict_pair_correct": 1,
+            "strict_pair_total": 20
+          },
+          "speaker": {
+            "decision_correct": 19,
+            "decision_total": 40,
+            "strict_pair_correct": 0,
+            "strict_pair_total": 20
+          },
+          "state": {
+            "decision_correct": 35,
+            "decision_total": 40,
+            "strict_pair_correct": 15,
+            "strict_pair_total": 20
+          },
+          "transfer": {
+            "decision_correct": 19,
+            "decision_total": 40,
+            "strict_pair_correct": 0,
+            "strict_pair_total": 20
+          }
+        },
+        "rows": [
+          {
+            "pair_id": 0,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.5539131164550781,
+            "second_margin": -2.5484867095947266
+          },
+          {
+            "pair_id": 1,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 0.5517692565917969,
+            "second_margin": 5.290548324584961
+          },
+          {
+            "pair_id": 2,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 1.0973599751790353,
+            "second_margin": 10.150390625
+          },
+          {
+            "pair_id": 3,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -4.907515525817871,
+            "second_margin": 4.641148567199707
+          },
+          {
+            "pair_id": 4,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -3.581451416015625,
+            "second_margin": 5.483747482299805
+          },
+          {
+            "pair_id": 5,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -6.43862247467041,
+            "second_margin": 7.224379539489746
+          },
+          {
+            "pair_id": 6,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 5.873984336853027,
+            "second_margin": -2.7942590713500977
+          },
+          {
+            "pair_id": 7,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.2037607828776054,
+            "second_margin": 0.3401133219401018
+          },
+          {
+            "pair_id": 8,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 4.26258659362793,
+            "second_margin": -0.9212417602539062
+          },
+          {
+            "pair_id": 9,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.48310184478759766,
+            "second_margin": 0.8908214569091797
+          },
+          {
+            "pair_id": 10,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.6528739929199219,
+            "second_margin": -1.2485637664794922
+          },
+          {
+            "pair_id": 11,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 3.9026540120442696,
+            "second_margin": 2.536356608072918
+          },
+          {
+            "pair_id": 12,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.8306713104248047,
+            "second_margin": -1.2755317687988281
+          },
+          {
+            "pair_id": 13,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 3.360666275024414,
+            "second_margin": 1.3812427520751953
+          },
+          {
+            "pair_id": 14,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -5.576076507568359,
+            "second_margin": 9.24152946472168
+          },
+          {
+            "pair_id": 15,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 16.001407623291016,
+            "second_margin": -8.835648536682129
+          },
+          {
+            "pair_id": 16,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.42850240071614465,
+            "second_margin": -0.9571266174316424
+          },
+          {
+            "pair_id": 17,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 8.629682540893555,
+            "second_margin": -9.487995147705078
+          },
+          {
+            "pair_id": 18,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": -1.214019775390625,
+            "second_margin": -0.06203937530517578
+          },
+          {
+            "pair_id": 19,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -4.612653732299805,
+            "second_margin": 2.51611328125
+          },
+          {
+            "pair_id": 20,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.4229354858398438,
+            "second_margin": 0.8718929290771484
+          },
+          {
+            "pair_id": 21,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 0.9990361531575509,
+            "second_margin": 13.90738296508789
+          },
+          {
+            "pair_id": 22,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 5.752162933349609,
+            "second_margin": -7.614076614379883
+          },
+          {
+            "pair_id": 23,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 7.90998649597168,
+            "second_margin": -7.45573616027832
+          },
+          {
+            "pair_id": 24,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.6015720367431641,
+            "second_margin": 2.6124649047851562
+          },
+          {
+            "pair_id": 25,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 9.073964436848959,
+            "second_margin": 0.5081825256347638
+          },
+          {
+            "pair_id": 26,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.6656780242919922,
+            "second_margin": -0.8606014251708984
+          },
+          {
+            "pair_id": 27,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 8.929048538208008,
+            "second_margin": -6.049620628356934
+          },
+          {
+            "pair_id": 28,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.991837501525879,
+            "second_margin": 3.4654178619384766
+          },
+          {
+            "pair_id": 29,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.18330955505371094,
+            "second_margin": 5.642474174499512
+          },
+          {
+            "pair_id": 30,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -3.9062252044677734,
+            "second_margin": 9.068071365356445
+          },
+          {
+            "pair_id": 31,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -6.346716403961182,
+            "second_margin": 3.714252471923828
+          },
+          {
+            "pair_id": 32,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -6.1045708656311035,
+            "second_margin": 6.8516011238098145
+          },
+          {
+            "pair_id": 33,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 5.3119672139485665,
+            "second_margin": 12.168928782145183
+          },
+          {
+            "pair_id": 34,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.6779098510742188,
+            "second_margin": -1.6326675415039062
+          },
+          {
+            "pair_id": 35,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 4.274187723795574,
+            "second_margin": 2.762360890706381
+          },
+          {
+            "pair_id": 36,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -4.254800796508789,
+            "second_margin": 3.779550552368164
+          },
+          {
+            "pair_id": 37,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 2.523984909057617,
+            "second_margin": 1.382009506225586
+          },
+          {
+            "pair_id": 38,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -4.424327850341797,
+            "second_margin": 4.975688934326172
+          },
+          {
+            "pair_id": 39,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 4.235328674316406,
+            "second_margin": -3.94451904296875
+          },
+          {
+            "pair_id": 40,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 6.213142395019531,
+            "second_margin": -6.8837995529174805
+          },
+          {
+            "pair_id": 41,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 8.123316446940104,
+            "second_margin": 7.802937825520836
+          },
+          {
+            "pair_id": 42,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 0.39691162109375,
+            "second_margin": 0.3872823715209961
+          },
+          {
+            "pair_id": 43,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -3.1154918670654297,
+            "second_margin": 7.669439315795898
+          },
+          {
+            "pair_id": 44,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.4452953338623047,
+            "second_margin": 8.766857147216797
+          },
+          {
+            "pair_id": 45,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 2.3316078186035156,
+            "second_margin": 1.588688850402832
+          },
+          {
+            "pair_id": 46,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.4338417053222656,
+            "second_margin": 2.6502914428710938
+          },
+          {
+            "pair_id": 47,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 0.2091064453125,
+            "second_margin": 13.750125885009766
+          },
+          {
+            "pair_id": 48,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 4.180532455444336,
+            "second_margin": -5.004765510559082
+          },
+          {
+            "pair_id": 49,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -7.883203506469727,
+            "second_margin": 6.986784934997559
+          },
+          {
+            "pair_id": 50,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 7.122891743977865,
+            "second_margin": -0.18685531616210938
+          },
+          {
+            "pair_id": 51,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": -1.2732048034667969,
+            "second_margin": -0.035511016845703125
+          },
+          {
+            "pair_id": 52,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": -2.060037612915039,
+            "second_margin": -0.0364227294921875
+          },
+          {
+            "pair_id": 53,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 2.925413131713867,
+            "second_margin": 2.785715103149414
+          },
+          {
+            "pair_id": 54,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.727691650390625,
+            "second_margin": 2.5873184204101562
+          },
+          {
+            "pair_id": 55,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 3.6597347259521484,
+            "second_margin": -2.981334686279297
+          },
+          {
+            "pair_id": 56,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 3.4595603942871094,
+            "second_margin": -3.5012617111206055
+          },
+          {
+            "pair_id": 57,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.488231658935547,
+            "second_margin": 4.885921478271484
+          },
+          {
+            "pair_id": 58,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.005695343017578125,
+            "second_margin": 0.5658578872680664
+          },
+          {
+            "pair_id": 59,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 7.26544189453125,
+            "second_margin": 1.9984169006347656
+          },
+          {
+            "pair_id": 60,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 4.274187723795574,
+            "second_margin": 2.762360890706381
+          },
+          {
+            "pair_id": 61,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -4.3717193603515625,
+            "second_margin": 4.427089691162109
+          },
+          {
+            "pair_id": 62,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.929102897644043,
+            "second_margin": -4.470268249511719
+          },
+          {
+            "pair_id": 63,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 2.8006248474121094,
+            "second_margin": 2.4715728759765625
+          },
+          {
+            "pair_id": 64,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -7.235125541687012,
+            "second_margin": 6.089217185974121
+          },
+          {
+            "pair_id": 65,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -5.771783828735352,
+            "second_margin": 4.576318740844727
+          },
+          {
+            "pair_id": 66,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -4.378629684448242,
+            "second_margin": 7.8804766337076835
+          },
+          {
+            "pair_id": 67,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 5.645479202270508,
+            "second_margin": -4.150901794433594
+          },
+          {
+            "pair_id": 68,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -7.0592498779296875,
+            "second_margin": 6.927711486816406
+          },
+          {
+            "pair_id": 69,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 4.44699764251709,
+            "second_margin": 0.4130973815917969
+          },
+          {
+            "pair_id": 70,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 0.17687606811523438,
+            "second_margin": 4.9253082275390625
+          },
+          {
+            "pair_id": 71,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 8.154207865397137,
+            "second_margin": 16.161532719930012
+          },
+          {
+            "pair_id": 72,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.5689420700073242,
+            "second_margin": -0.8253154754638672
+          },
+          {
+            "pair_id": 73,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -3.2365713119506836,
+            "second_margin": 2.26788330078125
+          },
+          {
+            "pair_id": 74,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.0774078369140625,
+            "second_margin": 0.6175117492675781
+          },
+          {
+            "pair_id": 75,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -7.235125541687012,
+            "second_margin": 6.089217185974121
+          },
+          {
+            "pair_id": 76,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -4.623024940490723,
+            "second_margin": 4.843829154968262
+          },
+          {
+            "pair_id": 77,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -5.5142974853515625,
+            "second_margin": 7.990867614746094
+          },
+          {
+            "pair_id": 78,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 5.997449239095053,
+            "second_margin": -2.2510592142740897
+          },
+          {
+            "pair_id": 79,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 11.626030921936035,
+            "second_margin": -5.606871604919434
+          },
+          {
+            "pair_id": 80,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -3.6022558212280273,
+            "second_margin": 3.2602357864379883
+          },
+          {
+            "pair_id": 81,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -5.34136962890625,
+            "second_margin": 4.2916412353515625
+          },
+          {
+            "pair_id": 82,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 1.9484106699625663,
+            "second_margin": 9.747748057047527
+          },
+          {
+            "pair_id": 83,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 3.934809684753418,
+            "second_margin": -5.747920989990234
+          },
+          {
+            "pair_id": 84,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.146322250366211,
+            "second_margin": 4.284653027852377
+          },
+          {
+            "pair_id": 85,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -4.709558486938477,
+            "second_margin": 4.429110527038574
+          },
+          {
+            "pair_id": 86,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 10.883719126383465,
+            "second_margin": 0.4747123718261719
+          },
+          {
+            "pair_id": 87,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.671682357788086,
+            "second_margin": 1.0762863159179688
+          },
+          {
+            "pair_id": 88,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 13.869101524353027,
+            "second_margin": -8.450456619262695
+          },
+          {
+            "pair_id": 89,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 7.065675735473633,
+            "second_margin": -1.0849170684814453
+          },
+          {
+            "pair_id": 90,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -3.470090866088867,
+            "second_margin": 4.469690322875977
+          },
+          {
+            "pair_id": 91,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.0982093811035156,
+            "second_margin": 0.5855369567871094
+          },
+          {
+            "pair_id": 92,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -7.846144676208496,
+            "second_margin": 11.388225555419922
+          },
+          {
+            "pair_id": 93,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 2.618703842163086,
+            "second_margin": 3.0287208557128906
+          },
+          {
+            "pair_id": 94,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 8.123316446940104,
+            "second_margin": 7.802937825520836
+          },
+          {
+            "pair_id": 95,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.3861427307128906,
+            "second_margin": 6.285785675048828
+          },
+          {
+            "pair_id": 96,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.9476938247680664,
+            "second_margin": 2.4672393798828125
+          },
+          {
+            "pair_id": 97,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 4.678976694742836,
+            "second_margin": 4.003501892089844
+          },
+          {
+            "pair_id": 98,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 5.8490142822265625,
+            "second_margin": -4.656087875366211
+          },
+          {
+            "pair_id": 99,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.463155746459961,
+            "second_margin": 0.414459228515625
+          }
+        ]
+      },
+      "generations": [
+        {
+          "prompt": "서윤이는 금빛 단추를 유리병에 넣어 찬장 위에 두었어요. 민호에게 병을 건드리지 말라고 했지만, 잠시 뒤 부엌에서 쨍그랑 소리가 났어요. 서윤이가 달려가 보니",
+          "continuation": "작은 생쥐 친구가 갇혀 있었어요. 서윤이는 겁났지만 도와주고 싶어 용기를 냈어요.  서윤이는 착한 마음으로 생쥐 친구를 구출해 주었어요. 둘은 함께 부엌으로 가서 맛있는 간식을 나누어 먹었어요. 정겨운 웃음소리가 방 안에 가득 퍼졌어요.  이제 서윤이는 비밀 친구 친구와 함께 나누어 먹기로 했어요. 둘은 서로를 꼭 껴안으며 다정한 인사를 나누었어요. 서윤이는 새로운 친구를 만나서 정말 행복했어요.",
+          "generated_tokens": 71,
+          "continuation_characters": 223,
+          "seconds": 1.1946254999784287,
+          "tokens_per_second": 59.432851551621866,
+          "characters_per_second": 186.66937881706585
+        },
+        {
+          "prompt": "토끼는 다리를 다쳐 경주에 나가지 않았고 거북이만 출발선에 섰어요. 종이 울리자",
+          "continuation": "거북이가 천천히 다가왔어요. 토끼는 거북이를 따라 천천히 걸었어요. 거북이는 더듬거리며 토끼를 따라갔어요. 거북이는 토끼를 따라 숲길로 갔어요. 토끼는 거북이를 따라가며 거북이를 따라갔어요. 거북이는 길을 잃고 길을 잃었어요. 거북이는 무사히 숲길로 돌아왔어요. 거북이는 거북이에게 고마운 마음을 담아 주었어요.",
+          "generated_tokens": 64,
+          "continuation_characters": 174,
+          "seconds": 0.9352949000021908,
+          "tokens_per_second": 68.42761571762028,
+          "characters_per_second": 186.03758023228013
+        },
+        {
+          "prompt": "“내일 네 책을 돌려줄게.” 은지가 말했어요. 다음 날 은지는 준호를 만나",
+          "continuation": "게 되었어요. 둘은 서로 미안하다고 말하며 화해했어요.",
+          "generated_tokens": 10,
+          "continuation_characters": 30,
+          "seconds": 0.12119189999066293,
+          "tokens_per_second": 82.51376536526317,
+          "characters_per_second": 247.54129609578948
+        }
+      ],
+      "elapsed_seconds": 8.468092800001614,
+      "forced_choice_common": {
+        "correct": 20,
+        "total": 37,
+        "accuracy": 0.5405405405405406,
+        "mean_margin_nats": 0.17119423118797508,
+        "by_category": {
+          "location": {
+            "correct": 5,
+            "total": 10
+          },
+          "negation": {
+            "correct": 1,
+            "total": 2
+          },
+          "persistent_state": {
+            "correct": 5,
+            "total": 10
+          },
+          "speaker_role": {
+            "correct": 4,
+            "total": 10
+          },
+          "transfer": {
+            "correct": 5,
+            "total": 5
+          }
+        }
+      }
+    },
+    "tiny_ko_stories_35m": {
+      "parameters": 34217856,
+      "training_tokens": 794820608,
+      "architecture": "10-layer full-attention Transformer",
+      "matched_case_ids": [
+        0,
+        1,
+        3,
+        4,
+        5,
+        6,
+        8,
+        9,
+        10,
+        11,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        23,
+        24,
+        25,
+        26,
+        28,
+        29,
+        30,
+        31,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        43,
+        44,
+        45,
+        46,
+        48,
+        49
+      ],
+      "forced_choice_rows": [
+        {
+          "case_id": 0,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 0.9968452453613281
+        },
+        {
+          "case_id": 1,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": false,
+          "margin_nats": -8.474557876586914
+        },
+        {
+          "case_id": 2,
+          "category": "negation",
+          "token_matched": false,
+          "expected_tokens": 3,
+          "contradiction_tokens": 2,
+          "correct": false,
+          "margin_nats": -7.384495735168457
+        },
+        {
+          "case_id": 3,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": false,
+          "margin_nats": -0.3933887481689453
+        },
+        {
+          "case_id": 4,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": false,
+          "margin_nats": -7.955448627471924
+        },
+        {
+          "case_id": 5,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -0.9763240814208984
+        },
+        {
+          "case_id": 6,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": false,
+          "margin_nats": -3.0953493118286133
+        },
+        {
+          "case_id": 7,
+          "category": "negation",
+          "token_matched": false,
+          "expected_tokens": 3,
+          "contradiction_tokens": 2,
+          "correct": false,
+          "margin_nats": -5.201684951782227
+        },
+        {
+          "case_id": 8,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": false,
+          "margin_nats": -0.06193828582763672
+        },
+        {
+          "case_id": 9,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": false,
+          "margin_nats": -3.516000747680664
+        },
+        {
+          "case_id": 10,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 0.8650989532470703
+        },
+        {
+          "case_id": 11,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": false,
+          "margin_nats": -4.042779922485352
+        },
+        {
+          "case_id": 12,
+          "category": "negation",
+          "token_matched": false,
+          "expected_tokens": 3,
+          "contradiction_tokens": 2,
+          "correct": false,
+          "margin_nats": -4.243468284606934
+        },
+        {
+          "case_id": 13,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": true,
+          "margin_nats": 0.4816741943359375
+        },
+        {
+          "case_id": 14,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": true,
+          "margin_nats": 4.626974105834961
+        },
+        {
+          "case_id": 15,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -1.5802783966064453
+        },
+        {
+          "case_id": 16,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": true,
+          "margin_nats": 11.331462860107422
+        },
+        {
+          "case_id": 17,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": true,
+          "margin_nats": 3.3312511444091797
+        },
+        {
+          "case_id": 18,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": false,
+          "margin_nats": -0.28233909606933594
+        },
+        {
+          "case_id": 19,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": false,
+          "margin_nats": -1.763620376586914
+        },
+        {
+          "case_id": 20,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 0.6214599609375
+        },
+        {
+          "case_id": 21,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": false,
+          "margin_nats": -1.5761184692382812
+        },
+        {
+          "case_id": 22,
+          "category": "negation",
+          "token_matched": false,
+          "expected_tokens": 2,
+          "contradiction_tokens": 3,
+          "correct": true,
+          "margin_nats": 2.151219367980957
+        },
+        {
+          "case_id": 23,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": true,
+          "margin_nats": 0.9088554382324219
+        },
+        {
+          "case_id": 24,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": true,
+          "margin_nats": 5.580198287963867
+        },
+        {
+          "case_id": 25,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -3.361928939819336
+        },
+        {
+          "case_id": 26,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": true,
+          "margin_nats": 5.108211517333984
+        },
+        {
+          "case_id": 27,
+          "category": "negation",
+          "token_matched": false,
+          "expected_tokens": 2,
+          "contradiction_tokens": 3,
+          "correct": true,
+          "margin_nats": 5.134702682495117
+        },
+        {
+          "case_id": 28,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": false,
+          "margin_nats": -1.0832099914550781
+        },
+        {
+          "case_id": 29,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": false,
+          "margin_nats": -0.3645954132080078
+        },
+        {
+          "case_id": 30,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 1.0153617858886719
+        },
+        {
+          "case_id": 31,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": false,
+          "margin_nats": -5.61995792388916
+        },
+        {
+          "case_id": 32,
+          "category": "negation",
+          "token_matched": false,
+          "expected_tokens": 2,
+          "contradiction_tokens": 3,
+          "correct": true,
+          "margin_nats": 2.5914344787597656
+        },
+        {
+          "case_id": 33,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": true,
+          "margin_nats": 0.21617889404296875
+        },
+        {
+          "case_id": 34,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": false,
+          "margin_nats": -5.127897262573242
+        },
+        {
+          "case_id": 35,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -2.3484668731689453
+        },
+        {
+          "case_id": 36,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": false,
+          "margin_nats": -3.370316505432129
+        },
+        {
+          "case_id": 37,
+          "category": "negation",
+          "token_matched": true,
+          "expected_tokens": 2,
+          "contradiction_tokens": 2,
+          "correct": false,
+          "margin_nats": -0.5799226760864258
+        },
+        {
+          "case_id": 38,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": false,
+          "margin_nats": -0.8574390411376953
+        },
+        {
+          "case_id": 39,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": true,
+          "margin_nats": 1.3275976181030273
+        },
+        {
+          "case_id": 40,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": true,
+          "margin_nats": 1.1203155517578125
+        },
+        {
+          "case_id": 41,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": false,
+          "margin_nats": -8.474557876586914
+        },
+        {
+          "case_id": 42,
+          "category": "negation",
+          "token_matched": false,
+          "expected_tokens": 3,
+          "contradiction_tokens": 2,
+          "correct": false,
+          "margin_nats": -7.384495735168457
+        },
+        {
+          "case_id": 43,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": false,
+          "margin_nats": -1.4660167694091797
+        },
+        {
+          "case_id": 44,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": false,
+          "margin_nats": -7.955448627471924
+        },
+        {
+          "case_id": 45,
+          "category": "location",
+          "token_matched": true,
+          "expected_tokens": 4,
+          "contradiction_tokens": 4,
+          "correct": false,
+          "margin_nats": -1.1818389892578125
+        },
+        {
+          "case_id": 46,
+          "category": "transfer",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": false,
+          "margin_nats": -3.0953493118286133
+        },
+        {
+          "case_id": 47,
+          "category": "negation",
+          "token_matched": false,
+          "expected_tokens": 3,
+          "contradiction_tokens": 2,
+          "correct": false,
+          "margin_nats": -5.201684951782227
+        },
+        {
+          "case_id": 48,
+          "category": "persistent_state",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": true,
+          "margin_nats": 1.4765167236328125
+        },
+        {
+          "case_id": 49,
+          "category": "speaker_role",
+          "token_matched": true,
+          "expected_tokens": 3,
+          "contradiction_tokens": 3,
+          "correct": false,
+          "margin_nats": -3.516000747680664
+        }
+      ],
+      "shared_text": {
+        "texts": 5,
+        "characters": 409,
+        "tokens": 143,
+        "nll_nats": 760.1628875732422,
+        "bits_per_character": 2.6813770859896118
+      },
+      "counterfactual_validation": {
+        "decision_correct": 97,
+        "decision_total": 200,
+        "decision_accuracy": 0.485,
+        "strict_pair_correct": 2,
+        "strict_pair_total": 100,
+        "strict_pair_accuracy": 0.02,
+        "prediction_flip_count": 7,
+        "mean_margin": -0.061639715433120745,
+        "by_category": {
+          "location": {
+            "decision_correct": 21,
+            "decision_total": 40,
+            "strict_pair_correct": 1,
+            "strict_pair_total": 20
+          },
+          "ownership": {
+            "decision_correct": 16,
+            "decision_total": 40,
+            "strict_pair_correct": 0,
+            "strict_pair_total": 20
+          },
+          "speaker": {
+            "decision_correct": 21,
+            "decision_total": 40,
+            "strict_pair_correct": 1,
+            "strict_pair_total": 20
+          },
+          "state": {
+            "decision_correct": 20,
+            "decision_total": 40,
+            "strict_pair_correct": 0,
+            "strict_pair_total": 20
+          },
+          "transfer": {
+            "decision_correct": 19,
+            "decision_total": 40,
+            "strict_pair_correct": 0,
+            "strict_pair_total": 20
+          }
+        },
+        "rows": [
+          {
+            "pair_id": 0,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.9087896347045898,
+            "second_margin": -1.488718032836914
+          },
+          {
+            "pair_id": 1,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.702482223510742,
+            "second_margin": 2.181051015853882
+          },
+          {
+            "pair_id": 2,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.6646499633789062,
+            "second_margin": -0.9253578186035156
+          },
+          {
+            "pair_id": 3,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 2.3286333084106445,
+            "second_margin": -1.8203339576721191
+          },
+          {
+            "pair_id": 4,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -3.9408349990844727,
+            "second_margin": 2.710768699645996
+          },
+          {
+            "pair_id": 5,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.2597179412841797,
+            "second_margin": -0.07868576049804688
+          },
+          {
+            "pair_id": 6,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.8290723164876299,
+            "second_margin": 0.7172150611877441
+          },
+          {
+            "pair_id": 7,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.590521812438965,
+            "second_margin": 2.5790562629699707
+          },
+          {
+            "pair_id": 8,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 3.551426410675049,
+            "second_margin": -3.5949182510375977
+          },
+          {
+            "pair_id": 9,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -3.77689266204834,
+            "second_margin": 1.9816861152648926
+          },
+          {
+            "pair_id": 10,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.1134910583496094,
+            "second_margin": 1.0669212341308594
+          },
+          {
+            "pair_id": 11,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.0707162221272792,
+            "second_margin": 2.2667880058288574
+          },
+          {
+            "pair_id": 12,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.6247711181640625,
+            "second_margin": 0.28995513916015625
+          },
+          {
+            "pair_id": 13,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.0417334238688154,
+            "second_margin": 0.9778681596120196
+          },
+          {
+            "pair_id": 14,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.3221931457519531,
+            "second_margin": 1.28521728515625
+          },
+          {
+            "pair_id": 15,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 3.5414655208587646,
+            "second_margin": -0.9295587539672852
+          },
+          {
+            "pair_id": 16,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.3610866864522304,
+            "second_margin": 2.4262170791625977
+          },
+          {
+            "pair_id": 17,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -3.465447425842285,
+            "second_margin": 4.041573524475098
+          },
+          {
+            "pair_id": 18,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.2750978469848633,
+            "second_margin": 0.38789844512939453
+          },
+          {
+            "pair_id": 19,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.1660141944885254,
+            "second_margin": 1.9714031219482422
+          },
+          {
+            "pair_id": 20,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.06760120391845703,
+            "second_margin": 0.6115837097167969
+          },
+          {
+            "pair_id": 21,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.6686124801635742,
+            "second_margin": 0.684934139251709
+          },
+          {
+            "pair_id": 22,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.5170326232910156,
+            "second_margin": 2.452228546142578
+          },
+          {
+            "pair_id": 23,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 2.185276985168457,
+            "second_margin": -2.254061222076416
+          },
+          {
+            "pair_id": 24,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.4952125549316406,
+            "second_margin": 2.389803409576416
+          },
+          {
+            "pair_id": 25,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.3034954071044922,
+            "second_margin": 0.3327827453613281
+          },
+          {
+            "pair_id": 26,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.5154967308044434,
+            "second_margin": -0.8778505325317383
+          },
+          {
+            "pair_id": 27,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.18041324615478516,
+            "second_margin": -0.07001495361328125
+          },
+          {
+            "pair_id": 28,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 2.3621668815612793,
+            "second_margin": -3.2942447662353516
+          },
+          {
+            "pair_id": 29,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.147210121154785,
+            "second_margin": 2.362208366394043
+          },
+          {
+            "pair_id": 30,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -3.8218235969543457,
+            "second_margin": 3.2445101737976074
+          },
+          {
+            "pair_id": 31,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.130366325378418,
+            "second_margin": 1.5176668167114258
+          },
+          {
+            "pair_id": 32,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 2.7455997467041016,
+            "second_margin": -5.052558898925781
+          },
+          {
+            "pair_id": 33,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.9366598129272461,
+            "second_margin": -1.3724937438964844
+          },
+          {
+            "pair_id": 34,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.34664058685302734,
+            "second_margin": 0.2255992889404297
+          },
+          {
+            "pair_id": 35,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.1441329320271816,
+            "second_margin": 2.1746398607889805
+          },
+          {
+            "pair_id": 36,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.2536473274230957,
+            "second_margin": 0.26187562942504883
+          },
+          {
+            "pair_id": 37,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.0285792350769043,
+            "second_margin": 2.180385112762451
+          },
+          {
+            "pair_id": 38,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 2.3379836082458496,
+            "second_margin": -2.173905372619629
+          },
+          {
+            "pair_id": 39,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": -1.0482816696166992,
+            "second_margin": -0.7102265357971191
+          },
+          {
+            "pair_id": 40,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -3.1157760620117188,
+            "second_margin": 3.1632938385009766
+          },
+          {
+            "pair_id": 41,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.8717136383056641,
+            "second_margin": -0.8541126251220703
+          },
+          {
+            "pair_id": 42,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": -1.1887426376342773,
+            "second_margin": -1.0230154991149902
+          },
+          {
+            "pair_id": 43,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.484511375427246,
+            "second_margin": 1.4798803329467773
+          },
+          {
+            "pair_id": 44,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.4242703914642334,
+            "second_margin": 2.204505443572998
+          },
+          {
+            "pair_id": 45,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.9132742881774902,
+            "second_margin": 1.9985966682434082
+          },
+          {
+            "pair_id": 46,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.6102709770202637,
+            "second_margin": 1.6784720420837402
+          },
+          {
+            "pair_id": 47,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.08876514434814453,
+            "second_margin": 0.12296152114868164
+          },
+          {
+            "pair_id": 48,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.0364885330200195,
+            "second_margin": -1.3408870697021484
+          },
+          {
+            "pair_id": 49,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 4.161859512329102,
+            "second_margin": -4.016801834106445
+          },
+          {
+            "pair_id": 50,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.339540958404541,
+            "second_margin": -0.30133914947509766
+          },
+          {
+            "pair_id": 51,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.9530305862426758,
+            "second_margin": 1.0638046264648438
+          },
+          {
+            "pair_id": 52,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.3742904663085938,
+            "second_margin": 1.691141128540039
+          },
+          {
+            "pair_id": 53,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.3321576118469238,
+            "second_margin": -1.0881489117940264
+          },
+          {
+            "pair_id": 54,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 2.2482287883758545,
+            "second_margin": -1.5618646144866943
+          },
+          {
+            "pair_id": 55,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 4.0237321853637695,
+            "second_margin": -3.9676313400268555
+          },
+          {
+            "pair_id": 56,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.1427135467529297,
+            "second_margin": 1.0566630363464355
+          },
+          {
+            "pair_id": 57,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 0.16775131225585938,
+            "second_margin": 2.053337574005127
+          },
+          {
+            "pair_id": 58,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": -0.7953033447265625,
+            "second_margin": -1.534897804260254
+          },
+          {
+            "pair_id": 59,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.9072688420613613,
+            "second_margin": 1.8258412679036464
+          },
+          {
+            "pair_id": 60,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.1441329320271816,
+            "second_margin": 2.1746398607889805
+          },
+          {
+            "pair_id": 61,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.4294629096984863,
+            "second_margin": -2.1806154251098633
+          },
+          {
+            "pair_id": 62,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": -0.6442165374755859,
+            "second_margin": -0.10643482208251953
+          },
+          {
+            "pair_id": 63,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.1057109832763672,
+            "second_margin": -0.9341088930765791
+          },
+          {
+            "pair_id": 64,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.9592380523681641,
+            "second_margin": 1.1279268264770508
+          },
+          {
+            "pair_id": 65,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.40751171112060547,
+            "second_margin": -1.1392230987548828
+          },
+          {
+            "pair_id": 66,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.8121356964111328,
+            "second_margin": -1.915374755859375
+          },
+          {
+            "pair_id": 67,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.9107751846313477,
+            "second_margin": -1.782947063446045
+          },
+          {
+            "pair_id": 68,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 2.6451210975646973,
+            "second_margin": -2.6196165084838867
+          },
+          {
+            "pair_id": 69,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.005885124206543,
+            "second_margin": -0.7972796758015948
+          },
+          {
+            "pair_id": 70,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.0156084696451826,
+            "second_margin": -0.7488304773966474
+          },
+          {
+            "pair_id": 71,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.256145477294922,
+            "second_margin": 2.1685895919799805
+          },
+          {
+            "pair_id": 72,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.5806703567504883,
+            "second_margin": 0.6766233444213867
+          },
+          {
+            "pair_id": 73,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.36399269104003906,
+            "second_margin": -0.6907367706298828
+          },
+          {
+            "pair_id": 74,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.09417438507080078,
+            "second_margin": -0.7593655586242676
+          },
+          {
+            "pair_id": 75,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.9592380523681641,
+            "second_margin": 1.1279268264770508
+          },
+          {
+            "pair_id": 76,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.2247724533081055,
+            "second_margin": -1.954880714416504
+          },
+          {
+            "pair_id": 77,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -4.365389823913574,
+            "second_margin": 4.390064239501953
+          },
+          {
+            "pair_id": 78,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.4900784492492676,
+            "second_margin": -0.43062400817871094
+          },
+          {
+            "pair_id": 79,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 3.7082440853118896,
+            "second_margin": -1.7241401672363281
+          },
+          {
+            "pair_id": 80,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 3.9053726196289062,
+            "second_margin": -3.8869123458862305
+          },
+          {
+            "pair_id": 81,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -4.1570234298706055,
+            "second_margin": 3.455270290374756
+          },
+          {
+            "pair_id": 82,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.4614830017089844,
+            "second_margin": -1.7598075866699219
+          },
+          {
+            "pair_id": 83,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.14892578125,
+            "second_margin": -0.8007726669311523
+          },
+          {
+            "pair_id": 84,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.8779106140136719,
+            "second_margin": 3.235332489013672
+          },
+          {
+            "pair_id": 85,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 2.1486082077026367,
+            "second_margin": -2.283094882965088
+          },
+          {
+            "pair_id": 86,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.264130910237631,
+            "second_margin": 2.2766337394714355
+          },
+          {
+            "pair_id": 87,
+            "category": "speaker",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.9338302612304688,
+            "second_margin": 0.2435894012451172
+          },
+          {
+            "pair_id": 88,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.8102855682373047,
+            "second_margin": -1.8980531692504883
+          },
+          {
+            "pair_id": 89,
+            "category": "location",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.6768287022908526,
+            "second_margin": -0.8210115432739258
+          },
+          {
+            "pair_id": 90,
+            "category": "ownership",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.0925135612487793,
+            "second_margin": -2.5828514099121094
+          },
+          {
+            "pair_id": 91,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 1.01591157913208,
+            "second_margin": -0.4529995918273926
+          },
+          {
+            "pair_id": 92,
+            "category": "transfer",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.9510164260864258,
+            "second_margin": -0.9268088340759277
+          },
+          {
+            "pair_id": 93,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -1.941938877105713,
+            "second_margin": 1.7377374172210693
+          },
+          {
+            "pair_id": 94,
+            "category": "state",
+            "first_correct": true,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": 0.8717136383056641,
+            "second_margin": -0.8541126251220703
+          },
+          {
+            "pair_id": 95,
+            "category": "location",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.361797571182251,
+            "second_margin": 1.6920323371887207
+          },
+          {
+            "pair_id": 96,
+            "category": "ownership",
+            "first_correct": false,
+            "second_correct": false,
+            "strict_correct": false,
+            "first_margin": -0.8662285804748535,
+            "second_margin": -0.799006462097168
+          },
+          {
+            "pair_id": 97,
+            "category": "state",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -2.1045085589090977,
+            "second_margin": 2.28288714090983
+          },
+          {
+            "pair_id": 98,
+            "category": "transfer",
+            "first_correct": false,
+            "second_correct": true,
+            "strict_correct": false,
+            "first_margin": -0.6750354766845703,
+            "second_margin": 1.0180025100708008
+          },
+          {
+            "pair_id": 99,
+            "category": "speaker",
+            "first_correct": true,
+            "second_correct": true,
+            "strict_correct": true,
+            "first_margin": 0.33856868743896484,
+            "second_margin": 0.5938940048217773
+          }
+        ]
+      },
+      "generations": [
+        {
+          "prompt": "서윤이는 금빛 단추를 유리병에 넣어 찬장 위에 두었어요. 민호에게 병을 건드리지 말라고 했지만, 잠시 뒤 부엌에서 쨍그랑 소리가 났어요. 서윤이가 달려가 보니",
+          "continuation": "작은 숟가락이 그릇 뒤에 숨어 있었어요.\n민호는 놀라서 입을 다물었어요. 서윤이는 민호가 왜 안 오는지 몰라 고개를 갸웃했어요. 민호가 조용히 다가와 말했어요. \"나도 조금 무서웠어.\"\n둘은 잠깐 토라졌어요. 서윤이는 민호이가 일부러 그런 게 아니라 놀라게 한 줄 알았어요. 그래서 얼굴이 빨개졌어요.\n\"미안해요, 같이 알아도 돼요?\" 민호가 물었어요. 민호는 고개를 끄덕였어요. 둘은 숟가락을 놓고 웃으며 화해했어요.",
+          "generated_tokens": 80,
+          "continuation_characters": 234,
+          "seconds": 1.8881854999926873,
+          "tokens_per_second": 42.368718539735546,
+          "characters_per_second": 123.92850172872647
+        },
+        {
+          "prompt": "토끼는 다리를 다쳐 경주에 나가지 않았고 거북이만 출발선에 섰어요. 종이 울리자",
+          "continuation": "토끼는 놀라 귀를 내렸어요.\n거북이는 \"천천히 가면 안 돼요\" 하고 말했어요. 토끼는 \"내 발을 보고 싶어요\" 하며 발을 동동 굴렀어요.\n둘은 잠깐 다투었지만, 토끼가 먼저 손을 내밀었어요. 거북이는 \"아까 미안해요\" 하고 고개를 숙였어요.\n거북이는 \"다음엔 같이 가요\" 하고 웃었어요. 토끼는 친구와 함께 다리를 건너고, 작은 다리까지 천천히 건넜어요.",
+          "generated_tokens": 67,
+          "continuation_characters": 198,
+          "seconds": 1.2534636000054888,
+          "tokens_per_second": 53.45189122341216,
+          "characters_per_second": 157.9623054065016
+        },
+        {
+          "prompt": "“내일 네 책을 돌려줄게.” 은지가 말했어요. 다음 날 은지는 준호를 만나",
+          "continuation": "꼭 안았어요.\n둘은 먼 마을로 여행을 갔어요. 그런데 은지는 친구 말을 듣지 않아 마음이 아팠어요.\n은지는 “내가 먼저 가서 미안해요” 하고 말했어요. 친구는 고개를 숙였어요.\n둘은 책을 함께 읽고 다시 손을 잡았어요. 우정은 남았지만, 은지는 마음을 아프게 할 수 있다는 걸 알았어요.",
+          "generated_tokens": 56,
+          "continuation_characters": 160,
+          "seconds": 1.0664742999942973,
+          "tokens_per_second": 52.50946975496685,
+          "characters_per_second": 150.02705644276244
+        }
+      ],
+      "elapsed_seconds": 10.455211699998472,
+      "forced_choice_common": {
+        "correct": 15,
+        "total": 37,
+        "accuracy": 0.40540540540540543,
+        "mean_margin_nats": -0.40338152808112065,
+        "by_category": {
+          "location": {
+            "correct": 5,
+            "total": 10
+          },
+          "negation": {
+            "correct": 1,
+            "total": 2
+          },
+          "persistent_state": {
+            "correct": 4,
+            "total": 10
+          },
+          "speaker_role": {
+            "correct": 3,
+            "total": 10
+          },
+          "transfer": {
+            "correct": 2,
+            "total": 5
+          }
+        }
+      }
+    }
+  },
+  "common_case_ids": [
+    0,
+    3,
+    4,
+    5,
+    6,
+    8,
+    9,
+    10,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    23,
+    24,
+    25,
+    26,
+    28,
+    29,
+    30,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    43,
+    44,
+    45,
+    46,
+    48,
+    49
+  ],
+  "common_case_count": 37
+}
