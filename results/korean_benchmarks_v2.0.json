@@ -1,0 +1,89 @@
+{
+  "export_dir": "runs\\haru-v2-unfolded\\transformers",
+  "tasks": [
+    "kobest_boolq",
+    "kobest_copa",
+    "kobest_hellaswag",
+    "kobest_sentineg",
+    "kobest_wic"
+  ],
+  "limit": null,
+  "mean_accuracy": 0.4694067732249093,
+  "chance_mean_accuracy": 0.45,
+  "results": [
+    {
+      "task": "kobest_boolq",
+      "accuracy": 0.5071225071225072,
+      "chance": 0.5,
+      "above_chance": 0.007122507122507171,
+      "macro_f1": 0.3617829675310513
+    },
+    {
+      "task": "kobest_copa",
+      "accuracy": 0.529,
+      "chance": 0.5,
+      "above_chance": 0.029000000000000026,
+      "macro_f1": 0.5278664072437924
+    },
+    {
+      "task": "kobest_hellaswag",
+      "accuracy": 0.314,
+      "chance": 0.25,
+      "above_chance": 0.064,
+      "macro_f1": 0.31015193210563763
+    },
+    {
+      "task": "kobest_sentineg",
+      "accuracy": 0.5088161209068011,
+      "chance": 0.5,
+      "above_chance": 0.008816120906801062,
+      "macro_f1": 0.38171377456892075
+    },
+    {
+      "task": "kobest_wic",
+      "accuracy": 0.4880952380952381,
+      "chance": 0.5,
+      "above_chance": -0.011904761904761918,
+      "macro_f1": 0.328
+    }
+  ],
+  "raw": {
+    "kobest_boolq": {
+      "alias": "kobest_boolq",
+      "acc,none": 0.5071225071225072,
+      "acc_stderr,none": 0.013347413060911648,
+      "f1,none": 0.3617829675310513,
+      "f1_stderr,none": "N/A"
+    },
+    "kobest_copa": {
+      "alias": "kobest_copa",
+      "acc,none": 0.529,
+      "acc_stderr,none": 0.0157926694516289,
+      "f1,none": 0.5278664072437924,
+      "f1_stderr,none": "N/A"
+    },
+    "kobest_hellaswag": {
+      "alias": "kobest_hellaswag",
+      "acc,none": 0.314,
+      "acc_stderr,none": 0.020776701920308997,
+      "f1,none": 0.31015193210563763,
+      "f1_stderr,none": "N/A",
+      "acc_norm,none": 0.408,
+      "acc_norm_stderr,none": 0.022000910893877193
+    },
+    "kobest_sentineg": {
+      "alias": "kobest_sentineg",
+      "acc,none": 0.5088161209068011,
+      "acc_stderr,none": 0.025122039300513738,
+      "f1,none": 0.38171377456892075,
+      "f1_stderr,none": "N/A"
+    },
+    "kobest_wic": {
+      "alias": "kobest_wic",
+      "acc,none": 0.4880952380952381,
+      "acc_stderr,none": 0.014087502464604038,
+      "f1,none": 0.328,
+      "f1_stderr,none": "N/A"
+    }
+  }
+}

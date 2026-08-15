@@ -9,12 +9,16 @@
 Haru is a compact Korean story continuation language model. Its custom Causal
 Folded Recurrent Decoder (CFRD) uses local causal attention, compressed summary
 memory, and reusable decoder cells. Measurements at release scale show the cell
-reuse is the one part that does not pay for itself; see
-[Result at release scale](#result-at-release-scale). Haru v1.1 is the current 11.6-million-
-parameter release; the original 6.8-million-parameter checkpoint remains
-available as Haru v1.0. Both support recurrent inference depths 2, 4, and 6.
+reuse is the one part that does not pay for itself, so v2.0 unfolds the stack
+to six independent cells; see [Result at release scale](#result-at-release-scale).
+
+Haru v2.0 is the current 17.0-million-parameter release and the first Haru to
+score above chance on KoBEST. v1.1 (11.6M) and v1.0 (6.8M) remain available.
+v2.0 runs at recurrent depth 6 only; v1.1 and v1.0 also support depths 2 and 4.
+See [Recurrent depth](#recurrent-depth) for why that changed.
 
 - GitHub: [alice-noa-chan/haru](https://github.com/alice-noa-chan/haru)
+- Model v2.0: [gaon12/haru_2](https://huggingface.co/gaon12/haru_2)
 - Model v1.1: [gaon12/haru_1.1](https://huggingface.co/gaon12/haru_1.1)
 - Model v1.0: [gaon12/haru](https://huggingface.co/gaon12/haru)
 - Demo: [gaon12/haru](https://huggingface.co/spaces/gaon12/haru)
@@ -26,33 +30,46 @@ model, a factual assistant, or a safety-reviewed product.
 
 | Version | GitHub | Hugging Face | Status |
 |---|---|---|---|
-| 1.1 | [`v1.1.0`](https://github.com/alice-noa-chan/haru/releases/tag/v1.1.0) | [`gaon12/haru_1.1`](https://huggingface.co/gaon12/haru_1.1) | Current |
+| 2.0 | [`v2.0.0`](https://github.com/alice-noa-chan/haru/releases/tag/v2.0.0) | [`gaon12/haru_2`](https://huggingface.co/gaon12/haru_2) | Current |
+| 1.1 | [`v1.1.0`](https://github.com/alice-noa-chan/haru/releases/tag/v1.1.0) | [`gaon12/haru_1.1`](https://huggingface.co/gaon12/haru_1.1) | Legacy |
 | 1.0 | [`v1.0.0`](https://github.com/alice-noa-chan/haru/releases/tag/v1.0.0) | [`gaon12/haru`](https://huggingface.co/gaon12/haru) | Legacy |
 
-## Haru v1.1 at a glance
+## Haru v2.0 at a glance
 
-| Setting | Value |
-|---|---:|
-| Vocabulary | 12,000 |
-| Context length | 512 tokens |
-| Local chunk | 64 tokens |
-| Hidden size | 384 |
-| Query / KV heads | 6 / 2 |
-| Physical decoder cells | 3 |
-| Recurrent depth | 6 |
-| FFN size | 1,024 |
-| Full-context binding block | enabled |
-| Trainable parameters | 11,634,459 |
-| Best-checkpoint training tokens | 753,664,000 |
+| Setting | v2.0 | v1.1 |
+|---|---:|---:|
+| Vocabulary | 12,000 | 12,000 |
+| Context length | 512 tokens | 512 tokens |
+| Local chunk | 64 tokens | 64 tokens |
+| Hidden size | 384 | 384 |
+| Query / KV heads | 6 / 2 | 6 / 2 |
+| Physical decoder cells | **6** | 3 |
+| Recurrent depth | 6 | 6 |
+| FFN size | 1,016 | 1,024 |
+| Full-context binding block | enabled | enabled |
+| Deep supervision weight | **0.0** | 0.15 |
+| Trainable parameters | 16,983,213 | 11,634,459 |
+| Training tokens | 4,259,840,000 | 753,664,000 |
 
-The three physical cells run in this order:
+v1.1 reused three physical cells twice:
 
 ```text
 A -> B -> C -> A -> B -> C
 ```
 
-The shared language-model head supervises depths 2, 4, and 6. Depth 4 is a
-useful CPU setting; depth 6 gives the best measured validation quality.
+v2.0 unfolds that into six independent cells, so no cell runs twice:
+
+```text
+A -> B -> C -> D -> E -> F
+```
+
+Unfolding is what the release-scale ablation pointed to: the arm without cell
+sharing won by more than the paired spread. The cost, measured after the fact,
+is that early exits no longer work; see [Recurrent depth](#recurrent-depth).
+
+Training stopped at 4.26B of a planned 10.4B tokens. Two KoBEST measurements
+1.5B tokens apart moved the mean by +0.003, inside the harness's own noise, so
+the remaining budget was not buying anything measurable.
 
 ## What changed in v1.1
 
@@ -170,19 +187,28 @@ and ownership (4/20). Speaker attribution and transfer remain 0/20, so v1.1 is
 still a research checkpoint rather than a solved entity-binding model. Run
 `python compare_models.py` to reproduce the three-way comparison.
 
-## Haru v1.1 evaluation
+## Recurrent depth
 
-The final held-out evaluation used 200 fixed batches at each supervised depth.
+The final held-out evaluation used 200 fixed batches at each depth.
 
-| Inference recurrences | Validation loss | Perplexity |
-|---:|---:|---:|
-| 2 | 2.95689 | 19.238 |
-| 4 | 2.12258 | 8.353 |
-| 6 | 1.92052 | 6.825 |
+| Depth | v2.0 loss | v2.0 PPL | v1.1 loss | v1.1 PPL |
+|---:|---:|---:|---:|---:|
+| 2 | 8.79562 | 6605.2 | 2.95689 | 19.238 |
+| 4 | 5.56061 | 260.0 | 2.12258 | 8.353 |
+| 6 | **3.38503** | **29.5** | 1.92052 | 6.825 |
 
-Per-token perplexity is comparable only for models using the same tokenizer.
-For different tokenizers, use byte- or character-normalized negative
-log-likelihood and report actual latency or FLOPs.
+**v2.0 is usable at depth 6 only.** Depths 2 and 4 collapse, and the cause is
+a deliberate change rather than a defect. v1.1 reused three physical cells
+twice, so an early exit ran the same trained cells fewer times and degraded
+gracefully. v2.0 unfolds the stack into six independent cells and sets
+`AUX_EXIT_LOSS_WEIGHT = 0.0`, so the depth-2 and depth-4 exits receive no
+training signal at all. Early exit is a feature of cell reuse plus deep
+supervision, and v2.0 dropped both.
+
+Loss and perplexity are not comparable across the two releases: they use
+different tokenizers, and v2.0 trains on a far broader corpus than v1.1's
+mostly narrative data. A higher number here does not mean a worse model, which
+is why the KoBEST table below is the comparison that counts.
 
 ## Korean benchmarks
 
@@ -194,20 +220,54 @@ the five KoBEST tasks through lm-eval, the harness published baselines use.
 python evaluate_korean.py runs/<RUN_NAME>/transformers
 ```
 
-Haru v1.1 sits at chance on every task:
-
-| Task | Accuracy | Chance | vs chance |
-|---|---:|---:|---:|
-| kobest_boolq | 0.502 | 0.50 | +0.002 |
-| kobest_copa | 0.500 | 0.50 | +0.000 |
-| kobest_hellaswag | 0.224 | 0.25 | -0.026 |
-| kobest_sentineg | 0.496 | 0.50 | -0.004 |
-| kobest_wic | 0.488 | 0.50 | -0.012 |
-| **mean** | **0.442** | **0.450** | **-0.008** |
-
 The tasks mix two-way and four-way formats, so the mean has no fixed floor and
-is printed beside the mean of the chance levels. 0.442 is what a coin flip
-scores, not a score.
+is printed beside the mean of the chance levels. Read the "vs chance" column,
+not the mean: 0.450 is what a coin flip scores.
+
+| Task | v2.0 | v1.1 | Chance | v2.0 vs chance |
+|---|---:|---:|---:|---:|
+| kobest_boolq | 0.507 | 0.502 | 0.50 | +0.007 |
+| kobest_copa | 0.529 | 0.500 | 0.50 | +0.029 |
+| kobest_hellaswag | **0.314** | 0.224 | 0.25 | **+0.064** |
+| kobest_sentineg | 0.509 | 0.496 | 0.50 | +0.009 |
+| kobest_wic | 0.488 | 0.488 | 0.50 | -0.012 |
+| **mean** | **0.469** | 0.442 | 0.450 | **+0.019** |
+
+v1.1 sat at or below chance on every task. v2.0 is above chance on four of
+five, and hellaswag at 0.314 against a 0.25 chance level is the first evidence
+in this project of a task being learned rather than guessed. wic is unchanged
+at 0.488, below chance, in both releases.
+
+### Against other sub-20M Korean models
+
+Every row was scored locally with the same harness, task list and settings, so
+the numbers are comparable to each other rather than quoted from model cards.
+
+| Model | Parameters | Mean | Chance | vs chance |
+|---|---:|---:|---:|---:|
+| **Haru v2.0** | **17.0M** | **0.469** | 0.450 | **+0.019** |
+| minpeter/tiny-ko-20m-sft | 20.0M | 0.463 | 0.450 | +0.013 |
+| minpeter/tiny-ko-20m-base | 20.0M | 0.457 | 0.450 | +0.007 |
+| Haru v1.1 | 11.6M | 0.442 | 0.450 | -0.008 |
+
+Per task:
+
+| Task | Haru v2.0 | tiny-ko-20m-sft | tiny-ko-20m-base | Chance |
+|---|---:|---:|---:|---:|
+| kobest_boolq | **0.507** | 0.501 | 0.504 | 0.50 |
+| kobest_copa | **0.529** | 0.502 | 0.508 | 0.50 |
+| kobest_hellaswag | 0.314 | **0.330** | 0.288 | 0.25 |
+| kobest_sentineg | **0.509** | 0.491 | 0.496 | 0.50 |
+| kobest_wic | 0.488 | 0.488 | 0.488 | 0.50 |
+
+Haru v2.0 leads on the mean with 15% fewer parameters, and leads on three of
+the five tasks. tiny-ko-20m-sft is ahead on hellaswag, the one task where all
+three models are clearly above chance.
+
+These are small margins on a benchmark where chance is 0.450, and no model here
+is close to useful on wic, which all three score below chance. The honest
+summary is that sub-20M Korean models are all near the floor, and Haru v2.0 is
+slightly further from it than the others tested.
 
 This is a data result, not an architecture one. v1.1 saw 0.75B tokens of
 children's stories; a Pythia-scale baseline sees roughly 400x more text across
