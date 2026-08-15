@@ -16,6 +16,7 @@ paired deltas, strict pair accuracies, parameter counts, and measured FLOPs.
 | `architecture_release_ablate_deepsup_6000steps_3seeds.json` | `compare_architectures.py --scale release --ablate --deep-supervision-arms` (6,000 steps, 3 seeds) | RESEARCH.md, "Eight-arm release table" |
 | `architecture_release_ablate_combine_6000steps_3seeds.json` | `compare_architectures.py --scale release --ablate --combine` (6,000 steps, 3 seeds) | RESEARCH.md, "Does the combination compose" |
 | `korean_benchmarks_v1.1.json` | `evaluate_korean.py runs/haru-v2-binding/transformers` | README, "Korean benchmarks" |
+| `korean_benchmarks_v2.0_midtraining.json` | `evaluate_korean.py runs/haru-v2-unfolded/transformers` at 39.6% of the v2.0 budget | README, "Korean benchmarks"; a mid-training probe, not a release score |
 | `decontamination_textbooks.json` | `decontaminate.py data/textbooks.txt` | data/datasets.md, decontamination log |
 
 The first two ran on CPU with the 8,192-entry tokenizer at reduced model scale
