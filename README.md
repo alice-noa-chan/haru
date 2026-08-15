@@ -71,30 +71,44 @@ Training stopped at 4.26B of a planned 10.4B tokens. Two KoBEST measurements
 1.5B tokens apart moved the mean by +0.003, inside the harness's own noise, so
 the remaining budget was not buying anything measurable.
 
-## What changed in v1.1
+## What changed in v2.0
 
-Version 1.1 uses a separate `haru-v2-binding` run and a separate 12,000-token
-tokenizer. It does not overwrite the v1.0 artifacts.
+v2.0 uses a separate `haru-v2-unfolded` run and a retrained 12,000-token BPE
+tokenizer. It does not overwrite the v1.1 or v1.0 artifacts.
 
-| Setting | Value |
-|---|---:|
-| Vocabulary | 12,000 |
-| Physical decoder cells | 3 |
-| Recurrent depth | 6 |
-| Full-context binding block | enabled |
-| Trainable parameters | 11,634,459 |
+| Setting | v2.0 | v1.1 |
+|---|---:|---:|
+| Physical decoder cells | 6 | 3 |
+| FFN size | 1,016 | 1,024 |
+| Deep supervision weight | 0.0 | 0.15 |
+| Trainable parameters | 16,983,213 | 11,634,459 |
+| Training tokens | 4,259,840,000 | 753,664,000 |
+| Corpus | stories, encyclopaedic, textbook, web | mostly narrative |
 
-The extra cell reduces forced parameter sharing. The final binding block gives
-all tokens one independent causal-attention pass after the recurrent stack,
-so entity, role, and attribute evidence need not survive only through local
-chunks and compressed summaries.
+Unfolding the recurrent stack into six independent cells follows the
+release-scale ablation, where the arm without cell sharing beat CFRD by more
+than the paired spread. The corpus grew from 0.75B to 2.6B tokens and was
+n-gram decontaminated against all five KoBEST evaluation sets.
 
-Training also adds a 0.20-weight auxiliary relation objective. Each step draws
-fresh entity permutations across location, state, ownership, transfer, and
-speaker-attribution pairs. The loss compares only candidate-answer token spans
-and requires the preferred answer to flip in both counterfactual directions.
-Held-out names and phrasings are evaluated separately; best-checkpoint
-selection combines language-model loss with this relation loss.
+Two things regressed, and both are documented rather than smoothed over.
+Early-exit inference no longer works, because it depended on cell reuse and
+deep supervision and v2.0 dropped both; see
+[Recurrent depth](#recurrent-depth). The auxiliary relation objective
+memorised its training entities this run, reaching 100% strict-pair accuracy
+on training permutations while held-out accuracy fell from 41% to 27%.
+
+Training stopped at 4.26B of a planned 10.4B tokens. Two KoBEST measurements
+1.5B tokens apart moved the mean by +0.003, inside the harness's own noise, so
+the remaining budget was not buying measurable accuracy.
+
+### What changed in v1.1
+
+v1.1 added a third physical cell and a final full-context binding block, giving
+all tokens one independent causal-attention pass after the recurrent stack, so
+entity, role, and attribute evidence need not survive only through local chunks
+and compressed summaries. It also introduced the 0.20-weight auxiliary relation
+objective, which draws fresh entity permutations each step across location,
+state, ownership, transfer, and speaker-attribution pairs.
 
 ## Install
 
@@ -112,7 +126,7 @@ AutoClasses. It does not load the training `.pt` checkpoint.
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-model_id = "gaon12/haru_1.1"
+model_id = "gaon12/haru_2"
 tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained(
     model_id,
