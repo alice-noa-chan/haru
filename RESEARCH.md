@@ -1,8 +1,19 @@
 # Haru Research Notes
 
-Haru uses a custom Causal Folded Recurrent Decoder (CFRD). The design combines
-recurrent parameter sharing, local causal attention, compressed summary memory,
-and supervised early exits.
+Haru uses a custom architecture still named Causal Folded Recurrent Decoder
+(CFRD): local causal attention, compressed summary memory, and a full-context
+binding block. It originally combined those with recurrent parameter sharing
+and supervised early exits, and the current v2.0 release has neither -- see
+[Where this leaves v1.2](#where-this-leaves-v12) for why the name now overstates
+what the model does.
+
+**How to read this document.** It is a chronological notebook, not a design
+spec. Sections appear in the order the work happened, and earlier ones state
+plans and hypotheses that later measurements went on to refute -- that is the
+point of keeping them. Anything describing what to do next is superseded by
+[v2.0 outcome, and where v2.1 should look](#v20-outcome-and-where-v21-should-look)
+at the end. In particular, "Next-training design" below describes the v1.1
+profile as it was planned, not the current release.
 
 ## Related architecture research
 
@@ -463,17 +474,38 @@ row that cleared the spread on all three seeds:
 - Test `cell_attention = "full"` combined with unfolding. Both help
   independently; nothing here shows they compose.
 
-Two things are still unmeasured and neither should be assumed:
+Two things were still unmeasured here. The first has since been answered; the
+second has not.
 
-1. Whether unfolding and full-context cells compose, or whether they are two
-   routes to the same gain. The table has no arm with both.
-2. The learning rate remains CFRD's tuned 4e-4 for every arm. It is now the
-   last uncontrolled variable large enough to matter.
+1. Whether unfolding and full-context cells compose. **They do not.** The
+   combine arm was run at release scale over three seeds:
 
-Naming honesty applies to the result as well. If v1.2 ships unfolded, the
+   | Arm | Parameters | Mean val loss | Std |
+   |---|---:|---:|---:|
+   | cfrd-unfolded | 17,047,725 | **3.3231** | 0.0108 |
+   | cfrd-unfolded-full-attention | 15,667,599 | 3.3355 | 0.0036 |
+   | cfrd-full-attention | 10,944,393 | 3.3558 | 0.0081 |
+   | cfrd | 11,634,459 | 3.3814 | 0.0113 |
+
+   Each helps on its own, and together they are worse than unfolding alone.
+   They are two routes to the same gain, not additive ones, so v2.0 shipped
+   unfolded with local cells and summary memory retained.
+
+2. The learning rate remains CFRD's tuned 4e-4 for every arm, and still is.
+   v2.0 trained at 4e-4 as well, so this is the oldest uncontrolled variable in
+   the project and it survived into the release.
+
+Naming honesty applies to the result as well. If a release ships unfolded, the
 "Folded" in Causal Folded Recurrent Decoder no longer describes it, and the
 architecture should be renamed rather than keeping a label the measurements
 have removed.
+
+**v2.0 shipped unfolded and kept the name.** Six independent cells run once
+each; nothing is folded. The label is now inherited rather than descriptive,
+and this document set the standard that says so. Renaming is a breaking change
+for `trust_remote_code` users, whose configs and class names carry `cfrd`, so
+it is deferred rather than dismissed: the next architecture change is the point
+to make it, and the debt is recorded here so it is not quietly forgotten.
 
 ## Required validation and limits
 
@@ -498,6 +530,31 @@ This design targets entity and role hallucinations caused by weak contextual
 binding. It cannot guarantee factual truth, recover knowledge absent from the
 training data, or turn Haru into an instruction-following assistant. Those
 claims require separate data, retrieval, calibration, and safety evaluation.
+
+### What v2.0 actually reported against that list
+
+Scored honestly, the release met four of six.
+
+| Required | v2.0 |
+|---|---|
+| Validation loss at depths 2, 4, 6 | done: 8.796 / 5.561 / 3.385, and the collapse is itself a finding |
+| Relation decision and strict-pair accuracy, per family | done, held out: 27% strict pairs against 41% early |
+| Preference flip, signed margin, **multiple seeds** | flip and margin done; **one seed only** |
+| **Matched dense baselines under an identical schedule** | **not run for the release model.** The dense comparison exists only at 6,000-step ablation scale |
+| Ablations for cells, binding block, vocabulary, relation loss | done at ablation scale, not re-run at release scale |
+| Free-generation quality and memorization checks | generation reviewed by hand; no systematic memorization check |
+
+The two failures matter differently. Single-seed means the KoBEST margin of
++0.019 over chance has no variance estimate attached to it, and the same
+harness's per-task standard error is 0.012 to 0.022, so a second seed could
+move the headline. Not training a matched dense baseline at release scale
+means the claim CFRD carries -- that this architecture is worth its custom code
+-- still rests on 6,000-step arms, exactly the gap this document flagged before
+v1.2 and has now carried through a second release.
+
+Neither was skipped for a reason worth defending. Both were the cost of
+stopping training early once the token axis was measured to be exhausted, and
+both belong in v2.1's budget ahead of any new architecture idea.
 
 ## v2.0 outcome, and where v2.1 should look
 
