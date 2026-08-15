@@ -1,0 +1,51 @@
+{
+  "model": "minpeter/tiny-ko-20m-sft",
+  "tasks": [
+    "kobest_boolq",
+    "kobest_copa",
+    "kobest_hellaswag",
+    "kobest_sentineg",
+    "kobest_wic"
+  ],
+  "results": [
+    {
+      "task": "kobest_boolq",
+      "accuracy": 0.5014245014245015,
+      "chance": 0.5,
+      "above_chance": 0.0014245014245014564,
+      "macro_f1": 0.33649109920497755
+    },
+    {
+      "task": "kobest_copa",
+      "accuracy": 0.502,
+      "chance": 0.5,
+      "above_chance": 0.0020000000000000018,
+      "macro_f1": 0.5009439974987073
+    },
+    {
+      "task": "kobest_hellaswag",
+      "accuracy": 0.33,
+      "chance": 0.25,
+      "above_chance": 0.08000000000000002,
+      "macro_f1": 0.3265192538944517
+    },
+    {
+      "task": "kobest_sentineg",
+      "accuracy": 0.491183879093199,
+      "chance": 0.5,
+      "above_chance": -0.008816120906801006,
+      "macro_f1": 0.4513273125342091
+    },
+    {
+      "task": "kobest_wic",
+      "accuracy": 0.4880952380952381,
+      "chance": 0.5,
+      "above_chance": -0.011904761904761918,
+      "macro_f1": 0.328
+    }
+  ],
+  "mean_accuracy": 0.4625407237225877,
+  "chance_mean_accuracy": 0.45,
+  "above_chance_mean": 0.012540723722587688,
+  "seconds": 423.13925339997513
+}
