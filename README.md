@@ -159,8 +159,10 @@ Set the prompt and sampling values in `config.py`, then run:
 python generate.py
 ```
 
-`generate.py` loads `AutoTokenizer` and `AutoModelForCausalLM`. Set
-`INFERENCE_RECURSIONS` to 2, 4, or 6 in `config.py`.
+`generate.py` loads `AutoTokenizer` and `AutoModelForCausalLM`.
+`INFERENCE_RECURSIONS` in `config.py` selects the depth. Leave it at 6 for
+v2.0: depths 2 and 4 are untrained in this release and produce unusable
+output. On v1.1 and v1.0 all three work.
 
 ## Architecture
 
@@ -175,10 +177,14 @@ Summary memory has a learned per-head recency bias. Korean token embeddings
 also receive a small projection of onset, vowel, coda, word-boundary, digit,
 ASCII, punctuation, byte-fallback, and token-length features.
 
-The v1.1 configuration then applies a non-recurrent full-context
+The v1.1 and v2.0 configurations then apply a non-recurrent full-context
 causal attention and SwiGLU block before the shared language-model head. Older
 configuration files do not enable this block, so existing exports remain
 loadable with their original architecture.
+
+v1.0 and v1.1 reuse their physical cells across the recurrent passes. v2.0
+gives each pass its own cell, which is why its cost is parameters rather
+than the early-exit flexibility the reuse provided.
 
 See [RESEARCH.md](RESEARCH.md) for related work.
 
@@ -448,7 +454,8 @@ python smoke_test.py
 The suite checks shapes, gradients, causality, partial chunks, exact checkpoint
 resume (including the dynamic relation sampler), counterfactual-pair leakage
 and gradients, Safetensors parity, AutoClass loading, tokenizer round trips,
-and the default parameter count.
+progress and ETA reporting across a resume, and that the configured model stays
+inside the 17M parameter ceiling.
 
 ### 5. Train and evaluate
 
@@ -459,8 +466,8 @@ python evaluate.py
 
 Review model, optimizer, schedule, and path settings in `config.py` first. Use
 a new `RUN_NAME` when changing an architecture or training schedule. The
-current defaults already isolate the new tokenizer, packed data, checkpoints,
-and logs under `haru-v2-binding` paths.
+current defaults isolate the tokenizer, packed data, checkpoints, and logs
+under `haru-v2-unfolded` paths.
 
 ### 6. Export
 
@@ -491,7 +498,8 @@ AutoClasses and verifies all serialized tensors and output logits.
 | `baseline_model.py` | Dense Transformer control for CFRD ablations |
 | `model_factory.py` | Architecture selection for training and evaluation |
 | `compare_architectures.py` | CFRD versus matched dense baselines |
-| `compare_models.py` | Reproducible v1.0/v1.1/35M comparison |
+| `compare_models.py` | Reproducible v1.0/v1.1/v2.0/35M comparison |
+| `select_checkpoint.py` | Reports which checkpoint the training log favours |
 | `generate.py` | Transformers-based local generation |
 | `download_data.py` | Corpus download, refusing benchmark datasets |
 | `decontaminate.py` | Benchmark n-gram removal from a corpus |
@@ -505,7 +513,17 @@ AutoClasses and verifies all serialized tensors and output logits.
 - Summary memory can lose names, quotations, and exact event details.
 - Generation has no KV or recurrent-state cache yet.
 - Longer continuations may repeat ideas or drift between entities.
-- Speaker attribution and transfer bindings remain weak in v1.1.
+- v2.0 runs at recurrent depth 6 only. Depths 2 and 4 are untrained and
+  collapse; v1.1 and v1.0 support all three.
+- Generation repeats itself within a sentence or two, entity reference is
+  unreliable, and encyclopaedic prompts reproduce surface form, including
+  wiki markup, without the underlying facts.
+- v2.0's auxiliary relation objective memorised its training entities:
+  100% strict pairs on training permutations against held-out accuracy
+  falling from 41% to 27%. It also distorted checkpoint selection, since the
+  weighted relation term varied 30x more than the language-model term it was
+  added to. Use `select_checkpoint.py` before trusting `best.pt`.
+- Speaker attribution and transfer bindings remain weak.
 - No released Haru checkpoint has itself been compared against a matched dense
   Transformer. The release-scale comparison trains fresh arms at 49.2M tokens
   each, so it does not retroactively validate the v1.0 or v1.1 artifacts.
