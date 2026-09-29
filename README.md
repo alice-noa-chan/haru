@@ -34,7 +34,9 @@ trains its own larger teacher, and preserves separate base/chat checkpoints.
 It is not yet a completed model release. See [V3.md](V3.md) for architecture,
 data splits, cost limits, training/resume commands and publication.
 
-The GPU runs have not started. After Beam rejected the available credit type,
+GPU model training has not started. The first booted L40S failed CUDA driver
+initialization before any optimizer step; no throughput result is available yet.
+After Beam rejected the available credit type,
 the owner approved RunPod L40S and subsequently RTX 5090 Community Cloud with a $20 total cap, Pod volume,
 and verified local checkpoint backups. Allocation waits for a valid single-GPU
 quote compatible with the selected runtime. CUDA 12.4 L40S hosts use the pinned
