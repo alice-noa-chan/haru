@@ -34,6 +34,11 @@ trains its own larger teacher, and preserves separate base/chat checkpoints.
 It is not yet a completed model release. See [V3.md](V3.md) for architecture,
 data splits, cost limits, training/resume commands and publication.
 
+The GPU runs have not started. After Beam rejected the available credit type,
+training preparation moved to RunPod; the total spending cap and storage choice
+are awaiting confirmation. Existing hashed zstd data can be reused without
+recompression via `v3_runpod_transfer.py`.
+
 The released v1/v2 models retain their weights and revision history while moving
 to the alice-noa-chan organization. The new character image is used above and
 in the CPU demo.
