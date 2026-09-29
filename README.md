@@ -35,9 +35,11 @@ It is not yet a completed model release. See [V3.md](V3.md) for architecture,
 data splits, cost limits, training/resume commands and publication.
 
 The GPU runs have not started. After Beam rejected the available credit type,
-training preparation moved to RunPod; the total spending cap and storage choice
-are awaiting confirmation. Existing hashed zstd data can be reused without
-recompression via `v3_runpod_transfer.py`.
+the owner approved RunPod L40S Community Cloud with a $20 total cap, Pod volume,
+and verified local checkpoint backups. Allocation waits for a valid single-GPU
+quote. Existing hashed zstd data is reused without recompression. The benchmark
+also measures larger-teacher training and student distillation with real optimizer
+steps before the candidate comparison begins.
 
 The released v1/v2 models retain their weights and revision history while moving
 to the alice-noa-chan organization. The new character image is used above and
