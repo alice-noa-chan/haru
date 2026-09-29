@@ -54,15 +54,20 @@ def build_harness_model(export_dir: Path, device: str, batch_size: int):
     from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
 
     from configuration_cfrd import CFRDConfig
+    from configuration_haru_dense import HaruDenseConfig
     from modeling_cfrd import CFRDForCausalLM
+    from modeling_haru_dense import HaruDenseForCausalLM
     from tokenization_cfrd import CFRDTokenizer
 
     AutoConfig.register("cfrd", CFRDConfig, exist_ok=True)
     AutoModelForCausalLM.register(CFRDConfig, CFRDForCausalLM, exist_ok=True)
     AutoTokenizer.register(CFRDConfig, slow_tokenizer_class=CFRDTokenizer, exist_ok=True)
+    AutoConfig.register("haru_dense", HaruDenseConfig, exist_ok=True)
+    AutoModelForCausalLM.register(HaruDenseConfig, HaruDenseForCausalLM, exist_ok=True)
+    AutoTokenizer.register(HaruDenseConfig, slow_tokenizer_class=CFRDTokenizer, exist_ok=True)
 
-    hf_config = CFRDConfig.from_pretrained(export_dir)
-    model = CFRDForCausalLM.from_pretrained(export_dir, config=hf_config).eval()
+    hf_config = AutoConfig.from_pretrained(export_dir, trust_remote_code=False)
+    model = AutoModelForCausalLM.from_pretrained(export_dir, config=hf_config, trust_remote_code=False).eval()
     tokenizer = CFRDTokenizer.from_pretrained(export_dir)
 
     from lm_eval.models.huggingface import HFLM
