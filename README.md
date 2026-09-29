@@ -21,6 +21,7 @@ See [Recurrent depth](#recurrent-depth) for why that changed.
 - Model v2.0: [alice-noa-chan/haru_2](https://huggingface.co/alice-noa-chan/haru_2)
 - Model v1.1: [alice-noa-chan/haru_1.1](https://huggingface.co/alice-noa-chan/haru_1.1)
 - Model v1.0: [alice-noa-chan/haru](https://huggingface.co/alice-noa-chan/haru)
+- Collection: [Haru model family](https://huggingface.co/collections/alice-noa-chan/haru-6abb683d0a8b9677162d7704)
 - Demo Spaces were retired at the owner's request; model weights remain available.
 
 Haru is a research prototype for story continuation. It is not an instruction
