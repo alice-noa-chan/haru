@@ -1,0 +1,23 @@
+{
+  "alice-noa-chan/haru": {
+    "revision": "5e722ae81bbf8203e56a6f867a8fccc93c95da8f",
+    "weight_hashes_preserved": true,
+    "safetensors": {
+      "model.safetensors": "cf7ebb261e754bd313109ec919f7de0585a5958d41a851a97e9a3e57c719233a"
+    }
+  },
+  "alice-noa-chan/haru_1.1": {
+    "revision": "b834a95bfe8f2cd108214d967acb1644bfc4d4d9",
+    "weight_hashes_preserved": true,
+    "safetensors": {
+      "model.safetensors": "6ab1998c9487af6eace90724de7af76678e1da2d9a217e655d2c0c5267d8239d"
+    }
+  },
+  "alice-noa-chan/haru_2": {
+    "revision": "11aa2adb45116f136aaf4ea8ee30270437adbc50",
+    "weight_hashes_preserved": true,
+    "safetensors": {
+      "model.safetensors": "d49ad462b9d4621e7b14ffa4900edfe2b98f6eed0638fd10e000e58fb09d0be6"
+    }
+  }
+}

@@ -147,7 +147,7 @@ class DenseBlock(nn.Module):
 
 @dataclass
 class DenseOutput:
-    logits: torch.Tensor
+    logits: torch.Tensor | None
     loss: torch.Tensor | None = None
     final_loss: torch.Tensor | None = None
     exit_losses: dict | None = None
@@ -193,6 +193,8 @@ class DenseLanguageModel(nn.Module):
         position_ids=None,
         past_key_values=None,
         use_cache=False,
+        loss_only=False,
+        loss_backend="torch",
     ):
         batch, length = token_ids.shape
         if length == 0:
@@ -230,12 +232,24 @@ class DenseLanguageModel(nn.Module):
                 presents.append(present)
         if logits_to_keep:
             x = x[:, -logits_to_keep:]
-        logits = F.linear(self.final_norm(x), self.token_embedding.weight)
+        hidden = self.final_norm(x)
+        if loss_backend == "liger":
+            if targets is None or not loss_only or use_cache or token_ids.device.type != "cuda":
+                raise ValueError("Liger CE requires CUDA loss-only training without a cache")
+            from liger_kernel.transformers import LigerFusedLinearCrossEntropyLoss
+
+            loss = LigerFusedLinearCrossEntropyLoss(ignore_index=-100, accum_dtype=torch.float32)(
+                self.token_embedding.weight, hidden.reshape(-1, self.cfg.d_model), targets.reshape(-1)
+            )
+            return DenseOutput(None, loss, loss)
+        if loss_backend != "torch":
+            raise ValueError("Unknown loss backend")
+        logits = F.linear(hidden, self.token_embedding.weight)
         loss = (
             None if targets is None else F.cross_entropy(logits.reshape(-1, self.cfg.vocab_size), targets.reshape(-1))
         )
         return DenseOutput(
-            logits,
+            None if loss_only else logits,
             loss,
             loss,
             {self.cfg.n_layer: loss} if loss is not None else {},
