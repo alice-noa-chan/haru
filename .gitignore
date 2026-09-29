@@ -23,6 +23,8 @@ plan_budget.py
 results/batch_sweep.json
 packed/**/*.zst
 packed/haru-v3/
+packed/haru-v3-rules-1m/
+packed/haru-v3-teacher/
 .v3_cloud_session.json
 .v3_hub_migration.json
 .v3_hub_migration.json.tmp

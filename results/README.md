@@ -52,3 +52,7 @@ results. `hub_migration.json` records legacy repository revisions and file hashe
 Training logs, throughput, selection and validation artifacts originate in
 `runs/haru-v3/` and are copied here only after verification. No untrained v3
 checkpoint is presented as a release.
+`v3_data_preparation.json` records verified token stream hashes, tokenizer sample
+sizes, the one-million-example rule overlay and expected domain exposure. It
+contains preparation results; GPU throughput and final model quality are recorded
+only after their measurements complete.
