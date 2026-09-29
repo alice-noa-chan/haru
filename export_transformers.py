@@ -108,7 +108,7 @@ causal architecture. It has {parameter_count:,} parameters and runs at
 {depth_claim}.
 
 - [Source code](https://github.com/alice-noa-chan/haru)
-- [Interactive demo](https://huggingface.co/spaces/gaon12/haru)
+- [Interactive demo](https://huggingface.co/spaces/alice-noa-chan/haru)
 - [Previous Haru release](https://huggingface.co/{config.PREVIOUS_HUGGINGFACE_MODEL_ID})
 
 ## Usage

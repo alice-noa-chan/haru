@@ -8,7 +8,7 @@ app_file: index.html
 pinned: false
 license: mit
 models:
-- gaon12/haru
+- alice-noa-chan/haru
 ---
 
 # Haru

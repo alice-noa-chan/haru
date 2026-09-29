@@ -43,3 +43,12 @@ checked before any benchmark score from that corpus is believed.
 
 Regenerating either command overwrites `runs/`, not this directory. Copy a new
 result here deliberately, alongside the documentation change that cites it.
+
+
+## v3 artifacts
+
+v3 implementation and release status are recorded separately from historical
+results. `hub_migration.json` records legacy repository revisions and file hashes.
+Training logs, throughput, selection and validation artifacts originate in
+`runs/haru-v3/` and are copied here only after verification. No untrained v3
+checkpoint is presented as a release.

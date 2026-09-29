@@ -9,14 +9,15 @@ app_file: app.py
 pinned: false
 license: mit
 models:
-- gaon12/haru
+- alice-noa-chan/haru_2
 ---
 
 # Haru
 
-Interactive CPU demo for the
-[Haru Korean story model](https://huggingface.co/gaon12/haru).
+CPU demo for Haru Korean continuation and chat models. The verified v3
+student-chat checkpoint is selected when released; until then the preserved
+[Haru v2](https://huggingface.co/alice-noa-chan/haru_2) remains available.
 
-Enter a Korean opening sentence and choose recurrent depth 2, 4, or 6. Depth 4
-is the practical CPU setting; depth 6 gives the best measured validation
-quality.
+The demo displays the selected model and actual parameter count. Recurrent
+depth controls have been removed. Input plus generation must fit the model
+context; the application asks for a shorter input instead of silently truncating.

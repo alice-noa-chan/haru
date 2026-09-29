@@ -679,3 +679,20 @@ by the axis that was just exhausted.
 Items 1 and 2 are the ones that can move the result; 3 and 4 are corrections to
 regressions this run introduced. Only 2 is cheap enough to run as a control
 alongside 1.
+
+
+## Haru v3: generalization and decoder replacement (2026-09-29)
+
+The v2 CPU probe scored 100/100 familiar strict pairs versus 30/100 when both
+names and templates were held out. Ownership/transfer/speaker generalized
+poorly despite prompts fitting within the 64-token local chunk. On 256 matched
+LM windows the train/validation NLL was 3.157958/3.411300; the gap was 0.25334
+(bootstrap 95% CI 0.13314–0.37147). This distinguishes relation-task overfitting
+from a large, globally rising validation loss.
+
+The new implementation and experiment protocol are documented in [V3.md](V3.md).
+Three independent dense candidates fit below 18M. Their approximately 30M
+teachers are grown with function-preserving zero-output inserted blocks and
+preserved before own-teacher distillation. No new external LLM data or pretrained
+weights are used. v3 quality results are pending; implementation tests do not
+show that any new candidate beats v2.

@@ -18,21 +18,32 @@ v2.0 runs at recurrent depth 6 only; v1.1 and v1.0 also support depths 2 and 4.
 See [Recurrent depth](#recurrent-depth) for why that changed.
 
 - GitHub: [alice-noa-chan/haru](https://github.com/alice-noa-chan/haru)
-- Model v2.0: [gaon12/haru_2](https://huggingface.co/gaon12/haru_2)
-- Model v1.1: [gaon12/haru_1.1](https://huggingface.co/gaon12/haru_1.1)
-- Model v1.0: [gaon12/haru](https://huggingface.co/gaon12/haru)
-- Demo: [gaon12/haru](https://huggingface.co/spaces/gaon12/haru)
+- Model v2.0: [alice-noa-chan/haru_2](https://huggingface.co/alice-noa-chan/haru_2)
+- Model v1.1: [alice-noa-chan/haru_1.1](https://huggingface.co/alice-noa-chan/haru_1.1)
+- Model v1.0: [alice-noa-chan/haru](https://huggingface.co/alice-noa-chan/haru)
+- Demo: [alice-noa-chan/haru](https://huggingface.co/spaces/alice-noa-chan/haru)
 
 Haru is a research prototype for story continuation. It is not an instruction
 model, a factual assistant, or a safety-reviewed product.
+
+## Haru v3 development
+
+The v3 implementation compares three full-attention decoders under 18M parameters,
+trains its own larger teacher, and preserves separate base/chat checkpoints.
+It is not yet a completed model release. See [V3.md](V3.md) for architecture,
+data splits, cost limits, training/resume commands and publication.
+
+The released v1/v2 models retain their weights and revision history while moving
+to the alice-noa-chan organization. The new character image is used above and
+in the CPU demo.
 
 ## Releases
 
 | Version | GitHub | Hugging Face | Status |
 |---|---|---|---|
-| 2.0 | [`v2.0.0`](https://github.com/alice-noa-chan/haru/releases/tag/v2.0.0) | [`gaon12/haru_2`](https://huggingface.co/gaon12/haru_2) | Current |
-| 1.1 | [`v1.1.0`](https://github.com/alice-noa-chan/haru/releases/tag/v1.1.0) | [`gaon12/haru_1.1`](https://huggingface.co/gaon12/haru_1.1) | Legacy |
-| 1.0 | [`v1.0.0`](https://github.com/alice-noa-chan/haru/releases/tag/v1.0.0) | [`gaon12/haru`](https://huggingface.co/gaon12/haru) | Legacy |
+| 2.0 | [`v2.0.0`](https://github.com/alice-noa-chan/haru/releases/tag/v2.0.0) | [`alice-noa-chan/haru_2`](https://huggingface.co/alice-noa-chan/haru_2) | Current |
+| 1.1 | [`v1.1.0`](https://github.com/alice-noa-chan/haru/releases/tag/v1.1.0) | [`alice-noa-chan/haru_1.1`](https://huggingface.co/alice-noa-chan/haru_1.1) | Legacy |
+| 1.0 | [`v1.0.0`](https://github.com/alice-noa-chan/haru/releases/tag/v1.0.0) | [`alice-noa-chan/haru`](https://huggingface.co/alice-noa-chan/haru) | Legacy |
 
 ## Haru v2.0 at a glance
 
@@ -126,7 +137,7 @@ AutoClasses. It does not load the training `.pt` checkpoint.
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-model_id = "gaon12/haru_2"
+model_id = "alice-noa-chan/haru_2"
 tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained(
     model_id,

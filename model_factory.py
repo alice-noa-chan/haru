@@ -18,14 +18,16 @@ from typing import Union
 import torch
 
 from baseline_model import BaselineConfig, BaselineLanguageModel
+from dense_model import DenseConfig, DenseLanguageModel
 from model import CFRDLanguageModel, ModelConfig
 
 CFRD_ARCH = "cfrd"
 BASELINE_ARCH = "dense-baseline"
-SUPPORTED_ARCHITECTURES = (CFRD_ARCH, BASELINE_ARCH)
+DENSE_ARCH = "haru-dense"
+SUPPORTED_ARCHITECTURES = (CFRD_ARCH, BASELINE_ARCH, DENSE_ARCH)
 
-AnyModelConfig = Union[ModelConfig, BaselineConfig]
-AnyLanguageModel = Union[CFRDLanguageModel, BaselineLanguageModel]
+AnyModelConfig = Union[ModelConfig, BaselineConfig, DenseConfig]
+AnyLanguageModel = Union[CFRDLanguageModel, BaselineLanguageModel, DenseLanguageModel]
 
 
 def normalize_architecture(name: str) -> str:
@@ -40,6 +42,8 @@ def architecture_of_config(model_cfg: AnyModelConfig) -> str:
         return CFRD_ARCH
     if isinstance(model_cfg, BaselineConfig):
         return BASELINE_ARCH
+    if isinstance(model_cfg, DenseConfig):
+        return DENSE_ARCH
     raise TypeError(f"Unsupported model configuration type: {type(model_cfg).__name__}")
 
 
@@ -64,6 +68,8 @@ def build_model_config(settings: object, vocab_size: int, architecture: str | No
     """Build the configured architecture's config from config.py settings."""
 
     resolved = normalize_architecture(architecture or getattr(settings, "MODEL_ARCH", CFRD_ARCH))
+    if resolved == DENSE_ARCH:
+        return DenseConfig(vocab_size=vocab_size)
     if resolved == BASELINE_ARCH:
         return BaselineConfig.from_project_settings(settings, vocab_size)
     return ModelConfig.from_project_settings(settings, vocab_size)
@@ -72,6 +78,8 @@ def build_model_config(settings: object, vocab_size: int, architecture: str | No
 def model_config_from_checkpoint(checkpoint: dict, vocab_size: int) -> AnyModelConfig:
     """Rebuild the exact configuration a checkpoint was trained with."""
 
+    if architecture_of_checkpoint(checkpoint) == DENSE_ARCH:
+        return DenseConfig.from_checkpoint(checkpoint, vocab_size)
     if architecture_of_checkpoint(checkpoint) == BASELINE_ARCH:
         return BaselineConfig.from_checkpoint(checkpoint, vocab_size)
     return ModelConfig.from_checkpoint(checkpoint, vocab_size)
@@ -80,6 +88,8 @@ def model_config_from_checkpoint(checkpoint: dict, vocab_size: int) -> AnyModelC
 def build_model(model_cfg: AnyModelConfig, surface_feature_table: torch.Tensor | None) -> AnyLanguageModel:
     """Instantiate the model matching a configuration object."""
 
+    if architecture_of_config(model_cfg) == DENSE_ARCH:
+        return DenseLanguageModel(model_cfg, surface_feature_table)
     if architecture_of_config(model_cfg) == BASELINE_ARCH:
         assert isinstance(model_cfg, BaselineConfig)
         return BaselineLanguageModel(model_cfg, surface_feature_table)
@@ -92,8 +102,7 @@ def describe_architecture(model_cfg: AnyModelConfig) -> str:
     """One-line shape summary for training logs and experiment snapshots."""
 
     architecture = architecture_of_config(model_cfg)
-    if architecture == BASELINE_ARCH:
-        assert isinstance(model_cfg, BaselineConfig)
+    if architecture in (BASELINE_ARCH, DENSE_ARCH):
         return f"{architecture} layers={model_cfg.n_layer} d_model={model_cfg.d_model} ffn={model_cfg.ffn_dim}"
 
     assert isinstance(model_cfg, ModelConfig)

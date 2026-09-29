@@ -5,8 +5,10 @@ from __future__ import annotations
 from transformers import PretrainedConfig
 
 try:
+    from .cfrd_features import SURFACE_FEATURE_DIM
     from .model import ModelConfig
 except ImportError:  # Direct imports from the project root.
+    from cfrd_features import SURFACE_FEATURE_DIM
     from model import ModelConfig
 
 
@@ -40,7 +42,7 @@ class CFRDConfig(PretrainedConfig):
         use_binding_block: bool = False,
         cell_attention: str = "local",
         use_surface_features: bool = True,
-        surface_feature_dim: int = 76,
+        surface_feature_dim: int = SURFACE_FEATURE_DIM,
         surface_feature_gain_init: float = 0.10,
         inference_recurrences: int | None = None,
         bos_token_id: int = 2,
