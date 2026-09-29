@@ -27,3 +27,4 @@ packed/haru-v3/
 .v3_hub_migration.json
 .v3_hub_migration.json.tmp
 source_commit.txt
+*.tmp

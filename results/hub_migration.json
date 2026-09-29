@@ -1,0 +1,550 @@
+{
+  "repositories": [
+    {
+      "from": "gaon12/haru",
+      "to": "alice-noa-chan/haru",
+      "type": "model",
+      "before": {
+        "repo": "gaon12/haru",
+        "revision": "3ef9085d4717a59fa34896d69ee4ffcbc62947e7",
+        "files": {
+          ".gitattributes": {
+            "blob_id": "a6344aac8c09253b3b630fb776ae94478aa0275b",
+            "size": 1519,
+            "lfs_sha256": null
+          },
+          "LICENSE": {
+            "blob_id": "83e57ae1c649020e4729eab1d4a0ddf22b48b072",
+            "size": 1074,
+            "lfs_sha256": null
+          },
+          "README.md": {
+            "blob_id": "61bee94f1521f9f30d14d759ece39fade6dba39c",
+            "size": 2702,
+            "lfs_sha256": null
+          },
+          "cfrd_features.py": {
+            "blob_id": "92b6c015c4c95cf1028517a6253f6499ababfc33",
+            "size": 175,
+            "lfs_sha256": null
+          },
+          "config.json": {
+            "blob_id": "b7b9e7d95546c440fb0c519fca93661e63f36e3f",
+            "size": 1080,
+            "lfs_sha256": null
+          },
+          "configuration_cfrd.py": {
+            "blob_id": "d2016d50db6ff26371615b3a5d29bdbbc6e453d4",
+            "size": 6381,
+            "lfs_sha256": null
+          },
+          "export_metadata.json": {
+            "blob_id": "e22f4a292a508c8862cc12512304aeeabd752fa0",
+            "size": 147,
+            "lfs_sha256": null
+          },
+          "generation_config.json": {
+            "blob_id": "8831f696cd29d389f8c1ab0e6e4eed4b1f09aa14",
+            "size": 266,
+            "lfs_sha256": null
+          },
+          "model.py": {
+            "blob_id": "cb19f3abad2d890c34457591fa094b2c10058678",
+            "size": 26976,
+            "lfs_sha256": null
+          },
+          "model.safetensors": {
+            "blob_id": "510ae66d96f6f03a0309db6b6eca5efb05927a44",
+            "size": 29970100,
+            "lfs_sha256": "cf7ebb261e754bd313109ec919f7de0585a5958d41a851a97e9a3e57c719233a"
+          },
+          "modeling_cfrd.py": {
+            "blob_id": "e93665f753fb785bd9cd2f6c0b9591328861892f",
+            "size": 5124,
+            "lfs_sha256": null
+          },
+          "tokenization_cfrd.py": {
+            "blob_id": "dd2aa3c482cfa8f43eae27932f968b41185b2e9e",
+            "size": 4081,
+            "lfs_sha256": null
+          },
+          "tokenizer.model": {
+            "blob_id": "5a0bd3ff831f27b94f3de1169069aaa9f8cf83ec",
+            "size": 150344,
+            "lfs_sha256": "ca5ef86da8fd74da8e59163ef61ea0fd12ab052d072cb28eb4f59579982a72e6"
+          },
+          "tokenizer_config.json": {
+            "blob_id": "0adcb722032c3e083fc2a951b252a425769f5020",
+            "size": 1059,
+            "lfs_sha256": null
+          }
+        }
+      },
+      "status": "transferred",
+      "after": {
+        "repo": "alice-noa-chan/haru",
+        "revision": "3ef9085d4717a59fa34896d69ee4ffcbc62947e7",
+        "files": {
+          ".gitattributes": {
+            "blob_id": "a6344aac8c09253b3b630fb776ae94478aa0275b",
+            "size": 1519,
+            "lfs_sha256": null
+          },
+          "LICENSE": {
+            "blob_id": "83e57ae1c649020e4729eab1d4a0ddf22b48b072",
+            "size": 1074,
+            "lfs_sha256": null
+          },
+          "README.md": {
+            "blob_id": "61bee94f1521f9f30d14d759ece39fade6dba39c",
+            "size": 2702,
+            "lfs_sha256": null
+          },
+          "cfrd_features.py": {
+            "blob_id": "92b6c015c4c95cf1028517a6253f6499ababfc33",
+            "size": 175,
+            "lfs_sha256": null
+          },
+          "config.json": {
+            "blob_id": "b7b9e7d95546c440fb0c519fca93661e63f36e3f",
+            "size": 1080,
+            "lfs_sha256": null
+          },
+          "configuration_cfrd.py": {
+            "blob_id": "d2016d50db6ff26371615b3a5d29bdbbc6e453d4",
+            "size": 6381,
+            "lfs_sha256": null
+          },
+          "export_metadata.json": {
+            "blob_id": "e22f4a292a508c8862cc12512304aeeabd752fa0",
+            "size": 147,
+            "lfs_sha256": null
+          },
+          "generation_config.json": {
+            "blob_id": "8831f696cd29d389f8c1ab0e6e4eed4b1f09aa14",
+            "size": 266,
+            "lfs_sha256": null
+          },
+          "model.py": {
+            "blob_id": "cb19f3abad2d890c34457591fa094b2c10058678",
+            "size": 26976,
+            "lfs_sha256": null
+          },
+          "model.safetensors": {
+            "blob_id": "510ae66d96f6f03a0309db6b6eca5efb05927a44",
+            "size": 29970100,
+            "lfs_sha256": "cf7ebb261e754bd313109ec919f7de0585a5958d41a851a97e9a3e57c719233a"
+          },
+          "modeling_cfrd.py": {
+            "blob_id": "e93665f753fb785bd9cd2f6c0b9591328861892f",
+            "size": 5124,
+            "lfs_sha256": null
+          },
+          "tokenization_cfrd.py": {
+            "blob_id": "dd2aa3c482cfa8f43eae27932f968b41185b2e9e",
+            "size": 4081,
+            "lfs_sha256": null
+          },
+          "tokenizer.model": {
+            "blob_id": "5a0bd3ff831f27b94f3de1169069aaa9f8cf83ec",
+            "size": 150344,
+            "lfs_sha256": "ca5ef86da8fd74da8e59163ef61ea0fd12ab052d072cb28eb4f59579982a72e6"
+          },
+          "tokenizer_config.json": {
+            "blob_id": "0adcb722032c3e083fc2a951b252a425769f5020",
+            "size": 1059,
+            "lfs_sha256": null
+          }
+        }
+      },
+      "redirect_verified": true
+    },
+    {
+      "from": "gaon12/haru_1.1",
+      "to": "alice-noa-chan/haru_1.1",
+      "type": "model",
+      "before": {
+        "repo": "gaon12/haru_1.1",
+        "revision": "82236704a666b594e7e87992579f9029b9a8b17c",
+        "files": {
+          ".gitattributes": {
+            "blob_id": "a6344aac8c09253b3b630fb776ae94478aa0275b",
+            "size": 1519,
+            "lfs_sha256": null
+          },
+          "LICENSE": {
+            "blob_id": "83e57ae1c649020e4729eab1d4a0ddf22b48b072",
+            "size": 1074,
+            "lfs_sha256": null
+          },
+          "README.md": {
+            "blob_id": "924cfc2854e9b7a28e972929c7c6ca1c5924ce07",
+            "size": 3002,
+            "lfs_sha256": null
+          },
+          "cfrd_features.py": {
+            "blob_id": "92b6c015c4c95cf1028517a6253f6499ababfc33",
+            "size": 175,
+            "lfs_sha256": null
+          },
+          "config.json": {
+            "blob_id": "381561b76f589960b857766275b419215e0773b0",
+            "size": 1065,
+            "lfs_sha256": null
+          },
+          "configuration_cfrd.py": {
+            "blob_id": "4ae7e102688a1fa2d46d38bac66725bdd563bea8",
+            "size": 6589,
+            "lfs_sha256": null
+          },
+          "export_metadata.json": {
+            "blob_id": "f2b4f97dc0fd2ba8e95caa1b5988cbd9c6f312b1",
+            "size": 225,
+            "lfs_sha256": null
+          },
+          "generation_config.json": {
+            "blob_id": "49110ae0fc85404f2003396c6e9a0564952cdba7",
+            "size": 253,
+            "lfs_sha256": null
+          },
+          "model.py": {
+            "blob_id": "32f00ef561ededba71ad4f96c976d6f108a43b97",
+            "size": 30767,
+            "lfs_sha256": null
+          },
+          "model.safetensors": {
+            "blob_id": "36e7d66b17c440af17e0fb35017e8ee8ca2bc69d",
+            "size": 50580620,
+            "lfs_sha256": "6ab1998c9487af6eace90724de7af76678e1da2d9a217e655d2c0c5267d8239d"
+          },
+          "modeling_cfrd.py": {
+            "blob_id": "ff064711d600a10f9e97bea14a51cecb95305a52",
+            "size": 5122,
+            "lfs_sha256": null
+          },
+          "tokenization_cfrd.py": {
+            "blob_id": "27b19a3cf1f4325771434ecf1999b28b08ff9717",
+            "size": 4058,
+            "lfs_sha256": null
+          },
+          "tokenizer.model": {
+            "blob_id": "4bce416776c163120d70447f4ad3baa697cde2e5",
+            "size": 231010,
+            "lfs_sha256": "ab6376fdda9629aa94df2228efa026a534fe17f418d97f6d1c5daed91f805d39"
+          },
+          "tokenizer_config.json": {
+            "blob_id": "ae64033cc7d3f0bf91a797c58df9f5aaad740643",
+            "size": 1009,
+            "lfs_sha256": null
+          }
+        }
+      },
+      "status": "transferred",
+      "after": {
+        "repo": "alice-noa-chan/haru_1.1",
+        "revision": "82236704a666b594e7e87992579f9029b9a8b17c",
+        "files": {
+          ".gitattributes": {
+            "blob_id": "a6344aac8c09253b3b630fb776ae94478aa0275b",
+            "size": 1519,
+            "lfs_sha256": null
+          },
+          "LICENSE": {
+            "blob_id": "83e57ae1c649020e4729eab1d4a0ddf22b48b072",
+            "size": 1074,
+            "lfs_sha256": null
+          },
+          "README.md": {
+            "blob_id": "924cfc2854e9b7a28e972929c7c6ca1c5924ce07",
+            "size": 3002,
+            "lfs_sha256": null
+          },
+          "cfrd_features.py": {
+            "blob_id": "92b6c015c4c95cf1028517a6253f6499ababfc33",
+            "size": 175,
+            "lfs_sha256": null
+          },
+          "config.json": {
+            "blob_id": "381561b76f589960b857766275b419215e0773b0",
+            "size": 1065,
+            "lfs_sha256": null
+          },
+          "configuration_cfrd.py": {
+            "blob_id": "4ae7e102688a1fa2d46d38bac66725bdd563bea8",
+            "size": 6589,
+            "lfs_sha256": null
+          },
+          "export_metadata.json": {
+            "blob_id": "f2b4f97dc0fd2ba8e95caa1b5988cbd9c6f312b1",
+            "size": 225,
+            "lfs_sha256": null
+          },
+          "generation_config.json": {
+            "blob_id": "49110ae0fc85404f2003396c6e9a0564952cdba7",
+            "size": 253,
+            "lfs_sha256": null
+          },
+          "model.py": {
+            "blob_id": "32f00ef561ededba71ad4f96c976d6f108a43b97",
+            "size": 30767,
+            "lfs_sha256": null
+          },
+          "model.safetensors": {
+            "blob_id": "36e7d66b17c440af17e0fb35017e8ee8ca2bc69d",
+            "size": 50580620,
+            "lfs_sha256": "6ab1998c9487af6eace90724de7af76678e1da2d9a217e655d2c0c5267d8239d"
+          },
+          "modeling_cfrd.py": {
+            "blob_id": "ff064711d600a10f9e97bea14a51cecb95305a52",
+            "size": 5122,
+            "lfs_sha256": null
+          },
+          "tokenization_cfrd.py": {
+            "blob_id": "27b19a3cf1f4325771434ecf1999b28b08ff9717",
+            "size": 4058,
+            "lfs_sha256": null
+          },
+          "tokenizer.model": {
+            "blob_id": "4bce416776c163120d70447f4ad3baa697cde2e5",
+            "size": 231010,
+            "lfs_sha256": "ab6376fdda9629aa94df2228efa026a534fe17f418d97f6d1c5daed91f805d39"
+          },
+          "tokenizer_config.json": {
+            "blob_id": "ae64033cc7d3f0bf91a797c58df9f5aaad740643",
+            "size": 1009,
+            "lfs_sha256": null
+          }
+        }
+      },
+      "redirect_verified": true
+    },
+    {
+      "from": "gaon12/haru_2",
+      "to": "alice-noa-chan/haru_2",
+      "type": "model",
+      "before": {
+        "repo": "gaon12/haru_2",
+        "revision": "1eac8888c92a0f00e5f56c2fc6bd81b3f1455678",
+        "files": {
+          ".gitattributes": {
+            "blob_id": "a6344aac8c09253b3b630fb776ae94478aa0275b",
+            "size": 1519,
+            "lfs_sha256": null
+          },
+          "LICENSE": {
+            "blob_id": "83e57ae1c649020e4729eab1d4a0ddf22b48b072",
+            "size": 1074,
+            "lfs_sha256": null
+          },
+          "README.md": {
+            "blob_id": "8c2986dc6bdbdc4641efd53c5b8b2edd9872bf24",
+            "size": 5096,
+            "lfs_sha256": null
+          },
+          "cfrd_features.py": {
+            "blob_id": "92b6c015c4c95cf1028517a6253f6499ababfc33",
+            "size": 175,
+            "lfs_sha256": null
+          },
+          "config.json": {
+            "blob_id": "f4cd61743ee2b030579315f070f508dabd6da486",
+            "size": 1139,
+            "lfs_sha256": null
+          },
+          "configuration_cfrd.py": {
+            "blob_id": "05772223fbe715f340b09fb0a8711128b3485f35",
+            "size": 7107,
+            "lfs_sha256": null
+          },
+          "export_metadata.json": {
+            "blob_id": "014bca20e99b1590aa82428cd995b7c9e2beb806",
+            "size": 235,
+            "lfs_sha256": null
+          },
+          "generation_config.json": {
+            "blob_id": "8831f696cd29d389f8c1ab0e6e4eed4b1f09aa14",
+            "size": 266,
+            "lfs_sha256": null
+          },
+          "model.py": {
+            "blob_id": "24f7421f42ef70b207863e6afebcbf5d4add2304",
+            "size": 32529,
+            "lfs_sha256": null
+          },
+          "model.safetensors": {
+            "blob_id": "7cc12c1b93a8782c14ada2d8a5a6eae362009a83",
+            "size": 72236876,
+            "lfs_sha256": "d49ad462b9d4621e7b14ffa4900edfe2b98f6eed0638fd10e000e58fb09d0be6"
+          },
+          "modeling_cfrd.py": {
+            "blob_id": "28e6a71d7c1e10471cea5d8e61917965e031225b",
+            "size": 5770,
+            "lfs_sha256": null
+          },
+          "tokenization_cfrd.py": {
+            "blob_id": "27b19a3cf1f4325771434ecf1999b28b08ff9717",
+            "size": 4058,
+            "lfs_sha256": null
+          },
+          "tokenizer.model": {
+            "blob_id": "6e6685d5db3d1c4b88ecb358eb90948563d23142",
+            "size": 204224,
+            "lfs_sha256": "860692d398031964a8c30609c4cf530fe18e6a33c716e1b47b3cb2ab56e6678c"
+          },
+          "tokenizer_config.json": {
+            "blob_id": "0adcb722032c3e083fc2a951b252a425769f5020",
+            "size": 1059,
+            "lfs_sha256": null
+          }
+        }
+      },
+      "status": "transferred",
+      "after": {
+        "repo": "alice-noa-chan/haru_2",
+        "revision": "1eac8888c92a0f00e5f56c2fc6bd81b3f1455678",
+        "files": {
+          ".gitattributes": {
+            "blob_id": "a6344aac8c09253b3b630fb776ae94478aa0275b",
+            "size": 1519,
+            "lfs_sha256": null
+          },
+          "LICENSE": {
+            "blob_id": "83e57ae1c649020e4729eab1d4a0ddf22b48b072",
+            "size": 1074,
+            "lfs_sha256": null
+          },
+          "README.md": {
+            "blob_id": "8c2986dc6bdbdc4641efd53c5b8b2edd9872bf24",
+            "size": 5096,
+            "lfs_sha256": null
+          },
+          "cfrd_features.py": {
+            "blob_id": "92b6c015c4c95cf1028517a6253f6499ababfc33",
+            "size": 175,
+            "lfs_sha256": null
+          },
+          "config.json": {
+            "blob_id": "f4cd61743ee2b030579315f070f508dabd6da486",
+            "size": 1139,
+            "lfs_sha256": null
+          },
+          "configuration_cfrd.py": {
+            "blob_id": "05772223fbe715f340b09fb0a8711128b3485f35",
+            "size": 7107,
+            "lfs_sha256": null
+          },
+          "export_metadata.json": {
+            "blob_id": "014bca20e99b1590aa82428cd995b7c9e2beb806",
+            "size": 235,
+            "lfs_sha256": null
+          },
+          "generation_config.json": {
+            "blob_id": "8831f696cd29d389f8c1ab0e6e4eed4b1f09aa14",
+            "size": 266,
+            "lfs_sha256": null
+          },
+          "model.py": {
+            "blob_id": "24f7421f42ef70b207863e6afebcbf5d4add2304",
+            "size": 32529,
+            "lfs_sha256": null
+          },
+          "model.safetensors": {
+            "blob_id": "7cc12c1b93a8782c14ada2d8a5a6eae362009a83",
+            "size": 72236876,
+            "lfs_sha256": "d49ad462b9d4621e7b14ffa4900edfe2b98f6eed0638fd10e000e58fb09d0be6"
+          },
+          "modeling_cfrd.py": {
+            "blob_id": "28e6a71d7c1e10471cea5d8e61917965e031225b",
+            "size": 5770,
+            "lfs_sha256": null
+          },
+          "tokenization_cfrd.py": {
+            "blob_id": "27b19a3cf1f4325771434ecf1999b28b08ff9717",
+            "size": 4058,
+            "lfs_sha256": null
+          },
+          "tokenizer.model": {
+            "blob_id": "6e6685d5db3d1c4b88ecb358eb90948563d23142",
+            "size": 204224,
+            "lfs_sha256": "860692d398031964a8c30609c4cf530fe18e6a33c716e1b47b3cb2ab56e6678c"
+          },
+          "tokenizer_config.json": {
+            "blob_id": "0adcb722032c3e083fc2a951b252a425769f5020",
+            "size": 1059,
+            "lfs_sha256": null
+          }
+        }
+      },
+      "redirect_verified": true
+    },
+    {
+      "from": "gaon12/haru",
+      "to": "alice-noa-chan/haru",
+      "type": "space",
+      "before": {
+        "repo": "gaon12/haru",
+        "revision": "97d5ae297d04a1fb9119eb9d658f57d01e8017e6",
+        "files": {
+          ".gitattributes": {
+            "blob_id": "a6344aac8c09253b3b630fb776ae94478aa0275b",
+            "size": 1519,
+            "lfs_sha256": null
+          },
+          "LICENSE": {
+            "blob_id": "83e57ae1c649020e4729eab1d4a0ddf22b48b072",
+            "size": 1074,
+            "lfs_sha256": null
+          },
+          "README.md": {
+            "blob_id": "a6c58f0927a02f6985883c4b8c3cc4f59c0142db",
+            "size": 627,
+            "lfs_sha256": null
+          },
+          "index.html": {
+            "blob_id": "0e80f51ee4767d939fd9f36846a80fef99dc3ccd",
+            "size": 6990,
+            "lfs_sha256": null
+          },
+          "style.css": {
+            "blob_id": "114adf441e9032febb46bc056b2a8bb651075f0d",
+            "size": 388,
+            "lfs_sha256": null
+          }
+        }
+      },
+      "status": "transferred",
+      "after": {
+        "repo": "alice-noa-chan/haru",
+        "revision": "97d5ae297d04a1fb9119eb9d658f57d01e8017e6",
+        "files": {
+          ".gitattributes": {
+            "blob_id": "a6344aac8c09253b3b630fb776ae94478aa0275b",
+            "size": 1519,
+            "lfs_sha256": null
+          },
+          "LICENSE": {
+            "blob_id": "83e57ae1c649020e4729eab1d4a0ddf22b48b072",
+            "size": 1074,
+            "lfs_sha256": null
+          },
+          "README.md": {
+            "blob_id": "a6c58f0927a02f6985883c4b8c3cc4f59c0142db",
+            "size": 627,
+            "lfs_sha256": null
+          },
+          "index.html": {
+            "blob_id": "0e80f51ee4767d939fd9f36846a80fef99dc3ccd",
+            "size": 6990,
+            "lfs_sha256": null
+          },
+          "style.css": {
+            "blob_id": "114adf441e9032febb46bc056b2a8bb651075f0d",
+            "size": 388,
+            "lfs_sha256": null
+          }
+        }
+      },
+      "redirect_verified": true
+    }
+  ]
+}
