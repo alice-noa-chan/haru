@@ -37,7 +37,9 @@ data splits, cost limits, training/resume commands and publication.
 The GPU runs have not started. After Beam rejected the available credit type,
 the owner approved RunPod L40S Community Cloud with a $20 total cap, Pod volume,
 and verified local checkpoint backups. Allocation waits for a valid single-GPU
-quote. Existing hashed zstd data is reused without recompression. The benchmark
+quote compatible with the selected runtime. CUDA 12.4 L40S hosts use the pinned
+PyTorch 2.6.0 profile; CUDA 13 remains an explicit alternative. Existing hashed
+zstd data is reused without recompression. The benchmark
 also measures larger-teacher training and student distillation with real optimizer
 steps before the candidate comparison begins.
 
