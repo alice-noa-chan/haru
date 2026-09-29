@@ -1,0 +1,157 @@
+{
+  "models": {
+    "alice-noa-chan/haru": {
+      "revision": "6676a43c82bc04b12ae262946e917a450d9b31b1",
+      "files": {
+        ".gitattributes": "66f95f0f7574bfba0acb6e4912b9498e09a81369",
+        "LICENSE": "83e57ae1c649020e4729eab1d4a0ddf22b48b072",
+        "README.md": "08fc0fa0e9abef448bb17071dcdfdb446f38fe9c",
+        "assets/haru.png": "4b8934ffe467b50b868edcdcfa9ace4c2572b2066c1b9c2220e4dda4e9b59bc0",
+        "cfrd_features.py": "92b6c015c4c95cf1028517a6253f6499ababfc33",
+        "config.json": "b7b9e7d95546c440fb0c519fca93661e63f36e3f",
+        "configuration_cfrd.py": "d2016d50db6ff26371615b3a5d29bdbbc6e453d4",
+        "export_metadata.json": "e22f4a292a508c8862cc12512304aeeabd752fa0",
+        "generation_config.json": "8831f696cd29d389f8c1ab0e6e4eed4b1f09aa14",
+        "model.py": "cb19f3abad2d890c34457591fa094b2c10058678",
+        "model.safetensors": "cf7ebb261e754bd313109ec919f7de0585a5958d41a851a97e9a3e57c719233a",
+        "modeling_cfrd.py": "e93665f753fb785bd9cd2f6c0b9591328861892f",
+        "tokenization_cfrd.py": "dd2aa3c482cfa8f43eae27932f968b41185b2e9e",
+        "tokenizer.model": "ca5ef86da8fd74da8e59163ef61ea0fd12ab052d072cb28eb4f59579982a72e6",
+        "tokenizer_config.json": "0adcb722032c3e083fc2a951b252a425769f5020"
+      }
+    },
+    "alice-noa-chan/haru_1.1": {
+      "revision": "f430ac2f6bf3c49bc40bb3b86d75a0828a1f503e",
+      "files": {
+        ".gitattributes": "66f95f0f7574bfba0acb6e4912b9498e09a81369",
+        "LICENSE": "83e57ae1c649020e4729eab1d4a0ddf22b48b072",
+        "README.md": "345b7f0f3d62dc276957342b3cba8478ddaceedf",
+        "assets/haru.png": "4b8934ffe467b50b868edcdcfa9ace4c2572b2066c1b9c2220e4dda4e9b59bc0",
+        "cfrd_features.py": "92b6c015c4c95cf1028517a6253f6499ababfc33",
+        "config.json": "381561b76f589960b857766275b419215e0773b0",
+        "configuration_cfrd.py": "4ae7e102688a1fa2d46d38bac66725bdd563bea8",
+        "export_metadata.json": "f2b4f97dc0fd2ba8e95caa1b5988cbd9c6f312b1",
+        "generation_config.json": "49110ae0fc85404f2003396c6e9a0564952cdba7",
+        "model.py": "32f00ef561ededba71ad4f96c976d6f108a43b97",
+        "model.safetensors": "6ab1998c9487af6eace90724de7af76678e1da2d9a217e655d2c0c5267d8239d",
+        "modeling_cfrd.py": "ff064711d600a10f9e97bea14a51cecb95305a52",
+        "tokenization_cfrd.py": "27b19a3cf1f4325771434ecf1999b28b08ff9717",
+        "tokenizer.model": "ab6376fdda9629aa94df2228efa026a534fe17f418d97f6d1c5daed91f805d39",
+        "tokenizer_config.json": "ae64033cc7d3f0bf91a797c58df9f5aaad740643"
+      }
+    },
+    "alice-noa-chan/haru_2": {
+      "revision": "48940a59936640ba930495733170a2651fb4edb2",
+      "files": {
+        ".gitattributes": "66f95f0f7574bfba0acb6e4912b9498e09a81369",
+        "LICENSE": "83e57ae1c649020e4729eab1d4a0ddf22b48b072",
+        "README.md": "4f8394b273a7943c1b4683ede8cce5d19bc15808",
+        "assets/haru.png": "4b8934ffe467b50b868edcdcfa9ace4c2572b2066c1b9c2220e4dda4e9b59bc0",
+        "cfrd_features.py": "92b6c015c4c95cf1028517a6253f6499ababfc33",
+        "config.json": "f4cd61743ee2b030579315f070f508dabd6da486",
+        "configuration_cfrd.py": "05772223fbe715f340b09fb0a8711128b3485f35",
+        "export_metadata.json": "014bca20e99b1590aa82428cd995b7c9e2beb806",
+        "generation_config.json": "8831f696cd29d389f8c1ab0e6e4eed4b1f09aa14",
+        "model.py": "24f7421f42ef70b207863e6afebcbf5d4add2304",
+        "model.safetensors": "d49ad462b9d4621e7b14ffa4900edfe2b98f6eed0638fd10e000e58fb09d0be6",
+        "modeling_cfrd.py": "28e6a71d7c1e10471cea5d8e61917965e031225b",
+        "tokenization_cfrd.py": "27b19a3cf1f4325771434ecf1999b28b08ff9717",
+        "tokenizer.model": "860692d398031964a8c30609c4cf530fe18e6a33c716e1b47b3cb2ab56e6678c",
+        "tokenizer_config.json": "0adcb722032c3e083fc2a951b252a425769f5020"
+      }
+    },
+    "alice-noa-chan/ayaka-base": {
+      "revision": "064eac5e89c8fe31824f3279df1e610c75d75b0e",
+      "files": {
+        ".gitattributes": "f2dd537318a427067d43c2117b02717f61403aa5",
+        "README.md": "7ef466d342ce95bd981a0ac4bd5ff5b53e7b1d71",
+        "adapter/README.md": "7ce03e8a9fa7233c41a4ccf93553495635bc1c16",
+        "adapter/adapter_config.json": "45e1b5cbfe76fd1e58902a4cc313e8460b379094",
+        "adapter/adapter_model.safetensors": "b4b0bed7cc58c6ece92754ef0f35fe661dcb31188ec3c47723c27c4ae904b122",
+        "ayaka.png": "d11ea3aabe6cc5ed73040ae40cd23ef18754c88d0d5f5c10f9e997b5f8273064",
+        "ayaka_config.json": "2bc49d1895e744cdb314cf38c2a00f18d3933cc3",
+        "electra_config.json": "2bc49d1895e744cdb314cf38c2a00f18d3933cc3",
+        "head.safetensors": "8fecfb0a1cfd93a80e1789109889e1d75b0ee8f2c532efc1ad0869eaf4cb23df",
+        "meta.json": "4100c623538a9ac16057070ae5ebc8e0a12e788e"
+      }
+    },
+    "alice-noa-chan/ayaka-small": {
+      "revision": "9277bdccf1e650141c7d0d796e5a77663b3cedcb",
+      "files": {
+        ".gitattributes": "f2dd537318a427067d43c2117b02717f61403aa5",
+        "README.md": "1281619ab88f2ad66c1c9255f46f8dfc80c1af12",
+        "adapter/README.md": "6808fa3bcc5981bdc9c305e4649660b0478d881a",
+        "adapter/adapter_config.json": "aa6bbec8a0e669a8b7a615bc502bdabfe31c5a44",
+        "adapter/adapter_model.safetensors": "a55a7a7eadc3cae19a874f5c76a81d3986a55e205ce2b99b594ecec26853c53e",
+        "ayaka.png": "d11ea3aabe6cc5ed73040ae40cd23ef18754c88d0d5f5c10f9e997b5f8273064",
+        "ayaka_config.json": "b40fd42f979fb7825d5e9e161aa5687b910899d2",
+        "electra_config.json": "b40fd42f979fb7825d5e9e161aa5687b910899d2",
+        "head.safetensors": "17d8dc80c5f44054cd871d4190e351884730b54d71c112d184e7230e4bb1be3b",
+        "meta.json": "accb4088f4329fc78488bdcaa3a38e05a209a850"
+      }
+    },
+    "alice-noa-chan/ayaka-large": {
+      "revision": "267605ee22f2b5f934d81e5fbee691952d2e6f55",
+      "files": {
+        ".gitattributes": "f2dd537318a427067d43c2117b02717f61403aa5",
+        "README.md": "d1ac736c8a95db58c2c63f11fcb26e9f1fafc197",
+        "adapter/README.md": "45e1f36d17031570e5ba159f9d2d0b3ce526b999",
+        "adapter/adapter_config.json": "eb152294a9804637b35bfd1c9f5dc16ed64cc543",
+        "adapter/adapter_model.safetensors": "439e4a694be0fd68404e1068f4f533a297f270ce62f8fe01a18c497a1a3b10f0",
+        "ayaka.png": "d11ea3aabe6cc5ed73040ae40cd23ef18754c88d0d5f5c10f9e997b5f8273064",
+        "ayaka_config.json": "d333d235385dfe376ca02eb137ac62f429e74025",
+        "electra_config.json": "d333d235385dfe376ca02eb137ac62f429e74025",
+        "head.safetensors": "e75f5fb2e39a8947c5d42cbb7b3c0e4d8b371cc90ea4f825eb09eeb4a59e528c",
+        "meta.json": "f4b758a3dd8d1f0daba295aeba23f7aba0a0912e"
+      }
+    },
+    "gaon12/sion_translate": {
+      "revision": "7fbef0fc14ec9f81edddf77a9e188aca32ed262a",
+      "files": {
+        ".gitattributes": "a6344aac8c09253b3b630fb776ae94478aa0275b",
+        "LICENSE": "5c746f99cf70d2a2510633dae0b77cfddd0fe28c",
+        "README.md": "3e03a2844de2c8daeba37a2d7c67a170a9dae883",
+        "kjx.model": "c1b5447e08692bf7a7d2e485ba7b71b3ff5584c96844ecac07e25c9d1340db50",
+        "kjx.vocab": "04adbfdde1ca21b45fea7928750e1d3dfb9d67f1",
+        "model.pt": "952bf2e228564b6b4db6e7ecbf3e3a591f5b546b1c375fd04537cdf67d5147a6",
+        "model_ema.pt": "829580d1db1693ec00ee641398ce6ba9549388e266f6259f85e5a19ea28bfc2e",
+        "model_int8.pt": "820d47ca335d27d001d413f401736c6e5fc83b8c2e71be2b02f0357e84fabf04",
+        "sft/model.pt": "78d3303514ab3f448602859f32d5693bbee1351d9759417a8c4912af84abd5db",
+        "sft/model_ema.pt": "00aba04e0adfede94cf17a6124a94108b6951b1d5557c908139dfa8f548f0be4",
+        "sft/model_int8.pt": "c9cd894b19d34a78ebae5e17f95bc446c6d3c55d98361f1f3f590b520fe01264",
+        "token_features.npz": "54951b569255bd0a2e1d333860db2294113f1368a2e25e4ae5bc2bcdb6976b4c",
+        "training_logs/posttrain/events.out.tfevents.1784686773.7104ef6be46e.11029.1": "f73f1b22ad3e68ad1c3d14c34cd5bf21a663d3713564397341d60067f5899a64",
+        "training_logs/pretrain/events.out.tfevents.1783996608.529e0d7d0621.2279.0": "c39998e745e897c5b9701fec957e96ba1c471ae3676ccf5cb1cd19932a665288"
+      }
+    }
+  },
+  "collections": {
+    "Haru": {
+      "url": "https://huggingface.co/collections/alice-noa-chan/haru-6abb683d0a8b9677162d7704",
+      "models": [
+        "alice-noa-chan/haru",
+        "alice-noa-chan/haru_1.1",
+        "alice-noa-chan/haru_2"
+      ]
+    },
+    "Ayaka": {
+      "url": "https://huggingface.co/collections/alice-noa-chan/ayaka-6abb683ea001f085392b19cb",
+      "models": [
+        "alice-noa-chan/ayaka-base",
+        "alice-noa-chan/ayaka-small",
+        "alice-noa-chan/ayaka-large"
+      ]
+    },
+    "Sion": {
+      "url": "https://huggingface.co/collections/alice-noa-chan/sion-6abb683ff636ba703e4c0d8a",
+      "models": [
+        "gaon12/sion_translate"
+      ]
+    }
+  },
+  "deleted_spaces": [
+    "alice-noa-chan/haru",
+    "gaon12/sion-translate"
+  ],
+  "all_model_revisions_and_hashes_preserved": true
+}
