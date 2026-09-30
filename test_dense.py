@@ -521,6 +521,11 @@ class DenseTests(unittest.TestCase):
             export = root / "export"
             wrapper.save_pretrained(export)
             tokenizer.save_pretrained(export)
+            legacy_config_path = export / "tokenizer_config.json"
+            legacy_config = json.loads(legacy_config_path.read_text(encoding="utf-8"))
+            legacy_config["additional_special_tokens"] = ROLES
+            legacy_config["extra_special_tokens"] = {}
+            legacy_config_path.write_text(json.dumps(legacy_config), encoding="utf-8")
             loaded = AutoModelForCausalLM.from_pretrained(export, trust_remote_code=True, local_files_only=True).eval()
             loaded_tokenizer = AutoTokenizer.from_pretrained(export, trust_remote_code=True, local_files_only=True)
             ids = loaded_tokenizer.apply_chat_template(

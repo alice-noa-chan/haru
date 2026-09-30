@@ -34,6 +34,18 @@ class CFRDTokenizer(PreTrainedTokenizer):
         self.add_bos_token = add_bos_token
         self.add_eos_token = add_eos_token
         self.sp_model = spm.SentencePieceProcessor(model_file=str(vocab_file))
+        # Some Transformers 5 loaders drop the legacy list before __init__ when
+        # a Transformers 4 configuration also contains an empty extra-token map.
+        # Recover only the role symbols already reserved in this SentencePiece
+        # vocabulary; legacy CFRD vocabularies without those symbols are unchanged.
+        if not kwargs.get("additional_special_tokens") and not kwargs.get("extra_special_tokens"):
+            roles = [
+                token
+                for token in ("<|system|>", "<|user|>", "<|assistant|>", "<|end|>")
+                if self.sp_model.id_to_piece(self.sp_model.piece_to_id(token)) == token
+            ]
+            if roles:
+                kwargs["additional_special_tokens"] = roles
         # Transformers 4 saves an empty named-token map beside the legacy role
         # list. In Transformers 5 that empty map suppresses the legacy migration.
         if kwargs.get("additional_special_tokens") and not kwargs.get("extra_special_tokens"):

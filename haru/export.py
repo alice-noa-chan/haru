@@ -119,6 +119,15 @@ def export(checkpoint_path, tokenizer_path, output, repo_id=None, copy_resume=Tr
         if model.cfg.ffn_share_group_size > 1
         else f"FFNs are independent per layer; linear adapter rank: {model.cfg.ffn_adapter_rank}."
     )
+    inference_inputs = (
+        "inputs = tokenizer.apply_chat_template(\n"
+        '    [{"role": "user", "content": "토끼가 친구를 만나는 동화를 이어 써 주세요."}],\n'
+        '    add_generation_prompt=True, return_tensors="pt", return_dict=True,\n'
+        ")"
+        if metadata["instruction_tuned"]
+        else 'inputs = tokenizer("작은 마을에 아침이 찾아왔어요.", return_tensors="pt")'
+    )
+    inference_output = 'out[0, inputs["input_ids"].shape[1]:]' if metadata["instruction_tuned"] else "out[0]"
     card = f"""---
 library_name: transformers
 pipeline_tag: text-generation
@@ -148,13 +157,13 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 repo = {model_id!r}
 tokenizer = AutoTokenizer.from_pretrained(repo, trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained(repo, trust_remote_code=True).eval()
-inputs = tokenizer("작은 마을에 아침이 찾아왔어요.", return_tensors="pt")
+{inference_inputs}
 out = model.generate(**inputs, max_new_tokens=120, use_cache=True)
-print(tokenizer.decode(out[0], skip_special_tokens=True))
+print(tokenizer.decode({inference_output}, skip_special_tokens=True))
 ```
 
-IT (chat) checkpoints also support `tokenizer.apply_chat_template(messages,
-add_generation_prompt=True, return_tensors="pt", return_dict=False)`. Base checkpoints continue
+IT (chat) checkpoints use `tokenizer.apply_chat_template(messages,
+add_generation_prompt=True, return_tensors="pt", return_dict=True)`. Base checkpoints continue
 text and are non-IT. Input plus generation must fit 1024 tokens.
 
 Model weights and included source code are licensed under MIT (see LICENSE).
