@@ -20,6 +20,7 @@ it still loses story facts and generalizes poorly on unseen instruction forms.
 |---|---:|---|
 | Student non-IT (default for continuation) | 13,688,705 | [haru_3-student-base](https://huggingface.co/alice-noa-chan/haru_3-student-base) |
 | Student IT | 13,688,705 | [haru_3-student-chat](https://huggingface.co/alice-noa-chan/haru_3-student-chat) |
+| PairShare8-r48 experimental student non-IT (unselected) | 13,688,705 | [haru_3-student-pairshare-base](https://huggingface.co/alice-noa-chan/haru_3-student-pairshare-base) |
 | Teacher non-IT | 30,997,377 | [haru_3-teacher-base](https://huggingface.co/alice-noa-chan/haru_3-teacher-base) |
 | Teacher IT | 30,997,377 | [haru_3-teacher-chat](https://huggingface.co/alice-noa-chan/haru_3-teacher-chat) |
 
@@ -96,8 +97,9 @@ raises `all_tied_weights_keys`.
 The example runs on CPU. For GPU inference, move both `model` and `inputs` to
 `"cuda"` before generation. Input plus generated length must fit 1,024 tokens.
 
-The new implementation compares three full-attention decoders under 18M
-parameters for **Korean children's-story continuation**. It trains its own
+The new implementation provides three initial full-attention decoder designs
+under 18M parameters for **Korean children's-story continuation**. The final
+equal-budget student comparison evaluated two 13.69M candidates. It trains its own
 larger teacher and saves separate base/chat checkpoints. This decoder is not
 recurrent; "recurrent" describes the earlier CFRD line. The new models are
 now trained and evaluated, including two equal-budget 13.69M student candidates. See [TRAINING.md](TRAINING.md) for the
@@ -127,6 +129,7 @@ alice-noa-chan organization. The new character image is used above.
 |---|---|---|---|
 | 3 student non-IT | [`v3.0.2-students`](https://github.com/alice-noa-chan/haru/releases/tag/v3.0.2-students) | [`haru_3-student-base`](https://huggingface.co/alice-noa-chan/haru_3-student-base) | Current; default continuation model |
 | 3 student IT | [`v3.0.2-students`](https://github.com/alice-noa-chan/haru/releases/tag/v3.0.2-students) | [`haru_3-student-chat`](https://huggingface.co/alice-noa-chan/haru_3-student-chat) | Current; experimental IT |
+| 3 PairShare8-r48 non-IT | [`v3.0.2-students`](https://github.com/alice-noa-chan/haru/releases/tag/v3.0.2-students) | [`haru_3-student-pairshare-base`](https://huggingface.co/alice-noa-chan/haru_3-student-pairshare-base) | Unselected experimental candidate |
 | 3 teacher non-IT | [`v3.0.2-students`](https://github.com/alice-noa-chan/haru/releases/tag/v3.0.2-students) | [`haru_3-teacher-base`](https://huggingface.co/alice-noa-chan/haru_3-teacher-base) | Current; larger teacher |
 | 3 teacher IT | [`v3.0.2-students`](https://github.com/alice-noa-chan/haru/releases/tag/v3.0.2-students) | [`haru_3-teacher-chat`](https://huggingface.co/alice-noa-chan/haru_3-teacher-chat) | Current; larger experimental IT teacher |
 | 2.0 | [`v2.0.0`](https://github.com/alice-noa-chan/haru/releases/tag/v2.0.0) | [`alice-noa-chan/haru_2`](https://huggingface.co/alice-noa-chan/haru_2) | Legacy |
@@ -653,10 +656,40 @@ Selected student: **gated8-13m**, 13,688,705 parameters. Both candidates complet
 - [student-base](https://huggingface.co/alice-noa-chan/haru_3-student-base): FP32 weights, MIT license and usage examples.
 - [teacher-chat](https://huggingface.co/alice-noa-chan/haru_3-teacher-chat): FP32 weights, MIT license and usage examples.
 - [student-chat](https://huggingface.co/alice-noa-chan/haru_3-student-chat): FP32 weights, MIT license and usage examples.
+- [PairShare8-r48 non-IT](https://huggingface.co/alice-noa-chan/haru_3-student-pairshare-base): the unselected experimental candidate, published independently with the same FP32 weights as its original branch.
 
 [Test evaluation](results/student_final_evaluation.json) includes BPC, relation tests, fixed continuations and CPU timings. One training seed; no claim of being strongest under 18M.
 
-The validation BPC difference was statistically indistinguishable, so measured CPU generation speed decided selection. The shared-FFN candidate remains available on the `pairshare8-r48` branch of the student-base repository.
+### Two candidates and the selection decision
+
+Both students have **13,688,705 parameters** and completed **500,039,680**
+distillation tokens using the same frozen teacher. PairShare8-r48 shares each
+SwiGLU FFN across two adjacent layers and adds a rank-48 linear residual adapter
+per layer. Attention layers and KV caches remain independent. Gated8 uses
+independent FFNs with width 512; PairShare uses width 960.
+
+| Candidate | Validation story BPC ↓ | Training-host CPU generation (4 threads) | Decision |
+|---|---:|---:|---|
+| PairShare8-r48 | 0.945834 | 93.28 tokens/s | Preserved as an experimental non-IT model |
+| Gated8-13m | 0.949001 | 110.63 tokens/s | Selected default; also distilled into IT |
+
+The paired document-bootstrap 95% interval for PairShare minus Gated validation
+BPC was **[-0.009002, 0.003038]**, including zero. Under the predeclared rule,
+the statistically indistinguishable validation result made CPU generation speed
+the deciding factor. Test scores did not drive selection. Only one training
+seed was used; the bootstrap does not measure variation between training seeds.
+
+PairShare is available in its [independent repository](https://huggingface.co/alice-noa-chan/haru_3-student-pairshare-base)
+and the original [`pairshare8-r48` branch](https://huggingface.co/alice-noa-chan/haru_3-student-base/tree/pairshare8-r48).
+These contain the same trained weights. **No PairShare IT checkpoint was trained.**
+To use the experimental non-IT candidate, change the repository in the plain
+continuation example to `alice-noa-chan/haru_3-student-pairshare-base`; no branch
+argument is needed. Both candidates are included in the
+[Haru collection](https://huggingface.co/collections/alice-noa-chan/haru-6abb683d0a8b9677162d7704).
+
+English model-card sources for the [teacher base](model_cards/teacher-base.md),
+[teacher IT](model_cards/teacher-chat.md), and
+[experimental student](model_cards/student-pairshare-base.md) are maintained here.
 
 ### Student IT usage
 
