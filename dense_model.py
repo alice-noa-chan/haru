@@ -25,6 +25,8 @@ class DenseConfig:
     use_surface_features: bool = True
     surface_feature_dim: int = 76
     surface_feature_gain_init: float = 0.1
+    ffn_share_group_size: int = 1
+    ffn_adapter_rank: int = 0
 
     @property
     def exit_depths(self):
@@ -40,6 +42,10 @@ class DenseConfig:
             raise ValueError("RoPE head dimension must be even")
         if not 0 <= self.dropout < 1:
             raise ValueError("Invalid dropout")
+        if self.ffn_share_group_size <= 0 or self.n_layer % self.ffn_share_group_size:
+            raise ValueError("FFN sharing groups must evenly divide the logical layer count")
+        if not 0 <= self.ffn_adapter_rank <= self.d_model:
+            raise ValueError("FFN adapter rank must be between zero and d_model")
 
     @classmethod
     def from_checkpoint(cls, checkpoint, vocab_size):
@@ -50,6 +56,12 @@ CANDIDATES = {
     "dense8": DenseConfig(),
     "deep10": DenseConfig(d_model=320, n_head=5, n_kv_head=1, ffn_dim=1152, n_layer=10),
     "gated8": DenseConfig(ffn_dim=960, attention_gate=True),
+}
+
+# These CPU-validated experiments are opt-in; the original candidate sweep stays fixed.
+EXPERIMENTAL_CANDIDATES = {
+    "pairshare8-r48": replace(CANDIDATES["gated8"], ffn_share_group_size=2, ffn_adapter_rank=48),
+    "gated8-13m": replace(CANDIDATES["gated8"], ffn_dim=512),
 }
 
 
@@ -137,12 +149,22 @@ class DenseBlock(nn.Module):
     def __init__(self, cfg):
         super().__init__()
         self.attn_norm, self.ffn_norm = DenseRMSNorm(cfg.d_model), DenseRMSNorm(cfg.d_model)
-        self.attention, self.ffn = DenseAttention(cfg), DenseFFN(cfg)
+        self.attention = DenseAttention(cfg)
+        self.ffn = DenseFFN(cfg) if cfg.ffn_share_group_size == 1 else None
+        self.ffn_adapter_down = (
+            nn.Linear(cfg.d_model, cfg.ffn_adapter_rank, bias=False) if cfg.ffn_adapter_rank else None
+        )
+        self.ffn_adapter_up = nn.Linear(cfg.ffn_adapter_rank, cfg.d_model, bias=False) if cfg.ffn_adapter_rank else None
 
-    def forward(self, x, positions, mask, past, use_cache):
+    def forward(self, x, positions, mask, past, use_cache, ffn=None):
         update, present = self.attention(self.attn_norm(x), positions, mask, past, use_cache)
         x = x + update
-        return x + self.ffn(self.ffn_norm(x)), present
+        hidden = self.ffn_norm(x)
+        ffn = self.ffn if ffn is None else ffn
+        update = ffn(hidden)
+        if self.ffn_adapter_down is not None:
+            update = update + self.ffn_adapter_up(self.ffn_adapter_down(hidden))
+        return x + update, present
 
 
 @dataclass
@@ -172,11 +194,23 @@ class DenseLanguageModel(nn.Module):
             self.register_buffer("surface_feature_table", torch.empty(0), persistent=False)
             self.surface_projection = None
         self.blocks = nn.ModuleList([DenseBlock(cfg) for _ in range(cfg.n_layer)])
+        # Register each shared FFN once, so optimizers and Safetensors see no alias copies.
+        self.shared_ffns = (
+            nn.ModuleList([DenseFFN(cfg) for _ in range(cfg.n_layer // cfg.ffn_share_group_size)])
+            if cfg.ffn_share_group_size > 1
+            else None
+        )
         self.final_norm = DenseRMSNorm(cfg.d_model)
         self.apply(self._initialize)
         for block in self.blocks:
-            for output in (block.attention.o_proj, block.ffn.w2):
-                nn.init.normal_(output.weight, std=0.02 / math.sqrt(2 * cfg.n_layer))
+            nn.init.normal_(block.attention.o_proj.weight, std=0.02 / math.sqrt(2 * cfg.n_layer))
+            if block.ffn is not None:
+                nn.init.normal_(block.ffn.w2.weight, std=0.02 / math.sqrt(2 * cfg.n_layer))
+            if block.ffn_adapter_up is not None:
+                nn.init.zeros_(block.ffn_adapter_up.weight)
+        if self.shared_ffns is not None:
+            for ffn in self.shared_ffns:
+                nn.init.normal_(ffn.w2.weight, std=0.02 / math.sqrt(2 * cfg.n_layer))
 
     @staticmethod
     def _initialize(module):
@@ -226,7 +260,12 @@ class DenseLanguageModel(nn.Module):
         presents = []
         for index, block in enumerate(self.blocks):
             x, present = block(
-                x, position_ids, attention_mask, None if past_key_values is None else past_key_values[index], use_cache
+                x,
+                position_ids,
+                attention_mask,
+                None if past_key_values is None else past_key_values[index],
+                use_cache,
+                ffn=None if self.shared_ffns is None else self.shared_ffns[index // self.cfg.ffn_share_group_size],
             )
             if use_cache:
                 presents.append(present)
@@ -258,6 +297,7 @@ class DenseLanguageModel(nn.Module):
 
 
 def parameter_count(cfg):
+    cfg.validate()
     head = cfg.d_model // cfg.n_head
     attention = 2 * cfg.d_model**2 + 2 * cfg.d_model * cfg.n_kv_head * head + 2 * head
     gate = cfg.d_model**2 if cfg.attention_gate else 0
@@ -266,11 +306,14 @@ def parameter_count(cfg):
         cfg.vocab_size * cfg.d_model
         + surface
         + cfg.d_model
-        + cfg.n_layer * (attention + gate + 3 * cfg.d_model * cfg.ffn_dim + 2 * cfg.d_model)
+        + cfg.n_layer * (attention + gate + 2 * cfg.d_model + 2 * cfg.d_model * cfg.ffn_adapter_rank)
+        + (cfg.n_layer // cfg.ffn_share_group_size) * 3 * cfg.d_model * cfg.ffn_dim
     )
 
 
 def grow_teacher(student):
+    if student.cfg.ffn_share_group_size != 1 or student.cfg.ffn_adapter_rank:
+        raise ValueError("Function-preserving teacher growth currently requires an independent FFN baseline")
     cfg = replace(student.cfg, n_layer=2 * student.cfg.n_layer)
     teacher = DenseLanguageModel(cfg, student.surface_feature_table).to(student.token_embedding.weight.device)
     old = student.state_dict()
@@ -282,16 +325,49 @@ def grow_teacher(student):
     return teacher
 
 
-def student_from_teacher(teacher):
+def student_from_teacher(teacher, cfg=None):
     if teacher.cfg.n_layer % 2:
         raise ValueError("Teacher depth must be even")
-    cfg = replace(teacher.cfg, n_layer=teacher.cfg.n_layer // 2)
+    if teacher.cfg.ffn_share_group_size != 1 or teacher.cfg.ffn_adapter_rank:
+        raise ValueError("Student initialization currently requires an independent FFN teacher")
+    cfg = cfg or replace(teacher.cfg, n_layer=teacher.cfg.n_layer // 2)
+    cfg.validate()
+    for field in (
+        "vocab_size",
+        "d_model",
+        "n_head",
+        "n_kv_head",
+        "rope_theta",
+        "context_length",
+        "attention_gate",
+        "use_surface_features",
+        "surface_feature_dim",
+    ):
+        if getattr(cfg, field) != getattr(teacher.cfg, field):
+            raise ValueError(f"Teacher/student {field} differs")
+    if cfg.n_layer * 2 != teacher.cfg.n_layer or cfg.ffn_dim > teacher.cfg.ffn_dim:
+        raise ValueError("Student initialization requires half-depth and no FFN expansion")
     student = DenseLanguageModel(cfg, teacher.surface_feature_table).to(teacher.token_embedding.weight.device)
     student.load_state_dict(
         {key: value for key, value in teacher.state_dict().items() if not key.startswith("blocks.")}, strict=False
     )
     for index, block in enumerate(student.blocks):
-        block.load_state_dict(teacher.blocks[2 * index].state_dict())
+        original = teacher.blocks[2 * index]
+        block.attention.load_state_dict(original.attention.state_dict())
+        block.attn_norm.load_state_dict(original.attn_norm.state_dict())
+        block.ffn_norm.load_state_dict(original.ffn_norm.state_dict())
+    ffns = student.shared_ffns if student.shared_ffns is not None else [block.ffn for block in student.blocks]
+    for index, ffn in enumerate(ffns):
+        layer = index * cfg.ffn_share_group_size
+        original = teacher.blocks[2 * layer].ffn
+        # Keep one teacher FFN per pair; unaligned SwiGLU neuron weights are not averaged.
+        ffn.load_state_dict(
+            {
+                "w1.weight": original.w1.weight[: cfg.ffn_dim],
+                "w3.weight": original.w3.weight[: cfg.ffn_dim],
+                "w2.weight": original.w2.weight[:, : cfg.ffn_dim],
+            }
+        )
     return student
 
 

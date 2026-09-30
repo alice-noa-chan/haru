@@ -715,3 +715,36 @@ stories, so results must not be described as general Korean fiction quality.
 The reused 12K tokenizer and the story weighting are a controlled first test;
 neither has an empirical v3 quality result yet.
 
+## Experimental student implementation (2026-09-30)
+
+The independent Gated8 teacher remains a baseline. PairShare8-r48 explores
+partial weight sharing in a 13,688,705-parameter student: each adjacent pair
+uses one width-960 SwiGLU FFN, while attention, norms and rank-48 linear
+residual adapters are independent. The adapter output starts at zero.
+An independent eight-layer Gated8 with width-512 FFNs has exactly the same
+parameter count. This tests the allocation of a fixed parameter budget;
+the shared model still performs wider FFN computation in every layer.
+
+Teacher initialization copies attention from the original even-numbered
+teacher layers, takes one teacher FFN per shared pair, and does not average
+unaligned SwiGLU weights. The control slices the teacher's first 512 FFN
+channels. These different initializations must be reported alongside any
+comparison; neither student is initially function-equivalent to the teacher.
+
+Twenty-two CPU tests cover the baseline and new experiment, including shared
+gradient accumulation, zero-output adapter learning, causal and padded cache
+agreement through context 1024, frozen-teacher initialization, exact interrupted
+distillation resumption, and independent Safetensors loading and generation.
+Both actual 13.69M models also passed a synthetic CPU distillation backward
+pass using a preserved intermediate 30.99M teacher; no optimizer update was
+performed in that full-size check. Original candidates retain every seeded
+initialization tensor. The record is in
+[experimental_student_cpu.json](results/experimental_student_cpu.json).
+Its cold-run timings and synthetic losses are correctness diagnostics, not
+story-quality results or GPU-throughput estimates.
+
+The experimental students have not been trained or ranked. Compare story BPC,
+repetition and event continuity on identical data and seeds, and measure speed
+separately before selecting a student. Current weights remain unpublished
+pending clarification of the web-corpus permission conditions.
+

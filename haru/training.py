@@ -20,7 +20,15 @@ import torch
 from torch.nn import functional as F
 
 from data_utils import blake2b_file
-from dense_model import CANDIDATES, DenseConfig, DenseLanguageModel, grow_teacher, parameter_count, student_from_teacher
+from dense_model import (
+    CANDIDATES,
+    EXPERIMENTAL_CANDIDATES,
+    DenseConfig,
+    DenseLanguageModel,
+    grow_teacher,
+    parameter_count,
+    student_from_teacher,
+)
 from haru.data import CHAT_TEMPLATE, WEIGHTS, MixtureSampler, data_profile
 from haru.kernels import attention_context
 from haru.runtime import Deadline, atomic_json
@@ -343,9 +351,10 @@ def _train(args, deadline, resources):
         if args.grow_teacher:
             model = grow_teacher(model)
     elif teacher is not None:
-        model, checkpoint = student_from_teacher(teacher), None
+        target = EXPERIMENTAL_CANDIDATES.get(args.candidate)
+        model, checkpoint = student_from_teacher(teacher, target), None
     else:
-        cfg = CANDIDATES[args.candidate]
+        cfg = CANDIDATES.get(args.candidate) or EXPERIMENTAL_CANDIDATES[args.candidate]
         if tokenizer.vocab_size != cfg.vocab_size:
             raise ValueError("Tokenizer must be exactly 12000 pieces")
         model, checkpoint = DenseLanguageModel(cfg, build_surface_feature_table(tokenizer)).to(device), None
@@ -524,7 +533,7 @@ def parser():
     result = argparse.ArgumentParser(description=__doc__)
     result.add_argument("--data", type=Path, default=Path("packed/haru-v3"))
     result.add_argument("--output", type=Path, required=True)
-    result.add_argument("--candidate", choices=list(CANDIDATES), default="dense8")
+    result.add_argument("--candidate", choices=[*CANDIDATES, *EXPERIMENTAL_CANDIDATES], default="dense8")
     result.add_argument("--phase", default="candidate")
     result.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     result.add_argument("--microbatch", type=int, default=8)

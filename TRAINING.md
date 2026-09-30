@@ -92,6 +92,61 @@ limits, not mandatory epochs. The best validation checkpoints are kept.
 For one training phase or custom schedules, see `python -m haru.training --help`.
 The older CFRD training command remains `python train_legacy.py`.
 
+## Experimental student: paired FFN sharing
+
+The opt-in student experiment targets small models with an experimental
+architecture. Both candidates use eight logical layers, width 384, six query
+heads, two KV heads, gated full causal attention, and the same surface features.
+
+| Candidate | FFN width | Independent FFNs | Layer-specific adapter rank | Parameters |
+| --- | ---: | ---: | ---: | ---: |
+| `pairshare8-r48` | 960 | 4, each used by two adjacent layers | 48 | 13,688,705 |
+| `gated8-13m` | 512 | 8 | 0 | 13,688,705 |
+| Original `gated8` baseline | 960 | 8 | 0 | 17,817,473 |
+
+Each experimental layer adds `B_l(A_l(FFN_RMSNorm(x)))` to its shared FFN
+output. The adapter is linear, has no bias, and starts with `B_l = 0`.
+Attention, normalization and adapters stay independent; the KV cache retains
+eight entries. Shared FFNs are registered once so their gradients accumulate
+from both uses and their optimizer state and Safetensors weights have no aliases.
+
+Initialize from a frozen, independent, double-depth teacher. Student attention
+and norms come from teacher layers 0, 2, ..., 14. The four shared FFNs come
+from teacher layers 0, 4, 8, 12. SwiGLU neuron weights from separate layers are
+not averaged. The narrow control keeps the first 512 FFN channels of each
+corresponding teacher layer. This initialization does not preserve the complete
+teacher function. Function-preserving teacher growth remains supported for the
+independent baseline only.
+
+After choosing to run this experiment, use a separate output directory for
+each candidate with the same frozen teacher, data, seed, schedule and token order:
+
+```bash
+python -m haru.training --data packed/haru-v3-teacher \
+  --teacher runs/haru-v3/teacher-base/best.pt --phase student-base \
+  --candidate pairshare8-r48 --output runs/pairshare8-r48 \
+  --device cuda --microbatch 16 --effective-tokens 131072 \
+  --learning-rate 3e-4 --target-tokens 500000000 --schedule-tokens 500000000
+# Repeat with --candidate gated8-13m and --output runs/gated8-13m.
+```
+
+Both use `0.5 CE + 0.5 * T^2 KL(teacher || student)`, with `T = 2`.
+The default `train.py` sweep stays on the original three candidates; it does
+not automatically select this experiment. CPU tests check sharing gradients,
+adapter learning, causal/cache agreement at lengths 1, 63, 64, 65, 512 and 1024
+with padding, teacher immutability, exact interrupted distillation resumption,
+and independent Hugging Face loading. Run them with:
+
+```bash
+python -m unittest test_dense test_experimental
+```
+
+These candidates have not undergone story-quality training or comparison.
+Equal parameters do not imply equal compute: PairShare evaluates width-960
+FFNs in all eight layers, while the matched control uses width 512. Report
+actual training throughput and CPU speed alongside held-out story BPC,
+repetition and character/event continuity. Sharing alone is not a speed claim.
+
 ## Export and evaluate
 
 The four output phases are `teacher-base`, `student-base`, `teacher-chat`, and
@@ -108,6 +163,11 @@ The dense decoder differs from the v2 CFRD family, so this line uses v3.
 Base and IT versions have separate weights and repositories. Teachers are
 distillation tools; the sub-18M target applies to students. A repository is
 published only after its stage completes and its export is verified.
+
+Publication of the current run's weights is on hold while permission conditions
+for one web-text source are clarified. Code publication and local checkpoint
+preservation continue. The planned repository names above are not a claim that
+those releases already exist.
 
 ```bash
 python -m haru.export \

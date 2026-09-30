@@ -113,6 +113,13 @@ def export(checkpoint_path, tokenizer_path, output, repo_id=None, copy_resume=Tr
         if story_first and evaluation
         else (evaluation["macro_bpc"] if evaluation else "not yet recorded")
     )
+    architecture_note = (
+        f"FFNs are shared across groups of {model.cfg.ffn_share_group_size} adjacent layers; "
+        f"each layer has a rank-{model.cfg.ffn_adapter_rank} linear residual adapter. "
+        "Attention and KV caches remain independent per logical layer."
+        if model.cfg.ffn_share_group_size > 1
+        else f"FFNs are independent per layer; linear adapter rank: {model.cfg.ffn_adapter_rank}."
+    )
     card = f"""---
 library_name: transformers
 pipeline_tag: text-generation
@@ -126,6 +133,7 @@ tags: [haru, haru-dense, custom-code]
 
 Haru v3 {checkpoint["phase"]}: {metadata["parameters"]:,} parameters, context 1024,
 full causal attention, QK RMSNorm, SwiGLU and an incremental KV cache.
+{architecture_note}
 Training tokens: {checkpoint["tokens_seen"]:,}. Full FP32 weights are preserved.
 Variant: **{metadata["variant"]}**. {role_note}
 {purpose}

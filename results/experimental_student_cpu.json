@@ -1,0 +1,36 @@
+{
+  "verification": "synthetic CPU correctness only, no optimizer update or quality experiment",
+  "torch": "2.12.1+cpu",
+  "threads": 4,
+  "batch": 1,
+  "length": 63,
+  "teacher_parameters": 30997377,
+  "teacher_tokens_seen_intermediate_fixture": 1188560896,
+  "teacher_unchanged": true,
+  "original_candidate_seeded_initialization": {
+    "dense8": "all seeded state tensors unchanged",
+    "deep10": "all seeded state tensors unchanged",
+    "gated8": "all seeded state tensors unchanged"
+  },
+  "students": {
+    "pairshare8-r48": {
+      "parameters": 13688705,
+      "synthetic_loss": 5.3945698738098145,
+      "forward_plus_backward_seconds": 0.1179820999968797,
+      "full_plus_cached_forward_seconds": 1.2015074000228196,
+      "all_student_gradients_finite": true,
+      "teacher_gradients_absent": true,
+      "cache_matches_full": true
+    },
+    "gated8-13m": {
+      "parameters": 13688705,
+      "synthetic_loss": 4.7460036277771,
+      "forward_plus_backward_seconds": 0.10094910021871328,
+      "full_plus_cached_forward_seconds": 0.05788869992829859,
+      "all_student_gradients_finite": true,
+      "teacher_gradients_absent": true,
+      "cache_matches_full": true
+    }
+  },
+  "timing_limitation": "Single CPU correctness runs include cold execution; not a throughput benchmark or GPU forecast."
+}

@@ -35,6 +35,13 @@ recurrent; "recurrent" describes the earlier CFRD line. The new models are
 still being trained and evaluated. See [TRAINING.md](TRAINING.md) for the
 data layout, commands to run on your own GPU, resume behavior, and evaluation.
 
+The experimental student **PairShare8-r48** keeps eight independent attention
+layers, shares each SwiGLU FFN across an adjacent pair, and adds a rank-48
+linear residual adapter per layer. Its 13,688,705 parameters exactly match an
+independent Gated8 control with FFN width 512. Both are opt-in implementations;
+CPU correctness checks are separate from the story-quality experiments that
+remain to be run. The existing 17.82M Gated8 remains a baseline.
+
 The public training entry point is `python train.py`. It reads prepared data
 from a local directory, measures supported kernels on the current GPU, compares
 the candidates, and continues through teacher training and student distillation.
