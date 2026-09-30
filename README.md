@@ -6,10 +6,26 @@
 
 <p align="center"><strong>Haru</strong> — the character representing Haru in the model family.</p>
 
-Haru is a family of compact Korean story continuation language models. The
-released v1/v2 models use the Causal Folded Recurrent Decoder (CFRD); the
-released v3 dense model uses full causal attention. See
-[Result at release scale](#result-at-release-scale) for the v2 design decision.
+Haru is a family of compact experimental Korean story continuation language
+models. **Haru v3 is the current release**, with separate 13.69M student non-IT
+and IT models, plus 30.99M self-trained teachers. The v3 dense decoder uses full
+causal attention and an incremental KV cache. The earlier v1/v2 CFRD models
+are legacy releases preserved for research and reproducibility.
+
+For plain children's-story continuation, start with **student non-IT**. The
+student IT model uses a chat template and remains an experimental comparison;
+it still loses story facts and generalizes poorly on unseen instruction forms.
+
+| Current v3 model | Parameters | Hugging Face |
+|---|---:|---|
+| Student non-IT (default for continuation) | 13,688,705 | [haru_3-student-base](https://huggingface.co/alice-noa-chan/haru_3-student-base) |
+| Student IT | 13,688,705 | [haru_3-student-chat](https://huggingface.co/alice-noa-chan/haru_3-student-chat) |
+| Teacher non-IT | 30,997,377 | [haru_3-teacher-base](https://huggingface.co/alice-noa-chan/haru_3-teacher-base) |
+| Teacher IT | 30,997,377 | [haru_3-teacher-chat](https://huggingface.co/alice-noa-chan/haru_3-teacher-chat) |
+
+All four repositories include FP32 weights, MIT licensing and usage examples.
+See [student IT usage](#student-it-usage), [completed student evaluation](#completed-experimental-students),
+and the [v3 release](https://github.com/alice-noa-chan/haru/releases/tag/v3.0.2-students).
 
 Haru v2.0 is the earlier 17.0-million-parameter release and the first Haru to
 score above chance on KoBEST. v1.1 (11.6M) and v1.0 (6.8M) remain available.
@@ -18,9 +34,9 @@ See [Recurrent depth](#recurrent-depth) for why that changed.
 
 - GitHub: [alice-noa-chan/haru](https://github.com/alice-noa-chan/haru)
 - Teacher v3 non-IT: [alice-noa-chan/haru_3-teacher-base](https://huggingface.co/alice-noa-chan/haru_3-teacher-base)
-- Model v2.0: [alice-noa-chan/haru_2](https://huggingface.co/alice-noa-chan/haru_2)
-- Model v1.1: [alice-noa-chan/haru_1.1](https://huggingface.co/alice-noa-chan/haru_1.1)
-- Model v1.0: [alice-noa-chan/haru](https://huggingface.co/alice-noa-chan/haru)
+- Legacy model v2.0: [alice-noa-chan/haru_2](https://huggingface.co/alice-noa-chan/haru_2)
+- Legacy model v1.1: [alice-noa-chan/haru_1.1](https://huggingface.co/alice-noa-chan/haru_1.1)
+- Legacy model v1.0: [alice-noa-chan/haru](https://huggingface.co/alice-noa-chan/haru)
 - Collection: [Haru model family](https://huggingface.co/collections/alice-noa-chan/haru-6abb683d0a8b9677162d7704)
 - Demo Spaces were retired at the owner's request; model weights remain available.
 
@@ -55,7 +71,7 @@ python -m pip install "torch>=2.6" "transformers==4.57.1" sentencepiece safetens
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-repo = "alice-noa-chan/haru_3-teacher-base"
+repo = "alice-noa-chan/haru_3-student-base"  # Use haru_3-teacher-base for the larger teacher.
 tokenizer = AutoTokenizer.from_pretrained(repo, trust_remote_code=True)
 model = AutoModelForCausalLM.from_pretrained(repo, trust_remote_code=True).eval()
 prompt = "작은 마을에 사는 토끼는 길에서 반짝이는 단추를 발견했어요."
@@ -109,12 +125,15 @@ alice-noa-chan organization. The new character image is used above.
 
 | Version | GitHub | Hugging Face | Status |
 |---|---|---|---|
-| 3 teacher base | [Training code](TRAINING.md) | [`alice-noa-chan/haru_3-teacher-base`](https://huggingface.co/alice-noa-chan/haru_3-teacher-base) | non-IT teacher |
-| 2.0 | [`v2.0.0`](https://github.com/alice-noa-chan/haru/releases/tag/v2.0.0) | [`alice-noa-chan/haru_2`](https://huggingface.co/alice-noa-chan/haru_2) | Current |
+| 3 student non-IT | [`v3.0.2-students`](https://github.com/alice-noa-chan/haru/releases/tag/v3.0.2-students) | [`haru_3-student-base`](https://huggingface.co/alice-noa-chan/haru_3-student-base) | Current; default continuation model |
+| 3 student IT | [`v3.0.2-students`](https://github.com/alice-noa-chan/haru/releases/tag/v3.0.2-students) | [`haru_3-student-chat`](https://huggingface.co/alice-noa-chan/haru_3-student-chat) | Current; experimental IT |
+| 3 teacher non-IT | [`v3.0.2-students`](https://github.com/alice-noa-chan/haru/releases/tag/v3.0.2-students) | [`haru_3-teacher-base`](https://huggingface.co/alice-noa-chan/haru_3-teacher-base) | Current; larger teacher |
+| 3 teacher IT | [`v3.0.2-students`](https://github.com/alice-noa-chan/haru/releases/tag/v3.0.2-students) | [`haru_3-teacher-chat`](https://huggingface.co/alice-noa-chan/haru_3-teacher-chat) | Current; larger experimental IT teacher |
+| 2.0 | [`v2.0.0`](https://github.com/alice-noa-chan/haru/releases/tag/v2.0.0) | [`alice-noa-chan/haru_2`](https://huggingface.co/alice-noa-chan/haru_2) | Legacy |
 | 1.1 | [`v1.1.0`](https://github.com/alice-noa-chan/haru/releases/tag/v1.1.0) | [`alice-noa-chan/haru_1.1`](https://huggingface.co/alice-noa-chan/haru_1.1) | Legacy |
 | 1.0 | [`v1.0.0`](https://github.com/alice-noa-chan/haru/releases/tag/v1.0.0) | [`alice-noa-chan/haru`](https://huggingface.co/alice-noa-chan/haru) | Legacy |
 
-## Haru v2.0 at a glance
+## Legacy Haru v2.0 at a glance
 
 | Setting | v2.0 | v1.1 |
 |---|---:|---:|
@@ -198,7 +217,10 @@ Haru requires Python 3.11 or newer.
 python -m pip install -r requirements.txt
 ```
 
-## Load with Transformers
+## Load legacy v2 with Transformers
+
+This section is for the preserved CFRD v2 model. Use the v3 example above for
+the current student non-IT model, or [student IT usage](#student-it-usage) for IT.
 
 The public inference format uses Safetensors and standard Transformers
 AutoClasses. It does not load the training `.pt` checkpoint.
