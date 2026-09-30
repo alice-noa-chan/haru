@@ -1,5 +1,5 @@
 {
-  "checked_at_utc": "2026-09-30T09:08:05Z",
+  "checked_at_utc": "2026-09-30T09:16:58Z",
   "teacher_base": {
     "parameters": 30997377,
     "selected_tokens_seen": 1914437632,
@@ -14,24 +14,22 @@
       "parameters": 13688705,
       "tokens_seen": 0,
       "target_tokens": 500000000,
-      "status": "kernel_preflight_failed_no_trained_checkpoint"
+      "status": "waiting_for_kernel_verification_and_data_transfer"
     },
     {
       "candidate": "gated8-13m",
       "parameters": 13688705,
       "tokens_seen": 0,
       "target_tokens": 500000000,
-      "status": "kernel_preflight_failed_no_trained_checkpoint"
+      "status": "waiting_for_kernel_verification_and_data_transfer"
     }
   ],
   "limitations": "No trained student checkpoint or measured student quality result is available at this timestamp.",
   "latest_attempt": {
-    "status": "stopped_before_training",
-    "reason": "BF16 fast attention gradients failed unchanged reference tolerances",
-    "recovered_checkpoints": [
-      "frozen teacher only"
-    ],
-    "gpu_shutdown_confirmed": true,
-    "implementation_fix": "Retry failed fast backend with reference attention; abort if reference verification fails too."
+    "status": "runtime_verified_preparing_inputs",
+    "gpu": "NVIDIA L40S",
+    "runtime": "PyTorch 2.6.0 / CUDA 12.4",
+    "source_commit": "dd8c9337a9c5d28aeb339882e3758d941059d32c",
+    "kernel_preflight": "Both real student/teacher checks run before large data upload; training remains gated on agreement."
   }
 }
