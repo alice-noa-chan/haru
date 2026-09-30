@@ -56,6 +56,35 @@ class ExperimentalTests(unittest.TestCase):
         cfg = self.config(**kwargs)
         return DenseLanguageModel(cfg, torch.randn(cfg.vocab_size, 76))
 
+    def test_backend_selection_rejects_fast_kernel_without_relaxing_tolerances(self):
+        from haru.measure_phases import select_verified_attention
+
+        model, teacher = self.model(), self.model()
+        with patch(
+            "haru.measure_phases.verify_backend", side_effect=[AssertionError("gradient mismatch"), None]
+        ) as verify:
+            backend, failures = select_verified_attention(model, teacher, "cpu")
+        self.assertEqual(backend, "math")
+        self.assertEqual(failures[0]["error"], "agreement_failed")
+        self.assertEqual([call.args[3] for call in verify.call_args_list], ["auto", "math"])
+        with patch("haru.measure_phases.verify_backend", side_effect=AssertionError("reference mismatch")):
+            with self.assertRaisesRegex(AssertionError, "reference mismatch"):
+                select_verified_attention(model, teacher, "cpu")
+        with patch("haru.measure_phases.verify_backend", side_effect=RuntimeError("device lost")) as verify:
+            with self.assertRaisesRegex(RuntimeError, "device lost"):
+                select_verified_attention(model, teacher, "cpu")
+            verify.assert_called_once()
+
+    def test_backend_selection_accepts_verified_kernel_and_reference_cpu_kd(self):
+        from haru.measure_phases import select_verified_attention, verify_backend
+
+        model = self.model(context_length=65)
+        teacher = self.model(context_length=65).eval().requires_grad_(False)
+        backend, failures = select_verified_attention(model, teacher, "cpu")
+        self.assertEqual((backend, failures), ("auto", []))
+        verify_backend(model, teacher, "cpu", "math", "torch")
+        self.assertTrue(all(parameter.grad is None for parameter in model.parameters()))
+
     def test_exact_matched_parameter_count_and_unique_registration(self):
         for name, cfg in EXPERIMENTAL_CANDIDATES.items():
             with self.subTest(candidate=name), torch.device("meta"):

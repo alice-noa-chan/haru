@@ -225,3 +225,12 @@ speed. Compare generated stories for character, object, and event continuity;
 a lower BPC alone does not establish better storytelling. Run public benchmarks
 only after this selection is frozen. Do not describe the model as the best under
 18M parameters without comparable evidence.
+
+### Student kernel verification
+
+The student pipeline checks loss and parameter gradients against reference math
+attention before measuring or training. If the automatic BF16 backend fails the
+existing tolerance, it records the failure and verifies math attention separately.
+Only the verified backend is used for measurements and subsequent base/IT training;
+a reference mismatch or device error still aborts. The tolerance is never widened.
+See `results/student_progress.json` for actual trained tokens and publication status.

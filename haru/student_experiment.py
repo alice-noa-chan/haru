@@ -12,8 +12,8 @@ import torch
 from dense_model import EXPERIMENTAL_CANDIDATES, student_from_teacher
 from haru.archive import file_hash
 from haru.data import MixtureSampler
-from haru.kernels import attention_trace
-from haru.measure_phases import measure_steps, verify_backend
+from haru.kernels import attention_context, attention_trace
+from haru.measure_phases import measure_steps, select_verified_attention
 from haru.pipeline import select
 from haru.runtime import Deadline, atomic_json
 from haru.training import checkpoint_validation, load_model, source_commit, train
@@ -26,9 +26,10 @@ def measure_student(teacher_path, candidate, data, output, deadline, device):
     teacher.eval().requires_grad_(False)
     cfg = EXPERIMENTAL_CANDIDATES[candidate]
     model = student_from_teacher(teacher, cfg)
-    verify_backend(model, teacher, device, "auto", "torch")
-    rows, failures = [], []
-    trace = attention_trace(model, torch.randint(4, cfg.vocab_size, (1, 63), device=device))
+    backend, failures = select_verified_attention(model, teacher, device)
+    rows = []
+    with attention_context(backend):
+        trace = attention_trace(model, torch.randint(4, cfg.vocab_size, (1, 63), device=device))
     del model
     for batch in (8, 16, 32):
         if deadline.expired():
@@ -36,7 +37,7 @@ def measure_student(teacher_path, candidate, data, output, deadline, device):
         sampler = MixtureSampler(data, 1337)
         model = student_from_teacher(teacher, cfg)
         try:
-            settings = {"microbatch": batch, "attention_backend": "auto", "loss_backend": "torch", "compiled": False}
+            settings = {"microbatch": batch, "attention_backend": backend, "loss_backend": "torch", "compiled": False}
             row = measure_steps(model, teacher, sampler, device, settings, deadline)
             if row is None:
                 break
@@ -157,7 +158,8 @@ def run_experiment(args, deadline=None):
         if phase == "student-chat":
             frozen, _ = load_model(args.output / "teacher-chat/best.pt", args.device)
             frozen.eval().requires_grad_(False)
-        verify_backend(initialized, frozen, args.device, "auto", "torch")
+        backend, failures = select_verified_attention(initialized, frozen, args.device)
+        atomic_json(args.output / phase / "backend_verification.json", {"selected": backend, "failures": failures})
         del initialized, frozen
         gc.collect()
         if args.device.startswith("cuda"):
@@ -186,6 +188,8 @@ def run_experiment(args, deadline=None):
                 "131072",
                 "--microbatch",
                 "8",
+                "--attention-backend",
+                backend,
                 *extra,
             ]
         )

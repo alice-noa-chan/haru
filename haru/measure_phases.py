@@ -45,6 +45,21 @@ def verify_backend(model, teacher, device, attention_backend, loss_backend):
     model.zero_grad(set_to_none=True)
 
 
+def select_verified_attention(model, teacher, device, loss_backend="torch"):
+    """Use the fast backend only after agreement checks; retain the reference fallback."""
+    try:
+        verify_backend(model, teacher, device, "auto", loss_backend)
+        return "auto", []
+    except AssertionError as error:
+        failure = {"attention_backend": "auto", "error": "agreement_failed", "detail": str(error)}
+        model.zero_grad(set_to_none=True)
+        if teacher is not None:
+            teacher.zero_grad(set_to_none=True)
+    # Keep the original tolerances. A failed reference check must still abort training.
+    verify_backend(model, teacher, device, "math", loss_backend)
+    return "math", [failure]
+
+
 def measure_steps(model, teacher, sampler, device, settings, deadline, effective_tokens=131072, repeats=2):
     batch = settings["microbatch"]
     context = model.cfg.context_length
