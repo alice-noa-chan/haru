@@ -32,7 +32,7 @@ SOURCES = {
     "story": "data.txt",
 }
 ROLES = ["<|system|>", "<|user|>", "<|assistant|>", "<|end|>"]
-CHAT_TEMPLATE = "{% for message in messages %}{{ '<|' + message['role'] + '|>' + message['content'] + '<|end|>' }}{% endfor %}{% if add_generation_prompt %}{{ '<|assistant|>' }}{% endif %}"
+CHAT_TEMPLATE = "{{ bos_token }}{% for message in messages %}{{ '<|' + message['role'] + '|>' + message['content'] + '<|end|>' }}{% endfor %}{% if add_generation_prompt %}{{ '<|assistant|>' }}{% endif %}"
 NAMES = {
     "train": [
         "하린",

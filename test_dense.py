@@ -480,13 +480,17 @@ class DenseTests(unittest.TestCase):
                 pad_token="<pad>",
                 unk_token="<unk>",
                 additional_special_tokens=ROLES,
+                extra_special_tokens={},
                 chat_template=CHAT_TEMPLATE,
                 padding_side="left",
             )
             self.assertEqual(len(tokenizer), cfg.vocab_size)
             chat = [
                 {
-                    "messages": [{"role": "user", "content": "작은 마을"}, {"role": "assistant", "content": "하린"}],
+                    "messages": [
+                        {"role": "user", "content": "작은 마을\n하린"},
+                        {"role": "assistant", "content": "하린"},
+                    ],
                     "task": "grounded_extract",
                 },
                 {
@@ -526,6 +530,12 @@ class DenseTests(unittest.TestCase):
                 return_dict=False,
             )
             self.assertEqual(ids[0, -1].item(), loaded_tokenizer.convert_tokens_to_ids("<|assistant|>"))
+            self.assertEqual(ids[0, 0].item(), loaded_tokenizer.bos_token_id)
+            full_chat = loaded_tokenizer.apply_chat_template(chat[0]["messages"], return_dict=False)
+            self.assertEqual(full_chat, packed.items[0][0])
+            roles = [loaded_tokenizer.convert_tokens_to_ids(role) for role in ROLES]
+            self.assertTrue(set(roles).issubset(set(loaded_tokenizer.all_special_ids)))
+            self.assertEqual(loaded_tokenizer.decode(roles, skip_special_tokens=True), "")
             inputs = loaded_tokenizer(["작은 마을", "안녕하세요. 작은 마을"], padding=True, return_tensors="pt")
             from haru.evaluate import diagnose
 

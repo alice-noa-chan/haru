@@ -90,10 +90,14 @@ def diagnose(directory, data, documents=64, rules=70, threads=4):
         for item in rule_examples(rules, split, seed=71833, template_split=forms):
             prompt = item["prompt"]
             if chat:
-                prompt = tokenizer.apply_chat_template(
-                    [{"role": "user", "content": prompt}], tokenize=False, add_generation_prompt=True
+                inputs = tokenizer.apply_chat_template(
+                    [{"role": "user", "content": prompt}],
+                    add_generation_prompt=True,
+                    return_tensors="pt",
+                    return_dict=True,
                 )
-            inputs = tokenizer(prompt, return_tensors="pt")
+            else:
+                inputs = tokenizer(prompt, return_tensors="pt")
             ids = model.generate(**inputs, max_new_tokens=12, do_sample=False, use_cache=dense)
             answer = tokenizer.decode(ids[0, inputs["input_ids"].shape[1] :], skip_special_tokens=True)
             # A leading correct answer followed by unrelated text is not an exact match.
@@ -129,6 +133,26 @@ def diagnose(directory, data, documents=64, rules=70, threads=4):
             }
         )
     result["generation"] = generation
+    if chat:
+        result["chat_generation"] = []
+        for prompt in GENERATION_PROMPTS:
+            content = "다음 동화의 인물, 물건, 사건을 유지하며 이어 써 주세요.\n\n" + prompt
+            inputs = tokenizer.apply_chat_template(
+                [{"role": "user", "content": content}],
+                add_generation_prompt=True,
+                return_tensors="pt",
+                return_dict=True,
+            )
+            output = model.generate(**inputs, max_new_tokens=80, do_sample=False, use_cache=True)
+            generated = output[0, inputs["input_ids"].shape[1] :].tolist()
+            result["chat_generation"].append(
+                {
+                    "prompt": content,
+                    "completion": tokenizer.decode(generated, skip_special_tokens=True),
+                    "tokens": len(generated),
+                    "fact_retention": "requires human review of the saved prompt and continuation",
+                }
+            )
     result["native_context_length"] = context
     result["limitations"] = (
         "Small synthetic exact-match and ranking tests; no claim of universal reasoning. Fact retention requires human review."

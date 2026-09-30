@@ -34,6 +34,10 @@ class CFRDTokenizer(PreTrainedTokenizer):
         self.add_bos_token = add_bos_token
         self.add_eos_token = add_eos_token
         self.sp_model = spm.SentencePieceProcessor(model_file=str(vocab_file))
+        # Transformers 4 saves an empty named-token map beside the legacy role
+        # list. In Transformers 5 that empty map suppresses the legacy migration.
+        if kwargs.get("additional_special_tokens") and not kwargs.get("extra_special_tokens"):
+            kwargs.pop("extra_special_tokens", None)
         super().__init__(**kwargs)
 
     @property

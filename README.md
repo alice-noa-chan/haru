@@ -658,3 +658,9 @@ print(tokenizer.decode(output[0, inputs["input_ids"].shape[1] :], skip_special_t
 
 Input and generated output together must fit 1,024 tokens. For non-IT continuation, use
 `alice-noa-chan/haru_3-student-base` and plain text rather than a chat template.
+
+The chat template includes the BOS token used by the training sampler. Role tokens
+remain special tokens under Transformers 4.57.1 and 5.17.0, so
+`skip_special_tokens=True` removes the assistant turn boundary. Regression checks
+compare the complete multi-turn chat token IDs to the actual training sampler,
+including newlines. Use the latest model revision for the corrected tokenizer.
