@@ -72,6 +72,10 @@ with torch.inference_mode():
 print(tokenizer.decode(output[0], skip_special_tokens=True))
 ```
 
+The loading and generation wrapper is verified with Transformers 4.57.1 and
+5.17.0. Use the latest model repository revision if an older cached implementation
+raises `all_tied_weights_keys`.
+
 The example runs on CPU. For GPU inference, move both `model` and `inputs` to
 `"cuda"` before generation. Input plus generated length must fit 1,024 tokens.
 
@@ -88,6 +92,12 @@ linear residual adapter per layer. Its 13,688,705 parameters exactly match an
 independent Gated8 control with FFN width 512. Both are opt-in implementations;
 CPU correctness checks are separate from the story-quality experiments that
 remain to be run. The existing 17.82M Gated8 remains a baseline.
+
+Student status at **2026-09-30 08:31 UTC**: both 13.69M candidates have
+**0 student training tokens** recorded and no trained checkpoint yet.
+Each candidate targets 500M distillation tokens before equal-budget comparison;
+IT training follows the selected base model. This status is a dated observation,
+not a completed student release. See [student progress](results/student_progress.json).
 
 The public training entry point is `python train.py`. It reads prepared data
 from a local directory, measures supported kernels on the current GPU, compares

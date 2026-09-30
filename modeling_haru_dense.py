@@ -25,6 +25,12 @@ class HaruDenseForCausalLM(PreTrainedModel, GenerationMixin):
         cfg = DenseConfig(**config.dense_config)
         table = torch.zeros(cfg.vocab_size, cfg.surface_feature_dim) if cfg.use_surface_features else None
         self.model = DenseLanguageModel(cfg, table)
+        self.post_init()
+
+    def _init_weights(self, module):
+        # DenseLanguageModel owns its initialization, including zero residual adapters.
+        # post_init still registers Transformers loading, tying and parallelism metadata.
+        pass
 
     @classmethod
     def _supports_default_dynamic_cache(cls):

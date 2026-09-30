@@ -1,0 +1,28 @@
+{
+  "checked_at_utc": "2026-09-30T08:31:39Z",
+  "teacher_base": {
+    "parameters": 30997377,
+    "selected_tokens_seen": 1914437632,
+    "completed_training_tokens": 2000027648,
+    "test_story_bpc_context_512": 0.8718380866536986,
+    "reference_v2_test_story_bpc": 1.1467498498238682,
+    "repository": "alice-noa-chan/haru_3-teacher-base"
+  },
+  "students": [
+    {
+      "candidate": "pairshare8-r48",
+      "parameters": 13688705,
+      "tokens_seen": 0,
+      "target_tokens": 500000000,
+      "status": "not_started_no_trained_checkpoint"
+    },
+    {
+      "candidate": "gated8-13m",
+      "parameters": 13688705,
+      "tokens_seen": 0,
+      "target_tokens": 500000000,
+      "status": "not_started_no_trained_checkpoint"
+    }
+  ],
+  "limitations": "No trained student checkpoint or measured student quality result is available at this timestamp."
+}

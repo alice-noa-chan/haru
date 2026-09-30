@@ -199,6 +199,32 @@ class DenseTests(unittest.TestCase):
             restored = student_from_teacher(teacher).eval()
             torch.testing.assert_close(model(ids).logits, restored(ids).logits, atol=0, rtol=0)
 
+    def test_hf_wrapper_finalizes_without_changing_dense_initialization(self):
+        cfg = DenseConfig(
+            vocab_size=71,
+            d_model=32,
+            n_head=2,
+            n_kv_head=1,
+            ffn_dim=64,
+            n_layer=2,
+            ffn_share_group_size=2,
+            ffn_adapter_rank=8,
+        )
+        torch.manual_seed(197)
+        expected = DenseLanguageModel(cfg, torch.zeros(cfg.vocab_size, cfg.surface_feature_dim))
+        torch.manual_seed(197)
+        wrapper = HaruDenseForCausalLM(HaruDenseConfig(dense_config=asdict(cfg)))
+        for name, value in expected.state_dict().items():
+            self.assertTrue(torch.equal(value, wrapper.model.state_dict()[name]), name)
+        if hasattr(wrapper, "all_tied_weights_keys"):
+            self.assertEqual(wrapper.all_tied_weights_keys, {})
+        # Use the real version's save/load path so missing finalization metadata regresses.
+        with tempfile.TemporaryDirectory() as directory:
+            wrapper.save_pretrained(directory)
+            loaded = HaruDenseForCausalLM.from_pretrained(directory)
+            for name, value in wrapper.state_dict().items():
+                self.assertTrue(torch.equal(value, loaded.state_dict()[name]), name)
+
     def test_remote_inference_import_check_without_optional_liger(self):
         from transformers.dynamic_module_utils import check_imports
 
@@ -494,7 +520,10 @@ class DenseTests(unittest.TestCase):
             loaded = AutoModelForCausalLM.from_pretrained(export, trust_remote_code=True, local_files_only=True).eval()
             loaded_tokenizer = AutoTokenizer.from_pretrained(export, trust_remote_code=True, local_files_only=True)
             ids = loaded_tokenizer.apply_chat_template(
-                [{"role": "user", "content": "안녕하세요."}], add_generation_prompt=True, return_tensors="pt"
+                [{"role": "user", "content": "안녕하세요."}],
+                add_generation_prompt=True,
+                return_tensors="pt",
+                return_dict=False,
             )
             self.assertEqual(ids[0, -1].item(), loaded_tokenizer.convert_tokens_to_ids("<|assistant|>"))
             inputs = loaded_tokenizer(["작은 마을", "안녕하세요. 작은 마을"], padding=True, return_tensors="pt")

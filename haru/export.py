@@ -154,7 +154,7 @@ print(tokenizer.decode(out[0], skip_special_tokens=True))
 ```
 
 IT (chat) checkpoints also support `tokenizer.apply_chat_template(messages,
-add_generation_prompt=True, return_tensors="pt")`. Base checkpoints continue
+add_generation_prompt=True, return_tensors="pt", return_dict=False)`. Base checkpoints continue
 text and are non-IT. Input plus generation must fit 1024 tokens.
 
 Model weights and included source code are licensed under MIT (see LICENSE).
