@@ -690,7 +690,7 @@ LM windows the train/validation NLL was 3.157958/3.411300; the gap was 0.25334
 (bootstrap 95% CI 0.13314–0.37147). This distinguishes relation-task overfitting
 from a large, globally rising validation loss.
 
-The new implementation and experiment protocol are documented in [V3.md](V3.md).
+The new implementation and experiment protocol are documented in [TRAINING.md](TRAINING.md).
 Three independent dense candidates fit below 18M. Their approximately 30M
 teachers are grown with function-preserving zero-output inserted blocks and
 preserved before own-teacher distillation. No new external LLM data or pretrained
@@ -714,3 +714,4 @@ decide whether more training helps. Existing data are synthetic children's
 stories, so results must not be described as general Korean fiction quality.
 The reused 12K tokenizer and the story weighting are a controlled first test;
 neither has an empirical v3 quality result yet.
+

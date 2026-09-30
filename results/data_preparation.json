@@ -1,0 +1,147 @@
+{
+  "status": "prepared_and_locally_verified",
+  "candidate_manifest_blake2b16": "00dc92c2e7872ef268dda6020cf2d55a",
+  "tokenizer_blake2b16": "7b4fa4d76349163c2ce7bc4614c95140",
+  "train_tokens": 2601534294,
+  "streams": {
+    "textbooks.train": {
+      "tokens": 162655858,
+      "blake2b16": "9b4234459296f1653c257768fcb84a33"
+    },
+    "web.train": {
+      "tokens": 1786097139,
+      "blake2b16": "6d47ae3ea0e4f517feb718f5e36ef5a8"
+    },
+    "wiki.train": {
+      "tokens": 397842571,
+      "blake2b16": "0f6f2fd22d3c544fc35c9a1f1f98f83e"
+    },
+    "story.train": {
+      "tokens": 250740724,
+      "blake2b16": "a289e5c5385f78e697568fdf6bf0fc4d"
+    },
+    "rules.train": {
+      "tokens": 4198002,
+      "blake2b16": "73b5b690a882a38dc41d84e73a800b73"
+    },
+    "textbooks.val": {
+      "tokens": 812805,
+      "blake2b16": "9e84494852bf61a0af013cc62768b37e"
+    },
+    "web.val": {
+      "tokens": 8980289,
+      "blake2b16": "570778d26f7800a50015d34ef7783281"
+    },
+    "wiki.val": {
+      "tokens": 2043535,
+      "blake2b16": "7e4e0701e13d8a88daa158c4f02730a6"
+    },
+    "story.val": {
+      "tokens": 1279234,
+      "blake2b16": "0f212e9ca20ab0c671d4ccf489e2d160"
+    },
+    "rules.val": {
+      "tokens": 335704,
+      "blake2b16": "83cf62249d9d6c106c4d7f7a2ea09d5a"
+    },
+    "textbooks.test": {
+      "tokens": 838458,
+      "blake2b16": "70d2aafb2f7a8e8a6dfe54b4fa81a30f"
+    },
+    "web.test": {
+      "tokens": 9104987,
+      "blake2b16": "be30e40f01de3befaccc0f208805cc04"
+    },
+    "wiki.test": {
+      "tokens": 1956337,
+      "blake2b16": "acd3983d86f2fa1ee6ff39d02cefd049"
+    },
+    "story.test": {
+      "tokens": 1256068,
+      "blake2b16": "b597d34f9cf492a3651d40636904fb30"
+    },
+    "rules.test": {
+      "tokens": 360666,
+      "blake2b16": "4632dfa8ef7597a2c498e454df84e401"
+    }
+  },
+  "weights": {
+    "textbooks": 0.4,
+    "web": 0.25,
+    "wiki": 0.15,
+    "story": 0.15,
+    "rules": 0.05
+  },
+  "tokenizer_sampling": {
+    "seed": 1729,
+    "max_characters": 50000000,
+    "segment_length": 1000,
+    "domains": {
+      "textbooks": {
+        "segments_seen": 419235,
+        "sample_segments": 20000,
+        "characters": 20000000
+      },
+      "web": {
+        "segments_seen": 3534412,
+        "sample_segments": 12500,
+        "characters": 12500000
+      },
+      "wiki": {
+        "segments_seen": 718640,
+        "sample_segments": 7500,
+        "characters": 7500000
+      },
+      "story": {
+        "segments_seen": 683893,
+        "sample_segments": 7500,
+        "characters": 7500000
+      },
+      "rules": {
+        "segments_seen": 11449,
+        "sample_segments": 2500,
+        "characters": 2500000
+      }
+    }
+  },
+  "rule_expansion": {
+    "base_manifest_blake2b16": "00dc92c2e7872ef268dda6020cf2d55a",
+    "tokenizer_blake2b16": "7b4fa4d76349163c2ce7bc4614c95140",
+    "seed": 1337,
+    "unique_examples": 1000000,
+    "task_counts": {
+      "location": 142858,
+      "state": 142857,
+      "ownership": 142857,
+      "transfer": 142857,
+      "speaker": 142857,
+      "negation": 142857,
+      "arithmetic": 142857
+    },
+    "attempts": 1852699,
+    "deduplication": "blake2b16 of canonical text; mathematical operators preserved",
+    "rules.train": {
+      "tokens": 42842056,
+      "blake2b16": "fb656aca855193893d14ac4c65ac8c4b"
+    },
+    "held_out": "unchanged candidate validation/test documents",
+    "chat": "unchanged assistant-only chat dataset"
+  },
+  "teacher_2b_expected_exposure": {
+    "textbooks": 4.918359595754614,
+    "web": 0.27993998147264265,
+    "wiki": 0.7540671156581682,
+    "story": 1.1964550281828172,
+    "rules": 2.334155018143854
+  },
+  "limitations": [
+    "Near duplicate detection only checks a shared 64-character canonical prefix; it is not exhaustive semantic deduplication.",
+    "Exposure is a sampling expectation, not a count of document-level full passes.",
+    "No GPU throughput or quality result has been measured yet."
+  ],
+  "script_hashes": {
+    "v3_data.py": "238fc23005273de741b2864bd0de6eac",
+    "v3_rules.py": "d7576484475212c75ea49b8e740bf35c",
+    "v3_expand_rules.py": "5164764afa771eba5271b7f46c50e048"
+  }
+}

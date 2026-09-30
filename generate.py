@@ -6,7 +6,7 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 import config
-from train import resolve_device
+from train_legacy import resolve_device
 
 
 @torch.inference_mode()

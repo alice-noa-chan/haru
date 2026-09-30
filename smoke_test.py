@@ -54,7 +54,7 @@ from model_factory import (
 from modeling_cfrd import CFRDForCausalLM
 from surface_features import SURFACE_FEATURE_DIM
 from tokenization_cfrd import CFRDTokenizer
-from train import configure_optimizer, format_duration, restore_checkpoint, save_checkpoint
+from train_legacy import configure_optimizer, format_duration, restore_checkpoint, save_checkpoint
 
 # Small synthetic setup that does not require a trained tokenizer.
 TEST_VOCAB_SIZE = 512

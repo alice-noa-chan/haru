@@ -6,11 +6,10 @@
 
 <p align="center"><strong>Haru</strong> — the character representing Haru in the model family.</p>
 
-Haru is a compact Korean story continuation language model. Its custom Causal
-Folded Recurrent Decoder (CFRD) uses local causal attention, compressed summary
-memory, and reusable decoder cells. Measurements at release scale show the cell
-reuse is the one part that does not pay for itself, so v2.0 unfolds the stack
-to six independent cells; see [Result at release scale](#result-at-release-scale).
+Haru is a family of compact Korean story continuation language models. The
+released v1/v2 models use the Causal Folded Recurrent Decoder (CFRD); the
+in-development dense model uses full causal attention. See
+[Result at release scale](#result-at-release-scale) for the v2 design decision.
 
 Haru v2.0 is the current 17.0-million-parameter release and the first Haru to
 score above chance on KoBEST. v1.1 (11.6M) and v1.0 (6.8M) remain available.
@@ -29,31 +28,20 @@ model, a factual assistant, or a safety-reviewed product.
 
 ## Haru v3 development
 
-The v3 implementation compares three full-attention decoders under 18M parameters
-for **Korean children's-story continuation**. It trains its own larger teacher
-and preserves separate base/chat checkpoints. The v3 decoder is not recurrent;
-"recurrent" describes the earlier CFRD line, not the whole model family.
-It is not yet a completed model release. See [V3.md](V3.md) for architecture,
-data splits, cost limits, training/resume commands and publication.
+The new implementation compares three full-attention decoders under 18M
+parameters for **Korean children's-story continuation**. It trains its own
+larger teacher and saves separate base/chat checkpoints. This decoder is not
+recurrent; "recurrent" describes the earlier CFRD line. The new models are
+still being trained and evaluated. See [TRAINING.md](TRAINING.md) for the
+data layout, commands to run on your own GPU, resume behavior, and evaluation.
 
-GPU model training has not started. The first booted L40S failed CUDA driver
-initialization before any optimizer step; no throughput result is available yet.
-After Beam rejected the available credit type,
-the owner approved RunPod L40S and subsequently RTX 5090 Community Cloud with a $20 total cap, Pod volume,
-and verified local checkpoint backups. Allocation waits for a valid single-GPU
-quote compatible with the selected runtime and the story-first data view. CUDA 12.4 L40S hosts use the pinned
-PyTorch 2.6.0 profile; RTX 5090 uses the pinned PyTorch 2.8.0/CUDA 12.8 profile.
-CUDA 13 remains an explicit alternative. Recurring stock checks were removed at
-the owner's request. The earlier RTX 5090 measurement approval did not produce a
-Pod or result; the revised story objective is validated before further GPU spending.
-The original hashed zstd data remains available, while the story-first view has
-a distinct manifest and bundle. The benchmark
-also measures larger-teacher training and student distillation with real optimizer
-steps before the candidate comparison begins.
+The public training entry point is `python train.py`. It reads prepared data
+from a local directory, measures supported kernels on the current GPU, compares
+the candidates, and continues through teacher training and student distillation.
+No account or cloud provider is required by the training code.
 
-The released v1/v2 models retain their weights and revision history while moving
-to the alice-noa-chan organization. The new character image is used above and
-in the CPU demo.
+The released v1/v2 models retain their weights and revision history under the
+alice-noa-chan organization. The new character image is used above.
 
 ## Releases
 
@@ -489,7 +477,7 @@ inside the 17M parameter ceiling.
 ### 5. Train and evaluate
 
 ```bash
-python train.py
+python train_legacy.py
 python evaluate.py
 ```
 
@@ -520,7 +508,9 @@ AutoClasses and verifies all serialized tensors and output logits.
 | `tokenization_cfrd.py` | Transformers tokenizer implementation |
 | `tokenizer_train.py` | SentencePiece tokenizer training |
 | `prepare_data.py` | Packed token-stream creation |
-| `train.py` | Training, validation, checkpoints, and exact resume |
+| `train_legacy.py` | CFRD training, validation, checkpoints, and exact resume |
+| `train.py` | Dense story-model comparison, teacher training, and distillation |
+| `haru/` | Portable dense-model data, training, evaluation, and export modules |
 | `evaluate.py` | Recurrent-depth evaluation |
 | `evaluate_korean.py` | KoBEST zero-shot scoring through lm-eval |
 | `export_transformers.py` | Safetensors and AutoClass export |

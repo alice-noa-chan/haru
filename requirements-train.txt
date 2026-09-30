@@ -1,0 +1,8 @@
+# Install a PyTorch wheel compatible with your GPU before these dependencies.
+tomli==2.2.1; python_version < "3.11"
+numpy>=2.2,<3
+sentencepiece==0.2.2
+transformers==4.57.1
+safetensors>=0.6,<1
+zstandard==0.25.0
+huggingface-hub>=0.34,<1

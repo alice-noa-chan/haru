@@ -44,7 +44,7 @@ from model import ModelConfig, count_parameters
 from model_factory import architecture_of_config, build_model, describe_architecture
 from surface_features import build_surface_feature_table
 from tokenizer_utils import StoryTokenizer
-from train import autocast_context, configure_optimizer, get_random_batch, resolve_device
+from train_legacy import autocast_context, configure_optimizer, get_random_batch, resolve_device
 
 DATA_SEED_OFFSET = 40_000
 VALIDATION_SEED_OFFSET = 41_000
