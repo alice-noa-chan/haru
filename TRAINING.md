@@ -234,3 +234,15 @@ existing tolerance, it records the failure and verifies math attention separatel
 Only the verified backend is used for measurements and subsequent base/IT training;
 a reference mismatch or device error still aborts. The tolerance is never widened.
 See `results/student_progress.json` for actual trained tokens and publication status.
+
+### Completed-model publication
+
+Student releases follow completed training, checkpoint hash/CPU-loading verification,
+final test evaluation, and independent remote loading/generation verification.
+Intermediate student checkpoints are kept for resumption and are not published.
+Both 13.69M candidates must finish the same 500M-token budget before selection.
+Teacher IT and selected-student IT finish separate 10M-token stages.
+The selected best checkpoint may precede the final optimizer step; release metadata
+records both the selected checkpoint tokens and total completed training tokens.
+Base and IT artifacts remain separate, with FP32 Safetensors, MIT licensing,
+architecture details, measured limitations, and working inference examples.

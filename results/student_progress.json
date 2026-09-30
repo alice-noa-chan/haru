@@ -1,5 +1,5 @@
 {
-  "checked_at_utc": "2026-09-30T09:16:58Z",
+  "checked_at_utc": "2026-09-30T09:41:11Z",
   "teacher_base": {
     "parameters": 30997377,
     "selected_tokens_seen": 1914437632,
@@ -30,6 +30,7 @@
     "gpu": "NVIDIA L40S",
     "runtime": "PyTorch 2.6.0 / CUDA 12.4",
     "source_commit": "dd8c9337a9c5d28aeb339882e3758d941059d32c",
-    "kernel_preflight": "Both real student/teacher checks run before large data upload; training remains gated on agreement."
-  }
+    "kernel_preflight": "Both candidate KD loss/gradient checks passed with reference math attention. Automatic backend failed unchanged tolerances."
+  },
+  "publication_policy": "Only completed models, after final test evaluation and independent remote loading verification. Intermediate student publication is disabled."
 }
