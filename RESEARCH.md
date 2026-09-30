@@ -748,3 +748,38 @@ repetition and event continuity on identical data and seeds, and measure speed
 separately before selecting a student. Current weights remain unpublished
 pending clarification of the web-corpus permission conditions.
 
+## Completed teacher base evaluation (2026-09-30)
+
+Teacher training stopped normally at 2,000,027,648 tokens. Validation selected
+the checkpoint at 1,914,437,632 tokens; both that checkpoint and the final
+optimizer/sampler/RNG state are preserved. Evaluation used 64 fixed test
+documents per domain, seed 41000 for document sampling, the same raw text for
+both models, and four CPU threads. Public benchmarks were not used.
+
+| Model | Parameters | Test-story BPC, context 512 | Legacy relation ranking |
+| --- | ---: | ---: | ---: |
+| Selected Gated8 teacher base | 30,997,377 | 0.871838 | 26/50 |
+| Haru v2.0 | 16,983,213 | 1.146750 | 23/50 |
+
+Teacher story BPC is about 24% lower. This compares fixed checkpoints rather
+than isolating architecture: parameter count, training mix, objective and
+tokenizer differ. The paired document bootstrap is recorded in
+[teacher_base_evaluation.json](results/teacher_base_evaluation.json); it does
+not include training-seed variance. The same story BPC at context 1024 does
+not demonstrate a longer-context benefit on these selected stories.
+
+The three saved greedy continuations show less repetition, but cause and
+reference tracking remain weak. After the crashing-bottle prompt, the teacher
+cleans up and ends with a moral without resolving the gold button or Minho.
+The injured-rabbit prompt produces an unexplained rescue of the turtle. The
+book-return promise ends with friendship without actually returning the book.
+Zero repeated 4-grams in these three outputs is only a local observation;
+relation ranking remains close to chance and cannot support a reasoning claim.
+
+The base teacher is frozen for two 13.69M student distillation runs with the
+same seed, data order, 500M-token schedule and objective. Student selection
+uses validation data, not this test report. A separate IT teacher and selected
+IT student are trained afterward. Local CPU exports and final evaluation
+follow verified checkpoint recovery and GPU deletion. Weight publication is
+still on hold; code and measured evaluation results are public.
+

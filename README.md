@@ -28,6 +28,14 @@ model, a factual assistant, or a safety-reviewed product.
 
 ## Haru v3 development
 
+Teacher base training completed at 2,000,027,648 tokens. Its selected best
+checkpoint scored story BPC **0.872**, versus **1.147** for v2 on the same 64
+test stories at context 512. The teacher has 30.99M parameters and a different
+training mix, so this does not establish a small-student or architecture-only
+improvement. Fixed continuations repeat less but still lose objects, promises
+and event causes. See the [teacher evaluation](results/teacher_base_evaluation.json).
+Weights remain on hold pending clarification of web-corpus permission conditions.
+
 The new implementation compares three full-attention decoders under 18M
 parameters for **Korean children's-story continuation**. It trains its own
 larger teacher and saves separate base/chat checkpoints. This decoder is not
