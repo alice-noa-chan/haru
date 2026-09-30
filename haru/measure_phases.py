@@ -46,18 +46,33 @@ def verify_backend(model, teacher, device, attention_backend, loss_backend):
 
 
 def select_verified_attention(model, teacher, device, loss_backend="torch"):
-    """Use the fast backend only after agreement checks; retain the reference fallback."""
-    try:
-        verify_backend(model, teacher, device, "auto", loss_backend)
-        return "auto", []
-    except AssertionError as error:
-        failure = {"attention_backend": "auto", "error": "agreement_failed", "detail": str(error)}
+    """Try each backend on the same input RNG state, retaining unchanged tolerances."""
+    cuda = str(device).startswith("cuda")
+    backends = ("auto", "cudnn", "math") if cuda else ("auto", "math")
+    failures = []
+    for backend in backends:
+        try:
+            with torch.random.fork_rng(devices=None if cuda else []):
+                verify_backend(model, teacher, device, backend, loss_backend)
+            return backend, failures
+        except AssertionError as error:
+            if backend == "math":
+                raise
+            failures.append({"attention_backend": backend, "error": "agreement_failed", "detail": str(error)})
+        except RuntimeError as error:
+            unavailable = (
+                "no available kernel",
+                "no viable backend",
+                "no execution plans support",
+                "cudnn_status_not_supported",
+            )
+            if backend != "cudnn" or not any(message in str(error).lower() for message in unavailable):
+                raise
+            failures.append({"attention_backend": backend, "error": "kernel_unavailable", "detail": str(error)})
         model.zero_grad(set_to_none=True)
         if teacher is not None:
             teacher.zero_grad(set_to_none=True)
-    # Keep the original tolerances. A failed reference check must still abort training.
-    verify_backend(model, teacher, device, "math", loss_backend)
-    return "math", [failure]
+    raise RuntimeError("No backend passed verification")
 
 
 def measure_steps(model, teacher, sampler, device, settings, deadline, effective_tokens=131072, repeats=2):

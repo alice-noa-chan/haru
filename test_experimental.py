@@ -6,6 +6,7 @@ import copy
 import json
 import tempfile
 import unittest
+from contextlib import nullcontext
 from dataclasses import asdict, replace
 from pathlib import Path
 from types import SimpleNamespace
@@ -84,6 +85,46 @@ class ExperimentalTests(unittest.TestCase):
         self.assertEqual((backend, failures), ("auto", []))
         verify_backend(model, teacher, "cpu", "math", "torch")
         self.assertTrue(all(parameter.grad is None for parameter in model.parameters()))
+
+    def test_verified_cudnn_is_tried_before_reference_fallback(self):
+        from haru.measure_phases import select_verified_attention
+
+        model, teacher = self.model(), self.model()
+        with (
+            patch("torch.random.fork_rng", side_effect=lambda **kwargs: nullcontext()),
+            patch("haru.measure_phases.verify_backend", side_effect=[AssertionError("auto mismatch"), None]) as verify,
+        ):
+            backend, failures = select_verified_attention(model, teacher, "cuda")
+        self.assertEqual(backend, "cudnn")
+        self.assertEqual([call.args[3] for call in verify.call_args_list], ["auto", "cudnn"])
+        self.assertEqual(failures[0]["error"], "agreement_failed")
+        for error in (AssertionError("cudnn mismatch"), RuntimeError("No available kernel")):
+            with (
+                patch("torch.random.fork_rng", side_effect=lambda **kwargs: nullcontext()),
+                patch(
+                    "haru.measure_phases.verify_backend", side_effect=[AssertionError("auto mismatch"), error, None]
+                ) as verify,
+            ):
+                backend, failures = select_verified_attention(model, teacher, "cuda")
+            self.assertEqual(backend, "math")
+            self.assertEqual(len(failures), 2)
+        with (
+            patch("torch.random.fork_rng", side_effect=lambda **kwargs: nullcontext()),
+            patch(
+                "haru.measure_phases.verify_backend",
+                side_effect=[AssertionError("auto mismatch"), RuntimeError("device lost")],
+            ),
+        ):
+            with self.assertRaisesRegex(RuntimeError, "device lost"):
+                select_verified_attention(model, teacher, "cuda")
+
+    def test_backend_verification_does_not_advance_training_rng(self):
+        from haru.measure_phases import select_verified_attention
+
+        model, teacher = self.model(context_length=65), self.model(context_length=65).eval().requires_grad_(False)
+        before = torch.get_rng_state().clone()
+        select_verified_attention(model, teacher, "cpu")
+        self.assertTrue(torch.equal(before, torch.get_rng_state()))
 
     def test_exact_matched_parameter_count_and_unique_registration(self):
         for name, cfg in EXPERIMENTAL_CANDIDATES.items():

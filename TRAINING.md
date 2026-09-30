@@ -230,7 +230,7 @@ only after this selection is frozen. Do not describe the model as the best under
 
 The student pipeline checks loss and parameter gradients against reference math
 attention before measuring or training. If the automatic BF16 backend fails the
-existing tolerance, it records the failure and verifies math attention separately.
+existing tolerance, it records the failure and checks explicit cuDNN attention on CUDA before verifying math attention. Every attempt uses the same input RNG state and leaves training RNG unchanged.
 Only the verified backend is used for measurements and subsequent base/IT training;
 a reference mismatch or device error still aborts. The tolerance is never widened.
 See `results/student_progress.json` for actual trained tokens and publication status.
