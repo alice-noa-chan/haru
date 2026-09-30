@@ -1,5 +1,5 @@
 {
-  "checked_at_utc": "2026-09-30T09:41:11Z",
+  "checked_at_utc": "2026-09-30T13:32:04Z",
   "teacher_base": {
     "parameters": 30997377,
     "selected_tokens_seen": 1914437632,
@@ -10,27 +10,38 @@
   },
   "students": [
     {
-      "candidate": "pairshare8-r48",
+      "phase": "pairshare8-r48",
       "parameters": 13688705,
-      "tokens_seen": 0,
-      "target_tokens": 500000000,
-      "status": "waiting_for_kernel_verification_and_data_transfer"
+      "tokens_seen": 475398144,
+      "completed_training_tokens": 500039680,
+      "candidate": "pairshare8-r48",
+      "status": "completed_evaluated_published",
+      "publication": {
+        "repo": "alice-noa-chan/haru_3-student-base",
+        "branch": "pairshare8-r48",
+        "revision": "812a355a77aae4438f9975f928fa53e54cd9d437",
+        "remote_verified": true
+      }
     },
     {
-      "candidate": "gated8-13m",
+      "phase": "gated8-13m",
       "parameters": 13688705,
-      "tokens_seen": 0,
-      "target_tokens": 500000000,
-      "status": "waiting_for_kernel_verification_and_data_transfer"
+      "tokens_seen": 480509952,
+      "completed_training_tokens": 500039680,
+      "candidate": "gated8-13m",
+      "status": "completed_evaluated_published",
+      "publication": {
+        "repo": "alice-noa-chan/haru_3-student-base",
+        "branch": "gated8-13m",
+        "revision": "875f337deddce372914b0f2dc339e08d7896c05c",
+        "remote_verified": true
+      }
     }
   ],
   "limitations": "No trained student checkpoint or measured student quality result is available at this timestamp.",
   "latest_attempt": {
-    "status": "runtime_verified_preparing_inputs",
-    "gpu": "NVIDIA L40S",
-    "runtime": "PyTorch 2.6.0 / CUDA 12.4",
-    "source_commit": "dd8c9337a9c5d28aeb339882e3758d941059d32c",
-    "kernel_preflight": "Both candidate KD loss/gradient checks passed with reference math attention. Automatic backend failed unchanged tolerances."
+    "status": "completed_evaluated_published",
+    "winner": "gated8-13m"
   },
   "publication_policy": "Only completed models, after final test evaluation and independent remote loading verification. Intermediate student publication is disabled."
 }

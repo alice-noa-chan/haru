@@ -8,10 +8,10 @@
 
 Haru is a family of compact Korean story continuation language models. The
 released v1/v2 models use the Causal Folded Recurrent Decoder (CFRD); the
-in-development dense model uses full causal attention. See
+released v3 dense model uses full causal attention. See
 [Result at release scale](#result-at-release-scale) for the v2 design decision.
 
-Haru v2.0 is the current 17.0-million-parameter release and the first Haru to
+Haru v2.0 is the earlier 17.0-million-parameter release and the first Haru to
 score above chance on KoBEST. v1.1 (11.6M) and v1.0 (6.8M) remain available.
 v2.0 runs at recurrent depth 6 only; v1.1 and v1.0 also support depths 2 and 4.
 See [Recurrent depth](#recurrent-depth) for why that changed.
@@ -24,8 +24,9 @@ See [Recurrent depth](#recurrent-depth) for why that changed.
 - Collection: [Haru model family](https://huggingface.co/collections/alice-noa-chan/haru-6abb683d0a8b9677162d7704)
 - Demo Spaces were retired at the owner's request; model weights remain available.
 
-Haru is a research prototype for story continuation. It is not an instruction
-model, a factual assistant, or a safety-reviewed product.
+Haru is a research prototype for story continuation. Base models are non-IT;
+v3 also provides separate story-focused IT checkpoints. These experiments do not
+establish reliable factual assistance.
 
 ## Haru v3 teacher and student research
 
@@ -39,7 +40,7 @@ The FP32 teacher base is available at
 [alice-noa-chan/haru_3-teacher-base](https://huggingface.co/alice-noa-chan/haru_3-teacher-base)
 under the MIT license, with independent Transformers loading and generation examples.
 It is a **non-IT** continuation model. Teacher IT and the experimental compact
-students will have separate repositories after their training and evaluation.
+students are now available in separate repositories after completed training and evaluation.
 
 The teacher has 16 layers, width 384, FFN width 960, six query heads and two KV
 heads. It uses GQA, RMSNorm, QK RMSNorm, RoPE, SwiGLU, an input-dependent sigmoid
@@ -83,21 +84,18 @@ The new implementation compares three full-attention decoders under 18M
 parameters for **Korean children's-story continuation**. It trains its own
 larger teacher and saves separate base/chat checkpoints. This decoder is not
 recurrent; "recurrent" describes the earlier CFRD line. The new models are
-still being trained and evaluated. See [TRAINING.md](TRAINING.md) for the
+now trained and evaluated, including two equal-budget 13.69M student candidates. See [TRAINING.md](TRAINING.md) for the
 data layout, commands to run on your own GPU, resume behavior, and evaluation.
 
 The experimental student **PairShare8-r48** keeps eight independent attention
 layers, shares each SwiGLU FFN across an adjacent pair, and adds a rank-48
 linear residual adapter per layer. Its 13,688,705 parameters exactly match an
 independent Gated8 control with FFN width 512. Both are opt-in implementations;
-CPU correctness checks are separate from the story-quality experiments that
-remain to be run. The existing 17.82M Gated8 remains a baseline.
+CPU correctness checks and equal-budget story-quality comparisons are complete. The existing 17.82M Gated8 remains a baseline.
 
-Student status at **2026-09-30 08:31 UTC**: both 13.69M candidates have
-**0 student training tokens** recorded and no trained checkpoint yet.
-Each candidate targets 500M distillation tokens before equal-budget comparison;
-IT training follows the selected base model. This status is a dated observation,
-not a completed student release. See [student progress](results/student_progress.json).
+Both 13.69M candidates completed 500,039,680 distillation tokens. Teacher IT
+and selected-student IT each completed 10,092,544 tokens. See
+[student progress](results/student_progress.json) and the completed results below.
 
 The public training entry point is `python train.py`. It reads prepared data
 from a local directory, measures supported kernels on the current GPU, compares
@@ -625,3 +623,38 @@ The training corpus is not distributed with the code or model weights.
 
 Haru source code and model weights are released under the
 [MIT License](LICENSE).
+
+## Completed experimental students
+
+Selected student: **gated8-13m**, 13,688,705 parameters. Both candidates completed the same 500M-token budget.
+
+- [student-base](https://huggingface.co/alice-noa-chan/haru_3-student-base): FP32 weights, MIT license and usage examples.
+- [teacher-chat](https://huggingface.co/alice-noa-chan/haru_3-teacher-chat): FP32 weights, MIT license and usage examples.
+- [student-chat](https://huggingface.co/alice-noa-chan/haru_3-student-chat): FP32 weights, MIT license and usage examples.
+
+[Test evaluation](results/student_final_evaluation.json) includes BPC, relation tests, fixed continuations and CPU timings. One training seed; no claim of being strongest under 18M.
+
+The validation BPC difference was statistically indistinguishable, so measured CPU generation speed decided selection. The shared-FFN candidate remains available on the `pairshare8-r48` branch of the student-base repository.
+
+### Student IT usage
+
+```python
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+repo = "alice-noa-chan/haru_3-student-chat"
+tokenizer = AutoTokenizer.from_pretrained(repo, trust_remote_code=True)
+model = AutoModelForCausalLM.from_pretrained(repo, trust_remote_code=True).eval()
+inputs = tokenizer.apply_chat_template(
+    [{"role": "user", "content": "토끼가 친구를 만나는 동화를 이어 써 주세요."}],
+    add_generation_prompt=True,
+    return_tensors="pt",
+    return_dict=True,
+)
+with torch.inference_mode():
+    output = model.generate(**inputs, max_new_tokens=120, do_sample=True, temperature=0.8, top_p=0.9, use_cache=True)
+print(tokenizer.decode(output[0, inputs["input_ids"].shape[1] :], skip_special_tokens=True))
+```
+
+Input and generated output together must fit 1,024 tokens. For non-IT continuation, use
+`alice-noa-chan/haru_3-student-base` and plain text rather than a chat template.
