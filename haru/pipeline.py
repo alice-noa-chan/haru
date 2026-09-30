@@ -214,6 +214,13 @@ def run_pipeline(args):
     winner, _ = select(ranking[:2])
     atomic_json(args.output / "selection.json", {"winner": winner, "candidates": candidates, "replicated": ranking[:2]})
     candidate = winner["candidate"]
+    if getattr(args, "stop_after", "student-chat") == "candidate":
+        return {
+            "status": "phase_complete",
+            "phase": "candidate",
+            "winner": candidate,
+            "checkpoint": winner["checkpoint"],
+        }
     overlay = args.teacher_rules_overlay
     if overlay is None or not (overlay / "rule_generation.json").exists():
         return {"status": "teacher_data_required", "phase": "teacher-base", "checkpoint": winner["checkpoint"]}
@@ -257,6 +264,13 @@ def run_pipeline(args):
                 artifact,
                 None,
             )
+        if getattr(args, "stop_after", "student-chat") == name:
+            return {
+                "status": "phase_complete",
+                "phase": name,
+                "winner": candidate,
+                "exports": str(args.output / "exports"),
+            }
     return {"status": "complete", "winner": candidate, "exports": str(args.output / "exports")}
 
 
@@ -271,6 +285,9 @@ def main():
     parser.add_argument("--teacher-tokens", type=int, default=2_000_000_000)
     parser.add_argument("--student-tokens", type=int, default=500_000_000)
     parser.add_argument("--chat-tokens", type=int, default=10_000_000)
+    parser.add_argument(
+        "--stop-after", choices=("candidate", "teacher-base", "student-base", "teacher-chat", "student-chat")
+    )
     args = parser.parse_args()
     result = run_pipeline(args)
     atomic_json(args.output / "pipeline_status.json", result)

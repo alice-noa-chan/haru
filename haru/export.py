@@ -79,10 +79,13 @@ def export(checkpoint_path, tokenizer_path, output, repo_id=None, copy_resume=Tr
         "tokenizer_blake2b16": checkpoint["tokenizer_blake2b16"],
         "data_manifest_blake2b16": checkpoint["data_manifest_blake2b16"],
         "phase": checkpoint["phase"],
+        "instruction_tuned": bool(checkpoint.get("chat_template")),
+        "variant": "it" if checkpoint.get("chat_template") else "non-it",
+        "role": "teacher" if checkpoint["phase"].startswith("teacher") else "student",
         "objective": checkpoint.get("objective", "general_korean"),
         "checkpoint_blake2b16": blake2b_file(checkpoint_path),
         "weight_dtype": "float32",
-        "teacher_path": checkpoint.get("teacher_path"),
+        "teacher_checkpoint_blake2b16": checkpoint.get("training_config", {}).get("teacher_blake2b16"),
         "export_verified": True,
     }
     atomic_json(output / "export_metadata.json", metadata)
@@ -93,6 +96,11 @@ def export(checkpoint_path, tokenizer_path, output, repo_id=None, copy_resume=Tr
     if evaluation:
         atomic_json(output / "validation.json", evaluation)
     story_first = metadata["objective"] == "story_continuation"
+    role_note = (
+        "This larger teacher supports distillation into a sub-18M student; the student parameter limit does not apply to it."
+        if metadata["role"] == "teacher"
+        else "This is the compact student model."
+    )
     purpose = (
         "This model is trained for Korean children's-story continuation. General-language "
         "corpora support fluency, but story validation drives checkpoint selection."
@@ -119,6 +127,7 @@ tags: [haru, haru-dense, custom-code]
 Haru v3 {checkpoint["phase"]}: {metadata["parameters"]:,} parameters, context 1024,
 full causal attention, QK RMSNorm, SwiGLU and an incremental KV cache.
 Training tokens: {checkpoint["tokens_seen"]:,}. Full FP32 weights are preserved.
+Variant: **{metadata["variant"]}**. {role_note}
 {purpose}
 
 Source: [alice-noa-chan/haru](https://github.com/alice-noa-chan/haru/tree/{metadata["source_commit"]}).
@@ -137,9 +146,9 @@ out = model.generate(**inputs, max_new_tokens=120, use_cache=True)
 print(tokenizer.decode(out[0], skip_special_tokens=True))
 ```
 
-Chat checkpoints also support `tokenizer.apply_chat_template(messages,
+IT (chat) checkpoints also support `tokenizer.apply_chat_template(messages,
 add_generation_prompt=True, return_tensors="pt")`. Base checkpoints continue
-text and are not instruction tuned. Input plus generation must fit 1024 tokens.
+text and are non-IT. Input plus generation must fit 1024 tokens.
 
 `training_state.pt` contains the optimizer, schedule position, sampler and RNG
 states for trusted-source training resumption. Load it only from a trusted release.

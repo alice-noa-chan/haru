@@ -66,6 +66,51 @@ class DenseTests(unittest.TestCase):
         )
         return DenseLanguageModel(cfg, torch.randn(71, 76))
 
+    def test_pipeline_stops_after_completed_teacher(self):
+        from haru.pipeline import run_pipeline
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            overlay = root / "overlay"
+            overlay.mkdir()
+            (overlay / "rule_generation.json").write_text("{}")
+            args = SimpleNamespace(
+                output=root / "runs",
+                data=root / "data",
+                teacher_rules_overlay=overlay,
+                device="cpu",
+                deadline_unix=None,
+                max_seconds=None,
+                teacher_tokens=2_000_000_000,
+                student_tokens=500_000_000,
+                chat_tokens=10_000_000,
+                stop_after="teacher-base",
+            )
+            metrics = {
+                "macro_bpc": 1.0,
+                "selection_score": 1.0,
+                "domains": {"story": {"bpc": 1.0, "document_bpc": [1.0]}},
+            }
+
+            def choose(rows):
+                ranking = sorted(rows, key=lambda row: row["candidate"] != "gated8")
+                return ranking[0], ranking
+
+            with (
+                patch("haru.pipeline.train", return_value={"status": "complete"}) as training,
+                patch("haru.pipeline.checkpoint_validation", side_effect=lambda _: copy.deepcopy(metrics)),
+                patch("haru.pipeline.select", side_effect=choose),
+                patch("haru.pipeline.materialize", return_value=root / "teacher-data"),
+                patch("haru.pipeline.export") as exporting,
+            ):
+                result = run_pipeline(args)
+            self.assertEqual(result["status"], "phase_complete")
+            self.assertEqual(result["phase"], "teacher-base")
+            phases = [call.args[0].phase for call in training.call_args_list]
+            self.assertEqual(phases[-1], "teacher-base")
+            self.assertNotIn("student-base", phases)
+            exporting.assert_called_once()
+
     def test_exact_parameter_cap(self):
         expected = {"dense8": 17_227_649, "deep10": 17_389_121, "gated8": 17_817_473}
         for name, cfg in CANDIDATES.items():

@@ -6,6 +6,10 @@ architectures, grows the winner into a larger teacher, trains that teacher,
 and distills separate base and chat students. It uses no external LLM weights
 or generated teacher data.
 
+The research goal is a small model with a tested experimental architecture.
+Gated8 is the current full-attention baseline. Sharing and recurrence are
+research directions to compare against it, rather than assumptions of improvement.
+
 ## Install
 
 Use Python 3.10 or newer. Install a PyTorch build compatible with your GPU and
@@ -61,7 +65,7 @@ From the repository root, run:
 ```bash
 python train.py --data packed/haru-v3-story \
   --teacher-rules-overlay packed/haru-v3-rules-1m \
-  --output runs/haru-v3 --device cuda
+  --output runs/haru-v3 --device cuda --stop-after teacher-base
 ```
 
 The same command resumes from saved checkpoints. Checkpoints include weights,
@@ -70,6 +74,11 @@ and the source commit. They are written atomically at optimizer-step boundaries.
 `--max-seconds` is available for a time-limited session; restart with the same
 data, tokenizer, architecture, and output directory to continue. Changing the
 GPU preserves training state but does not promise bitwise-identical operations.
+
+`--stop-after teacher-base` finishes and exports the teacher without starting
+student distillation. Omit this option to run the complete baseline pipeline,
+or choose another stage with `python train.py --help`. The current project run
+stops at the teacher stage while the experimental student design is reviewed.
 
 The effective batch is 131,072 tokens through gradient accumulation. The
 pipeline measures supported attention/loss kernels and microbatch sizes on the
@@ -87,6 +96,18 @@ The older CFRD training command remains `python train_legacy.py`.
 
 The four output phases are `teacher-base`, `student-base`, `teacher-chat`, and
 `student-chat`. Export a completed checkpoint locally before publishing:
+
+| Phase | Variant | Planned model repository |
+| --- | --- | --- |
+| teacher-base | non-IT | `alice-noa-chan/haru_3-teacher-base` |
+| teacher-chat | IT | `alice-noa-chan/haru_3-teacher-chat` |
+| student-base | non-IT | `alice-noa-chan/haru_3-student-base` |
+| student-chat | IT | `alice-noa-chan/haru_3-student-chat` |
+
+The dense decoder differs from the v2 CFRD family, so this line uses v3.
+Base and IT versions have separate weights and repositories. Teachers are
+distillation tools; the sub-18M target applies to students. A repository is
+published only after its stage completes and its export is verified.
 
 ```bash
 python -m haru.export \
