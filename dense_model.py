@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import asdict, dataclass, replace
+from importlib import import_module
 
 import torch
 from torch import nn
@@ -275,9 +276,9 @@ class DenseLanguageModel(nn.Module):
         if loss_backend == "liger":
             if targets is None or not loss_only or use_cache or token_ids.device.type != "cuda":
                 raise ValueError("Liger CE requires CUDA loss-only training without a cache")
-            from liger_kernel.transformers import LigerFusedLinearCrossEntropyLoss
-
-            loss = LigerFusedLinearCrossEntropyLoss(ignore_index=-100, accum_dtype=torch.float32)(
+            # Optional training backend; remote inference must not require Liger.
+            fused_ce = import_module("liger_kernel.transformers").LigerFusedLinearCrossEntropyLoss
+            loss = fused_ce(ignore_index=-100, accum_dtype=torch.float32)(
                 self.token_embedding.weight, hidden.reshape(-1, self.cfg.d_model), targets.reshape(-1)
             )
             return DenseOutput(None, loss, loss)

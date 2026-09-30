@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import importlib
 import json
 import tempfile
 import unittest
@@ -197,6 +198,19 @@ class DenseTests(unittest.TestCase):
             torch.testing.assert_close(model(ids).logits, teacher(ids).logits, atol=0, rtol=0)
             restored = student_from_teacher(teacher).eval()
             torch.testing.assert_close(model(ids).logits, restored(ids).logits, atol=0, rtol=0)
+
+    def test_remote_inference_import_check_without_optional_liger(self):
+        from transformers.dynamic_module_utils import check_imports
+
+        original = importlib.import_module
+
+        def without_liger(name, *args, **kwargs):
+            if name.startswith("liger_kernel"):
+                raise ImportError("Optional training kernel is unavailable")
+            return original(name, *args, **kwargs)
+
+        with patch("importlib.import_module", side_effect=without_liger):
+            check_imports(str(Path(__file__).with_name("dense_model.py")))
 
     def test_kd_and_assistant_mask(self):
         model = self.tiny()

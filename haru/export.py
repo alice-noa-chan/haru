@@ -75,7 +75,6 @@ def export(checkpoint_path, tokenizer_path, output, repo_id=None, copy_resume=Tr
         "tokens_seen": checkpoint["tokens_seen"],
         "step": checkpoint["step"],
         "source_commit": public_source_commit or checkpoint["source_commit"],
-        "training_source_commit": public_source_commit or checkpoint["source_commit"],
         "tokenizer_blake2b16": checkpoint["tokenizer_blake2b16"],
         "data_manifest_blake2b16": checkpoint["data_manifest_blake2b16"],
         "phase": checkpoint["phase"],
@@ -139,7 +138,7 @@ Variant: **{metadata["variant"]}**. {role_note}
 {purpose}
 
 Source: [alice-noa-chan/haru](https://github.com/alice-noa-chan/haru/tree/{metadata["source_commit"]}).
-Training checkpoint source commit: `{metadata["training_source_commit"]}`.
+Public implementation commit: `{metadata["source_commit"]}`.
 Teacher/student training uses the same tokenizer. No new external LLM data,
 teacher logits or pretrained model weights were used. Existing synthetic corpora
 were reused. Training corpora are not distributed with this model.
