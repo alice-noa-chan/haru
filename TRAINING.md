@@ -147,6 +147,27 @@ FFNs in all eight layers, while the matched control uses width 512. Report
 actual training throughput and CPU speed alongside held-out story BPC,
 repetition and character/event continuity. Sharing alone is not a speed claim.
 
+To compare both students with a frozen teacher and then train separate teacher
+and selected-student IT checkpoints, run:
+
+```bash
+python -m haru.student_experiment --teacher runs/haru-v3/teacher-base/best.pt \
+  --data packed/haru-v3-teacher --output runs/student-comparison --device cuda
+```
+
+This measures KD loss/gradient agreement against mathematical SDPA and complete
+optimizer-step throughput at microbatches 8, 16 and 32 on the current GPU.
+Measurement weights are discarded. Both base runs use seed 1337 and 500M
+tokens, with matched token ordering and a frozen teacher. Selection uses
+validation story BPC with a paired document bootstrap and CPU speed for ties.
+One seed does not establish robustness across seeds. The selected student
+then gets a separate 10M-token IT checkpoint distilled from a separately
+trained 10M-token teacher IT checkpoint; base weights stay unchanged.
+Use `--stop-after student-base` to stop before the IT stages. Checkpoints
+resume within the same output directories. `--deadline-unix` or `--max-seconds`
+stops subsequent phases and saves the active training phase at an optimizer
+boundary. No cloud provider or automatic publication is involved.
+
 ## Export and evaluate
 
 The four output phases are `teacher-base`, `student-base`, `teacher-chat`, and

@@ -8,6 +8,7 @@ import tempfile
 import unittest
 from dataclasses import asdict, replace
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import numpy as np
@@ -268,6 +269,60 @@ class ExperimentalTests(unittest.TestCase):
                 for name, tensor in state.items():
                     self.assertTrue(torch.equal(tensor, resumed["optimizer"]["state"][index][name]))
             self.assertEqual(teacher_hash, blake2b_file(teacher_path))
+
+    def test_student_comparison_uses_same_teacher_and_stops_before_it(self):
+        from haru.student_experiment import run_experiment
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            teacher = root / "teacher.pt"
+            teacher.write_bytes(b"frozen fixture")
+            args = SimpleNamespace(
+                teacher=teacher,
+                data=root / "data",
+                output=root / "runs",
+                device="cpu",
+                seed=1337,
+                student_tokens=500_000_000,
+                chat_tokens=10_000_000,
+                microbatch=16,
+                stop_after="student-base",
+                deadline_unix=None,
+                max_seconds=None,
+            )
+            metrics = {"macro_bpc": 1.0, "selection_score": 1.0, "selection_metric": "story_bpc"}
+            with (
+                patch("haru.student_experiment.train", return_value={"status": "complete"}) as training,
+                patch("haru.student_experiment.checkpoint_validation", return_value=metrics),
+                patch("haru.student_experiment.select", side_effect=lambda rows: (rows[0], rows)),
+            ):
+                result = run_experiment(args)
+            self.assertEqual(result["phase"], "student-base")
+            self.assertEqual(training.call_count, 2)
+            options = [call.args[0] for call in training.call_args_list]
+            self.assertEqual({option.candidate for option in options}, set(EXPERIMENTAL_CANDIDATES))
+            self.assertTrue(
+                all(
+                    option.teacher == teacher and option.seed == 1337 and option.phase == "student-base"
+                    for option in options
+                )
+            )
+            self.assertTrue(
+                all(option.target_tokens == 500_000_000 and option.schedule_tokens == 500_000_000 for option in options)
+            )
+
+    def test_student_comparison_expired_deadline_starts_no_phase(self):
+        from haru.runtime import Deadline
+        from haru.student_experiment import run_experiment
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            teacher = root / "teacher.pt"
+            teacher.write_bytes(b"frozen fixture")
+            with patch("haru.student_experiment.train") as training:
+                result = run_experiment(SimpleNamespace(teacher=teacher, output=root / "runs"), Deadline(seconds=0))
+            self.assertEqual(result["status"], "budget_stop")
+            training.assert_not_called()
 
 
 if __name__ == "__main__":

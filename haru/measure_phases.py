@@ -31,7 +31,7 @@ def verify_backend(model, teacher, device, attention_backend, loss_backend):
     x, y = ids[:, :-1], ids[:, 1:].clone()
     y[:, : min(128, model.cfg.context_length // 2)] = -100
     model.zero_grad(set_to_none=True)
-    with precision_context(device):
+    with attention_context("math"), precision_context(device):
         reference = phase_loss(model, teacher, x, y, "torch")
     reference.backward()
     gradients = {name: p.grad.detach().float().clone() for name, p in model.named_parameters()}
