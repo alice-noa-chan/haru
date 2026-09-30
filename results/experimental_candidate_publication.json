@@ -1,0 +1,73 @@
+{
+  "checked_at_utc": "2026-09-30T14:45:54.557039+00:00",
+  "experimental_candidate": {
+    "repo": "alice-noa-chan/haru_3-student-pairshare-base",
+    "revision": "9aa80c545d6191e735d1d7c83e5e362cb05cf688",
+    "private": false,
+    "collection_added": true,
+    "weight_sha256": "69af98942030cf09aa80c1ce1dbd9473ddc83f93ad834d204b7c9e4064ef7134",
+    "same_weights_as_original_branch": true,
+    "all_release_file_hashes_verified": true,
+    "transformers_versions": [
+      "4.57.1",
+      "5.17.0"
+    ]
+  },
+  "origin": {
+    "repo": "alice-noa-chan/haru_3-student-base",
+    "branch": "pairshare8-r48",
+    "revision": "c4351c389b3c4216ca6368daa1e773ceeaf96f08"
+  },
+  "candidate_selection": "Gated8-13m selected by predeclared CPU tie-break after statistically indistinguishable validation BPC; PairShare preserved as experimental non-IT",
+  "pairshare_it_trained": false,
+  "updated_model_cards": {
+    "teacher-base": {
+      "repo": "alice-noa-chan/haru_3-teacher-base",
+      "revision": "50e76861f0b7c58c3422e6881c376b659101739c",
+      "weights_unchanged": true,
+      "card_verified": true
+    },
+    "teacher-chat": {
+      "repo": "alice-noa-chan/haru_3-teacher-chat",
+      "revision": "5673eee4259b3ff8286cc69600cb9e51d8dbe831",
+      "weights_unchanged": true,
+      "card_verified": true
+    },
+    "student-base": {
+      "repo": "alice-noa-chan/haru_3-student-base",
+      "revision": "5305e55ded1a0c334ead1b43a9b64c6c6ef8fc8e",
+      "weights_unchanged": true,
+      "card_verified": true
+    },
+    "student-chat": {
+      "repo": "alice-noa-chan/haru_3-student-chat",
+      "revision": "651bf730b747003fe031dc184e8b40cd5020615f",
+      "weights_unchanged": true,
+      "card_verified": true
+    }
+  },
+  "independent_loading_checks": [
+    {
+      "repo": "alice-noa-chan/haru_3-student-pairshare-base",
+      "revision": "9aa80c545d6191e735d1d7c83e5e362cb05cf688",
+      "transformers": "4.57.1",
+      "parameters": 13688705,
+      "fp32_tensors_equal_to_recovered_checkpoint": true,
+      "cached_and_plain_greedy_generation_equal": true,
+      "plain_and_chat_token_ids_equal_to_training": true,
+      "role_boundaries_removed_by_skip_special_tokens": true,
+      "completion": "작은 마을에 아침이 찾아왔어요. 지우는 친구들과 함께 맛있는 간식을 나누어 먹기로 했어요. 그런데 간식 접시가 하나 모자"
+    },
+    {
+      "repo": "alice-noa-chan/haru_3-student-pairshare-base",
+      "revision": "9aa80c545d6191e735d1d7c83e5e362cb05cf688",
+      "transformers": "5.17.0",
+      "parameters": 13688705,
+      "fp32_tensors_equal_to_recovered_checkpoint": true,
+      "cached_and_plain_greedy_generation_equal": true,
+      "plain_and_chat_token_ids_equal_to_training": true,
+      "role_boundaries_removed_by_skip_special_tokens": true,
+      "completion": "작은 마을에 아침이 찾아왔어요. 지우는 친구들과 함께 맛있는 간식을 나누어 먹기로 했어요. 그런데 간식 접시가 하나 모자"
+    }
+  ]
+}

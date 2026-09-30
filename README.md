@@ -24,7 +24,7 @@ it still loses story facts and generalizes poorly on unseen instruction forms.
 | Teacher non-IT | 30,997,377 | [haru_3-teacher-base](https://huggingface.co/alice-noa-chan/haru_3-teacher-base) |
 | Teacher IT | 30,997,377 | [haru_3-teacher-chat](https://huggingface.co/alice-noa-chan/haru_3-teacher-chat) |
 
-All four repositories include FP32 weights, MIT licensing and usage examples.
+All listed repositories include FP32 weights, MIT licensing and usage examples.
 See [student IT usage](#student-it-usage), [completed student evaluation](#completed-experimental-students),
 and the [v3 release](https://github.com/alice-noa-chan/haru/releases/tag/v3.0.2-students).
 

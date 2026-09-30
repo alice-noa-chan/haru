@@ -1,5 +1,5 @@
 {
-  "checked_at_utc": "2026-09-30T13:32:04Z",
+  "checked_at_utc": "2026-09-30T14:45:54.557039+00:00",
   "teacher_base": {
     "parameters": 30997377,
     "selected_tokens_seen": 1914437632,
@@ -23,6 +23,19 @@
         "remote_verified": true,
         "weights_unchanged": true,
         "transformers_5_verified": true
+      },
+      "independent_publication": {
+        "repo": "alice-noa-chan/haru_3-student-pairshare-base",
+        "revision": "9aa80c545d6191e735d1d7c83e5e362cb05cf688",
+        "private": false,
+        "collection_added": true,
+        "weight_sha256": "69af98942030cf09aa80c1ce1dbd9473ddc83f93ad834d204b7c9e4064ef7134",
+        "same_weights_as_original_branch": true,
+        "all_release_file_hashes_verified": true,
+        "transformers_versions": [
+          "4.57.1",
+          "5.17.0"
+        ]
       }
     },
     {
@@ -42,12 +55,19 @@
       }
     }
   ],
-  "limitations": "No trained student checkpoint or measured student quality result is available at this timestamp.",
+  "limitations": "Both student candidates completed training and evaluation with one seed. Story fact retention and relation generalization remain weak; no strongest-under-18M claim is established.",
   "latest_attempt": {
     "status": "completed_evaluated_published",
     "winner": "gated8-13m",
     "tokenizer_correction_verified": true,
     "inference_source_commit": "8d4a4d18b4f87217a7c8ead228fd238e1952b9b2"
   },
-  "publication_policy": "Only completed models, after final test evaluation and independent remote loading verification. Intermediate student publication is disabled."
+  "publication_policy": "Only completed models, after final test evaluation and independent remote loading verification. Intermediate student publication is disabled.",
+  "publication_repositories": {
+    "teacher-base": "alice-noa-chan/haru_3-teacher-base",
+    "teacher-chat": "alice-noa-chan/haru_3-teacher-chat",
+    "student-base": "alice-noa-chan/haru_3-student-base",
+    "student-chat": "alice-noa-chan/haru_3-student-chat",
+    "pairshare8-r48": "alice-noa-chan/haru_3-student-pairshare-base"
+  }
 }

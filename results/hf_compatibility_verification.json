@@ -3,8 +3,8 @@
     {
       "repo": "alice-noa-chan/haru_3-teacher-base",
       "branch": "main",
-      "revision": "ee0ca245b8cc3d1c3132a54cbc0f878197279907",
-      "remote_verified": false,
+      "revision": "50e76861f0b7c58c3422e6881c376b659101739c",
+      "remote_verified": true,
       "weights_unchanged": true,
       "parameters": 30997377,
       "transformers": "5.17.0",
@@ -12,7 +12,9 @@
       "cached_and_plain_greedy_generation_equal": true,
       "chat_prefix_equal_to_training_tokens": true,
       "role_boundaries_removed_by_skip_special_tokens": true,
-      "transformers_4_remote_tokenizer_parity_verified": true
+      "transformers_4_remote_tokenizer_parity_verified": true,
+      "inference_verified_revision": "ee0ca245b8cc3d1c3132a54cbc0f878197279907",
+      "documentation_only_update": true
     },
     {
       "repo": "alice-noa-chan/haru_3-student-base",
@@ -45,8 +47,8 @@
     {
       "repo": "alice-noa-chan/haru_3-student-base",
       "branch": "main",
-      "revision": "01b86676d633e0ceea9144b89a06a046453208ec",
-      "remote_verified": false,
+      "revision": "5305e55ded1a0c334ead1b43a9b64c6c6ef8fc8e",
+      "remote_verified": true,
       "weights_unchanged": true,
       "parameters": 13688705,
       "transformers": "5.17.0",
@@ -54,13 +56,15 @@
       "cached_and_plain_greedy_generation_equal": true,
       "chat_prefix_equal_to_training_tokens": true,
       "role_boundaries_removed_by_skip_special_tokens": true,
-      "transformers_4_remote_tokenizer_parity_verified": true
+      "transformers_4_remote_tokenizer_parity_verified": true,
+      "inference_verified_revision": "01b86676d633e0ceea9144b89a06a046453208ec",
+      "documentation_only_update": true
     },
     {
       "repo": "alice-noa-chan/haru_3-teacher-chat",
       "branch": "main",
-      "revision": "d67e029af1e57e2051a4f22ca42f486819f1716c",
-      "remote_verified": false,
+      "revision": "5673eee4259b3ff8286cc69600cb9e51d8dbe831",
+      "remote_verified": true,
       "weights_unchanged": true,
       "parameters": 30997377,
       "transformers": "5.17.0",
@@ -82,13 +86,15 @@
           "completion": " 작은 빵을 반으로 나누었어요. 준호는 “이거 먹고 싶어요.” 하고 말했어요. 은지는 “그럼 같이 먹어요.” 하고 웃었어요. 둘은 빵을 반으로 나누어 먹었어요. 은지는 나누면 내 것이 줄어드는 줄 알았는데, 반전처럼 마음이 더 커졌어요."
         }
       ],
-      "transformers_4_remote_tokenizer_parity_verified": true
+      "transformers_4_remote_tokenizer_parity_verified": true,
+      "inference_verified_revision": "d67e029af1e57e2051a4f22ca42f486819f1716c",
+      "documentation_only_update": true
     },
     {
       "repo": "alice-noa-chan/haru_3-student-chat",
       "branch": "main",
-      "revision": "07f063350a5cffb7a65aefca7485f430ecff13e3",
-      "remote_verified": false,
+      "revision": "651bf730b747003fe031dc184e8b40cd5020615f",
+      "remote_verified": true,
       "weights_unchanged": true,
       "parameters": 13688705,
       "transformers": "5.17.0",
@@ -110,7 +116,27 @@
           "completion": "  려들었어요. 은지는 낡은 책에서 낡은 천을 발견했어요. 천은 낡았지만, 은지랑은 작은 별빛으로 변신했어요. 은지는 별빛을 따라 방 안을 여행했어요. 별빛은 은지랑 별빛을 따라 방 안을 빙글빙글 돌았어요. 은지는 별빛을 따라 방 안 모험을 했어요."
         }
       ],
-      "transformers_4_remote_tokenizer_parity_verified": true
+      "transformers_4_remote_tokenizer_parity_verified": true,
+      "inference_verified_revision": "07f063350a5cffb7a65aefca7485f430ecff13e3",
+      "documentation_only_update": true
+    },
+    {
+      "repo": "alice-noa-chan/haru_3-student-pairshare-base",
+      "branch": "main",
+      "revision": "9aa80c545d6191e735d1d7c83e5e362cb05cf688",
+      "remote_verified": true,
+      "weights_unchanged": true,
+      "parameters": 13688705,
+      "transformers_versions": [
+        "4.57.1",
+        "5.17.0"
+      ],
+      "fp32_tensors_equal_to_recovered_checkpoint": true,
+      "cached_and_plain_greedy_generation_equal": true,
+      "plain_and_chat_token_ids_equal_to_training": true,
+      "role_boundaries_removed_by_skip_special_tokens": true,
+      "all_release_file_hashes_verified": true,
+      "original_branch_revision": "c4351c389b3c4216ca6368daa1e773ceeaf96f08"
     }
   ]
 }
