@@ -664,3 +664,40 @@ remain special tokens under Transformers 4.57.1 and 5.17.0, so
 `skip_special_tokens=True` removes the assistant turn boundary. Regression checks
 compare the complete multi-turn chat token IDs to the actual training sampler,
 including newlines. Use the latest model revision for the corrected tokenizer.
+
+### Measured results and remaining weaknesses
+
+All models below used the same 64 held-out raw test stories at context 512.
+Lower BPC is better. IT BPC here scores plain continuation, separately from
+chat-formatted instructions; it is not an instruction-following score.
+
+| Model | Parameters | Raw story test BPC |
+| --- | ---: | ---: |
+| Earlier v2 | 16,983,213 | 1.1467 |
+| Teacher non-IT | 30,997,377 | 0.8718 |
+| PairShare8-r48 non-IT | 13,688,705 | 0.9529 |
+| Gated8 non-IT, selected | 13,688,705 | 0.9606 |
+| Teacher IT | 30,997,377 | 0.9490 |
+| Selected student IT | 13,688,705 | 1.0349 |
+
+The earlier-v2 result is recorded in the [teacher comparison](results/teacher_base_evaluation.json).
+The shared student has slightly lower test BPC, while the predeclared
+validation-plus-CPU rule selected the independent control. Test results did not
+change model selection. Parameter counts, tokenizers and training mixes differ
+from v2, so this does not isolate the new architecture's effect.
+
+On the small strict program task suite, student IT scored 53/70 exact matches
+with familiar entities and templates, 7/70 with novel entities, and 0/70 when
+templates changed. Teacher IT scored 53/70, 9/70 and 0/70 respectively. These
+results indicate weak generalization rather than reliable reasoning.
+
+Actual chat-formatted greedy stories still lose important objects, promises and
+event continuity; student IT also repeats starlight dialogue. IT does not improve
+plain-story BPC in this run. The non-IT student is the default for plain
+continuation; the IT checkpoint is an experimental comparison, not a general
+assistant. Both student candidates remain available for research.
+
+[Compatibility verification and saved IT examples](results/hf_compatibility_verification.json)
+record independent loading of the current public revisions in Transformers 5.17.0,
+exact FP32 equality to recovered checkpoints, cache/plain generation agreement,
+and remote tokenizer parity with training under Transformers 4.57.1 and 5.17.0.

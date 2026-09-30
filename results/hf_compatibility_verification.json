@@ -1,0 +1,116 @@
+{
+  "models": [
+    {
+      "repo": "alice-noa-chan/haru_3-teacher-base",
+      "branch": "main",
+      "revision": "ee0ca245b8cc3d1c3132a54cbc0f878197279907",
+      "remote_verified": false,
+      "weights_unchanged": true,
+      "parameters": 30997377,
+      "transformers": "5.17.0",
+      "fp32_tensors_equal_to_recovered_checkpoint": true,
+      "cached_and_plain_greedy_generation_equal": true,
+      "chat_prefix_equal_to_training_tokens": true,
+      "role_boundaries_removed_by_skip_special_tokens": true,
+      "transformers_4_remote_tokenizer_parity_verified": true
+    },
+    {
+      "repo": "alice-noa-chan/haru_3-student-base",
+      "branch": "pairshare8-r48",
+      "revision": "c4351c389b3c4216ca6368daa1e773ceeaf96f08",
+      "remote_verified": false,
+      "weights_unchanged": true,
+      "parameters": 13688705,
+      "transformers": "5.17.0",
+      "fp32_tensors_equal_to_recovered_checkpoint": true,
+      "cached_and_plain_greedy_generation_equal": true,
+      "chat_prefix_equal_to_training_tokens": true,
+      "role_boundaries_removed_by_skip_special_tokens": true,
+      "transformers_4_remote_tokenizer_parity_verified": true
+    },
+    {
+      "repo": "alice-noa-chan/haru_3-student-base",
+      "branch": "gated8-13m",
+      "revision": "eb7690bc48bc0121428ff87c66682d2b5dfed000",
+      "remote_verified": false,
+      "weights_unchanged": true,
+      "parameters": 13688705,
+      "transformers": "5.17.0",
+      "fp32_tensors_equal_to_recovered_checkpoint": true,
+      "cached_and_plain_greedy_generation_equal": true,
+      "chat_prefix_equal_to_training_tokens": true,
+      "role_boundaries_removed_by_skip_special_tokens": true,
+      "transformers_4_remote_tokenizer_parity_verified": true
+    },
+    {
+      "repo": "alice-noa-chan/haru_3-student-base",
+      "branch": "main",
+      "revision": "01b86676d633e0ceea9144b89a06a046453208ec",
+      "remote_verified": false,
+      "weights_unchanged": true,
+      "parameters": 13688705,
+      "transformers": "5.17.0",
+      "fp32_tensors_equal_to_recovered_checkpoint": true,
+      "cached_and_plain_greedy_generation_equal": true,
+      "chat_prefix_equal_to_training_tokens": true,
+      "role_boundaries_removed_by_skip_special_tokens": true,
+      "transformers_4_remote_tokenizer_parity_verified": true
+    },
+    {
+      "repo": "alice-noa-chan/haru_3-teacher-chat",
+      "branch": "main",
+      "revision": "d67e029af1e57e2051a4f22ca42f486819f1716c",
+      "remote_verified": false,
+      "weights_unchanged": true,
+      "parameters": 30997377,
+      "transformers": "5.17.0",
+      "fp32_tensors_equal_to_recovered_checkpoint": true,
+      "cached_and_plain_greedy_generation_equal": true,
+      "chat_prefix_equal_to_training_tokens": true,
+      "role_boundaries_removed_by_skip_special_tokens": true,
+      "chat_story_examples": [
+        {
+          "prompt": "다음 동화의 인물, 물건, 사건을 유지하며 이어 써 주세요.\n\n서윤이는 금빛 단추를 유리병에 넣어 찬장 위에 두었어요. 민호에게 병을 건드리지 말라고 했지만, 잠시 뒤 부엌에서 쨍그랑 소리가 났어요. 서윤이가 달려가 보니",
+          "completion": " 병이 바닥에 떨어져 있었어요. 민호는 \"내가 그랬어요, 미안해요\" 하고 말했어요. 서윤이는 \"괜찮아요, 같이 닦아요\" 하고 웃었어요. 둘은 엎질러진 물을 닦고, 작은 숟가락으로 그릇을 씻었어요. 병은 다시 반짝였어요. 민호는 \"괜찮아요, 같이 하니 더 좋아요\" 하고 말했고, 둘은 다시 웃으며 화해했어요"
+        },
+        {
+          "prompt": "다음 동화의 인물, 물건, 사건을 유지하며 이어 써 주세요.\n\n토끼는 다리를 다쳐 경주에 나가지 않았고 거북이만 출발선에 섰어요. 종이 울리자",
+          "completion": " 거북이는 작은 배낭을 메고 있었어요. 배낭 안에는 물방울 그림이 그려진 낡은 종이가 있었어요. 거북이는 그 종이를 보고도 길을 잘 몰라 헤매었어요. 그때 종이에서 마법 빛이 나와 거북이의 길을 비추었어요. 거북이는 무서웠지만 한 걸음씩 걸었어요. 마침내 거북이는 넓은 들판에 닿았어요. 거북이는 용기를 내면 낯선 길도 따뜻한 길이 된다고"
+        },
+        {
+          "prompt": "다음 동화의 인물, 물건, 사건을 유지하며 이어 써 주세요.\n\n“내일 네 책을 돌려줄게.” 은지가 말했어요. 다음 날 은지는 준호를 만나",
+          "completion": " 작은 빵을 반으로 나누었어요. 준호는 “이거 먹고 싶어요.” 하고 말했어요. 은지는 “그럼 같이 먹어요.” 하고 웃었어요. 둘은 빵을 반으로 나누어 먹었어요. 은지는 나누면 내 것이 줄어드는 줄 알았는데, 반전처럼 마음이 더 커졌어요."
+        }
+      ],
+      "transformers_4_remote_tokenizer_parity_verified": true
+    },
+    {
+      "repo": "alice-noa-chan/haru_3-student-chat",
+      "branch": "main",
+      "revision": "07f063350a5cffb7a65aefca7485f430ecff13e3",
+      "remote_verified": false,
+      "weights_unchanged": true,
+      "parameters": 13688705,
+      "transformers": "5.17.0",
+      "fp32_tensors_equal_to_recovered_checkpoint": true,
+      "cached_and_plain_greedy_generation_equal": true,
+      "chat_prefix_equal_to_training_tokens": true,
+      "role_boundaries_removed_by_skip_special_tokens": true,
+      "chat_story_examples": [
+        {
+          "prompt": "다음 동화의 인물, 물건, 사건을 유지하며 이어 써 주세요.\n\n서윤이는 금빛 단추를 유리병에 넣어 찬장 위에 두었어요. 민호에게 병을 건드리지 말라고 했지만, 잠시 뒤 부엌에서 쨍그랑 소리가 났어요. 서윤이가 달려가 보니",
+          "completion": " 작은 방울이 딸랑 울렸어요. 방울은 작은 별빛을 내며 방 안을 빙글빙글 돌았어요. \"나도 할 수 있어요?\" 서윤이가 물었어요. \"나도 같이 할래요?\" 둘은 작은 모험을 시작했어요. 별빛은 마법을 부려 방울을 살짝 흔들어 주었어요. 방울은 작은 별빛을 따라 방 안을 빙글빙글 돌았어요. 서윤이는"
+        },
+        {
+          "prompt": "다음 동화의 인물, 물건, 사건을 유지하며 이어 써 주세요.\n\n토끼는 다리를 다쳐 경주에 나가지 않았고 거북이만 출발선에 섰어요. 종이 울리자",
+          "completion": "리가 작은 별빛을 보고 눈을 크게 떴어요. 별빛은 반짝이며 작은 별빛으로 변신했어요. 별빛은 \"나누면 길이 보여요\" 하고 속삭였어요. 별빛은 \"나누면 길이 보여요\" 하고 속삭였어요. 별빛은 \"나누면 길이 보여요\" 하고 속삭였어요. 별빛은 \"나누면 길이 보여요\" 하고 속삭였어요."
+        },
+        {
+          "prompt": "다음 동화의 인물, 물건, 사건을 유지하며 이어 써 주세요.\n\n“내일 네 책을 돌려줄게.” 은지가 말했어요. 다음 날 은지는 준호를 만나",
+          "completion": "  려들었어요. 은지는 낡은 책에서 낡은 천을 발견했어요. 천은 낡았지만, 은지랑은 작은 별빛으로 변신했어요. 은지는 별빛을 따라 방 안을 여행했어요. 별빛은 은지랑 별빛을 따라 방 안을 빙글빙글 돌았어요. 은지는 별빛을 따라 방 안 모험을 했어요."
+        }
+      ],
+      "transformers_4_remote_tokenizer_parity_verified": true
+    }
+  ]
+}
