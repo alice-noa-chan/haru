@@ -185,10 +185,10 @@ Base and IT versions have separate weights and repositories. Teachers are
 distillation tools; the sub-18M target applies to students. A repository is
 published only after its stage completes and its export is verified.
 
-Publication of the current run's weights is on hold while permission conditions
-for one web-text source are clarified. Code publication and local checkpoint
-preservation continue. The planned repository names above are not a claim that
-those releases already exist.
+The completed FP32 non-IT teacher is published under MIT at
+[alice-noa-chan/haru_3-teacher-base](https://huggingface.co/alice-noa-chan/haru_3-teacher-base).
+Student and IT repositories are published separately after their corresponding
+training stages and independent export checks complete.
 
 ```bash
 python -m haru.export \

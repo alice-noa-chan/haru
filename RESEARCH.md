@@ -745,8 +745,8 @@ story-quality results or GPU-throughput estimates.
 
 The experimental students have not been trained or ranked. Compare story BPC,
 repetition and event continuity on identical data and seeds, and measure speed
-separately before selecting a student. Current weights remain unpublished
-pending clarification of the web-corpus permission conditions.
+separately before selecting a student. The completed FP32 teacher base is
+released under MIT; student weights will be published after evaluation.
 
 ## Completed teacher base evaluation (2026-09-30)
 
@@ -780,6 +780,6 @@ The base teacher is frozen for two 13.69M student distillation runs with the
 same seed, data order, 500M-token schedule and objective. Student selection
 uses validation data, not this test report. A separate IT teacher and selected
 IT student are trained afterward. Local CPU exports and final evaluation
-follow verified checkpoint recovery and GPU deletion. Weight publication is
-still on hold; code and measured evaluation results are public.
+follow verified checkpoint recovery and GPU deletion. The completed non-IT
+teacher is published under MIT; remaining variants follow after verification.
 

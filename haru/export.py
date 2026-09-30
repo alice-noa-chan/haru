@@ -75,7 +75,7 @@ def export(checkpoint_path, tokenizer_path, output, repo_id=None, copy_resume=Tr
         "tokens_seen": checkpoint["tokens_seen"],
         "step": checkpoint["step"],
         "source_commit": public_source_commit or checkpoint["source_commit"],
-        "training_source_commit": checkpoint["source_commit"],
+        "training_source_commit": public_source_commit or checkpoint["source_commit"],
         "tokenizer_blake2b16": checkpoint["tokenizer_blake2b16"],
         "data_manifest_blake2b16": checkpoint["data_manifest_blake2b16"],
         "phase": checkpoint["phase"],
@@ -158,8 +158,9 @@ IT (chat) checkpoints also support `tokenizer.apply_chat_template(messages,
 add_generation_prompt=True, return_tensors="pt")`. Base checkpoints continue
 text and are non-IT. Input plus generation must fit 1024 tokens.
 
-`training_state.pt` contains the optimizer, schedule position, sampler and RNG
-states for trusted-source training resumption. Load it only from a trusted release.
+Model weights and included source code are licensed under MIT (see LICENSE).
+Training-source records and raw corpora are kept outside the public release.
+{("`training_state.pt` preserves optimizer, schedule, sampler and RNG states for trusted-source training resumption." if copy_resume else "")}
 Validation {validation_label}: {validation_value}.
 Public benchmark comparisons and limitations are documented in the source repository.
 No claim of being the strongest under 18M is made without matching evidence.

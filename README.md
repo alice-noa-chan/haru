@@ -17,6 +17,7 @@ v2.0 runs at recurrent depth 6 only; v1.1 and v1.0 also support depths 2 and 4.
 See [Recurrent depth](#recurrent-depth) for why that changed.
 
 - GitHub: [alice-noa-chan/haru](https://github.com/alice-noa-chan/haru)
+- Teacher v3 non-IT: [alice-noa-chan/haru_3-teacher-base](https://huggingface.co/alice-noa-chan/haru_3-teacher-base)
 - Model v2.0: [alice-noa-chan/haru_2](https://huggingface.co/alice-noa-chan/haru_2)
 - Model v1.1: [alice-noa-chan/haru_1.1](https://huggingface.co/alice-noa-chan/haru_1.1)
 - Model v1.0: [alice-noa-chan/haru](https://huggingface.co/alice-noa-chan/haru)
@@ -26,7 +27,7 @@ See [Recurrent depth](#recurrent-depth) for why that changed.
 Haru is a research prototype for story continuation. It is not an instruction
 model, a factual assistant, or a safety-reviewed product.
 
-## Haru v3 development
+## Haru v3 teacher and student research
 
 Teacher base training completed at 2,000,027,648 tokens. Its selected best
 checkpoint scored story BPC **0.872**, versus **1.147** for v2 on the same 64
@@ -34,7 +35,45 @@ test stories at context 512. The teacher has 30.99M parameters and a different
 training mix, so this does not establish a small-student or architecture-only
 improvement. Fixed continuations repeat less but still lose objects, promises
 and event causes. See the [teacher evaluation](results/teacher_base_evaluation.json).
-Weights remain on hold pending clarification of web-corpus permission conditions.
+The FP32 teacher base is available at
+[alice-noa-chan/haru_3-teacher-base](https://huggingface.co/alice-noa-chan/haru_3-teacher-base)
+under the MIT license, with independent Transformers loading and generation examples.
+It is a **non-IT** continuation model. Teacher IT and the experimental compact
+students will have separate repositories after their training and evaluation.
+
+The teacher has 16 layers, width 384, FFN width 960, six query heads and two KV
+heads. It uses GQA, RMSNorm, QK RMSNorm, RoPE, SwiGLU, an input-dependent sigmoid
+attention-output gate, tied input/output embeddings, and Korean surface features.
+Context length is 1,024 tokens and vocabulary size is 12,000.
+
+```bash
+python -m pip install "torch>=2.6" "transformers==4.57.1" sentencepiece safetensors
+```
+
+```python
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+repo = "alice-noa-chan/haru_3-teacher-base"
+tokenizer = AutoTokenizer.from_pretrained(repo, trust_remote_code=True)
+model = AutoModelForCausalLM.from_pretrained(repo, trust_remote_code=True).eval()
+prompt = "작은 마을에 사는 토끼는 길에서 반짝이는 단추를 발견했어요."
+inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=904)
+with torch.inference_mode():
+    output = model.generate(
+        **inputs,
+        max_new_tokens=120,
+        do_sample=True,
+        temperature=0.8,
+        top_p=0.9,
+        repetition_penalty=1.08,
+        use_cache=True,
+    )
+print(tokenizer.decode(output[0], skip_special_tokens=True))
+```
+
+The example runs on CPU. For GPU inference, move both `model` and `inputs` to
+`"cuda"` before generation. Input plus generated length must fit 1,024 tokens.
 
 The new implementation compares three full-attention decoders under 18M
 parameters for **Korean children's-story continuation**. It trains its own
@@ -62,6 +101,7 @@ alice-noa-chan organization. The new character image is used above.
 
 | Version | GitHub | Hugging Face | Status |
 |---|---|---|---|
+| 3 teacher base | [Training code](TRAINING.md) | [`alice-noa-chan/haru_3-teacher-base`](https://huggingface.co/alice-noa-chan/haru_3-teacher-base) | non-IT teacher |
 | 2.0 | [`v2.0.0`](https://github.com/alice-noa-chan/haru/releases/tag/v2.0.0) | [`alice-noa-chan/haru_2`](https://huggingface.co/alice-noa-chan/haru_2) | Current |
 | 1.1 | [`v1.1.0`](https://github.com/alice-noa-chan/haru/releases/tag/v1.1.0) | [`alice-noa-chan/haru_1.1`](https://huggingface.co/alice-noa-chan/haru_1.1) | Legacy |
 | 1.0 | [`v1.0.0`](https://github.com/alice-noa-chan/haru/releases/tag/v1.0.0) | [`alice-noa-chan/haru`](https://huggingface.co/alice-noa-chan/haru) | Legacy |
