@@ -29,8 +29,10 @@ model, a factual assistant, or a safety-reviewed product.
 
 ## Haru v3 development
 
-The v3 implementation compares three full-attention decoders under 18M parameters,
-trains its own larger teacher, and preserves separate base/chat checkpoints.
+The v3 implementation compares three full-attention decoders under 18M parameters
+for **Korean children's-story continuation**. It trains its own larger teacher
+and preserves separate base/chat checkpoints. The v3 decoder is not recurrent;
+"recurrent" describes the earlier CFRD line, not the whole model family.
 It is not yet a completed model release. See [V3.md](V3.md) for architecture,
 data splits, cost limits, training/resume commands and publication.
 
@@ -39,11 +41,13 @@ initialization before any optimizer step; no throughput result is available yet.
 After Beam rejected the available credit type,
 the owner approved RunPod L40S and subsequently RTX 5090 Community Cloud with a $20 total cap, Pod volume,
 and verified local checkpoint backups. Allocation waits for a valid single-GPU
-quote compatible with the selected runtime. CUDA 12.4 L40S hosts use the pinned
+quote compatible with the selected runtime and the story-first data view. CUDA 12.4 L40S hosts use the pinned
 PyTorch 2.6.0 profile; RTX 5090 uses the pinned PyTorch 2.8.0/CUDA 12.8 profile.
 CUDA 13 remains an explicit alternative. Recurring stock checks were removed at
-the owner's request; the RTX 5090 measurement is explicitly authorized. Existing hashed
-zstd data is reused without recompression. The benchmark
+the owner's request. The earlier RTX 5090 measurement approval did not produce a
+Pod or result; the revised story objective is validated before further GPU spending.
+The original hashed zstd data remains available, while the story-first view has
+a distinct manifest and bundle. The benchmark
 also measures larger-teacher training and student distillation with real optimizer
 steps before the candidate comparison begins.
 

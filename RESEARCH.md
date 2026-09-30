@@ -696,3 +696,21 @@ teachers are grown with function-preserving zero-output inserted blocks and
 preserved before own-teacher distillation. No new external LLM data or pretrained
 weights are used. v3 quality results are pending; implementation tests do not
 show that any new candidate beats v2.
+
+## Target changed to children's-story continuation (2026-09-30)
+
+The owner chose to prioritize Korean children's-story continuation over broad
+Korean assistant performance. This is a change of training and selection
+objective, not evidence that the untrained v3 architecture is better than v2.
+The prepared general-purpose 40/25/15/15/5 corpus and its tokenizer are kept
+unchanged. A versioned view samples textbook/web/wiki/story/program rules at
+25/15/5/50/5 and samples chat extract/rules/JSON/story at 15/10/5/70.
+Base candidates are selected by held-out story BPC; the other domains remain
+diagnostics. Chat checkpoints are selected by held-out story assistant NLL.
+The fixed story stream has 250,740,724 train tokens, so 2B teacher tokens at
+50% story sampling would expose it about four times on average. The target
+token count remains only a ceiling; validation and actual continuations must
+decide whether more training helps. Existing data are synthetic children's
+stories, so results must not be described as general Korean fiction quality.
+The reused 12K tokenizer and the story weighting are a controlled first test;
+neither has an empirical v3 quality result yet.
